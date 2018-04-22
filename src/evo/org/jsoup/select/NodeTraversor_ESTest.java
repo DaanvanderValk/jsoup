@@ -5,6 +5,7 @@
 
 package org.jsoup.select;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.shaded.org.mockito.Mockito.*;
@@ -36,6 +37,7 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true, useJEE = true) 
 public class NodeTraversor_ESTest extends NodeTraversor_ESTest_scaffolding {
 
+  @Ignore
   @Test(timeout = 4000)
   public void test00()  throws Throwable  {
       NodeVisitor nodeVisitor0 = mock(NodeVisitor.class, new ViolatedAssumptionAnswer());
@@ -1005,6 +1007,7 @@ public class NodeTraversor_ESTest extends NodeTraversor_ESTest_scaffolding {
       assertFalse(formElement0.hasParent());
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test03()  throws Throwable  {
       NodeVisitor nodeVisitor0 = mock(NodeVisitor.class, new ViolatedAssumptionAnswer());

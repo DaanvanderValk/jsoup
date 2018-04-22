@@ -5,6 +5,7 @@
 
 package org.jsoup.select;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.shaded.org.mockito.Mockito.*;
@@ -233,6 +234,7 @@ public class Selector_ESTest extends Selector_ESTest_scaffolding {
       assertNotNull(elements0);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test05()  throws Throwable  {
       Evaluator evaluator0 = mock(Evaluator.class, new ViolatedAssumptionAnswer());
@@ -360,6 +362,7 @@ public class Selector_ESTest extends Selector_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test10()  throws Throwable  {
       Evaluator evaluator0 = mock(Evaluator.class, new ViolatedAssumptionAnswer());
@@ -454,6 +457,7 @@ public class Selector_ESTest extends Selector_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test13()  throws Throwable  {
       Element element0 = new Element("rark");
@@ -489,6 +493,7 @@ public class Selector_ESTest extends Selector_ESTest_scaffolding {
       Selector.select("rark", element1);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test14()  throws Throwable  {
       Element element0 = mock(Element.class, new ViolatedAssumptionAnswer());
@@ -532,6 +537,7 @@ public class Selector_ESTest extends Selector_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test16()  throws Throwable  {
       Evaluator evaluator0 = mock(Evaluator.class, new ViolatedAssumptionAnswer());
@@ -594,6 +600,7 @@ public class Selector_ESTest extends Selector_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test18()  throws Throwable  {
       Element element0 = mock(Element.class, new ViolatedAssumptionAnswer());
@@ -688,6 +695,7 @@ public class Selector_ESTest extends Selector_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test21()  throws Throwable  {
       Evaluator evaluator0 = mock(Evaluator.class, new ViolatedAssumptionAnswer());

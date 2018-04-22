@@ -5,6 +5,7 @@
 
 package org.jsoup.examples;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.shaded.org.mockito.Mockito.*;
@@ -20,6 +21,7 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true, useJEE = true) 
 public class HtmlToPlainText_ESTest extends HtmlToPlainText_ESTest_scaffolding {
 
+  @Ignore
   @Test(timeout = 4000)
   public void test00()  throws Throwable  {
       HtmlToPlainText htmlToPlainText0 = new HtmlToPlainText();
@@ -46,6 +48,7 @@ public class HtmlToPlainText_ESTest extends HtmlToPlainText_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test01()  throws Throwable  {
       HtmlToPlainText htmlToPlainText0 = new HtmlToPlainText();
@@ -71,6 +74,7 @@ public class HtmlToPlainText_ESTest extends HtmlToPlainText_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test02()  throws Throwable  {
       HtmlToPlainText htmlToPlainText0 = new HtmlToPlainText();
@@ -92,6 +96,7 @@ public class HtmlToPlainText_ESTest extends HtmlToPlainText_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test03()  throws Throwable  {
       HtmlToPlainText htmlToPlainText0 = new HtmlToPlainText();

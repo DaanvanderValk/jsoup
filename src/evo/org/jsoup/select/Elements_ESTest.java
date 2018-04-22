@@ -5,6 +5,7 @@
 
 package org.jsoup.select;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.shaded.org.mockito.Mockito.*;
@@ -366,6 +367,7 @@ public class Elements_ESTest extends Elements_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test033()  throws Throwable  {
       Element[] elementArray0 = new Element[2];

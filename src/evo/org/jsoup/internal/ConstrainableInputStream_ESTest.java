@@ -5,6 +5,7 @@
 
 package org.jsoup.internal;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.shaded.org.mockito.Mockito.*;
@@ -63,6 +64,7 @@ public class ConstrainableInputStream_ESTest extends ConstrainableInputStream_ES
       constrainableInputStream0.read(byteArray0, (int) (byte)1, 1);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test04()  throws Throwable  {
       Enumeration<ConstrainableInputStream> enumeration0 = (Enumeration<ConstrainableInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());

@@ -5,6 +5,7 @@
 
 package org.jsoup.nodes;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.shaded.org.mockito.Mockito.*;
@@ -123,6 +124,7 @@ public class Document_ESTest extends Document_ESTest_scaffolding {
       document1.normalise();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test03()  throws Throwable  {
       Document document0 = new Document("progress");
@@ -161,6 +163,7 @@ public class Document_ESTest extends Document_ESTest_scaffolding {
       document2.text("body");
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test05()  throws Throwable  {
       Document.OutputSettings.Syntax.values();
@@ -454,6 +457,7 @@ public class Document_ESTest extends Document_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test20()  throws Throwable  {
       Document document0 = Document.createShell("");
@@ -1860,6 +1864,7 @@ public class Document_ESTest extends Document_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test49()  throws Throwable  {
       Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
@@ -6950,6 +6955,7 @@ public class Document_ESTest extends Document_ESTest_scaffolding {
       assertEquals(Document.OutputSettings.Syntax.html, document_OutputSettings2.syntax());
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test65()  throws Throwable  {
       Document document0 = Document.createShell("#document");

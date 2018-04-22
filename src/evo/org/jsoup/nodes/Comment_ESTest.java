@@ -5,6 +5,7 @@
 
 package org.jsoup.nodes;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.shaded.org.mockito.Mockito.*;
@@ -44,6 +45,7 @@ public class Comment_ESTest extends Comment_ESTest_scaffolding {
       comment0.toString();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test02()  throws Throwable  {
       StringBuffer stringBuffer0 = new StringBuffer();
@@ -84,6 +86,7 @@ public class Comment_ESTest extends Comment_ESTest_scaffolding {
       comment0.outerHtmlHead(stringBuffer4, 0, document_OutputSettings2);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test04()  throws Throwable  {
       Comment comment0 = new Comment("z", "?U+X,9U>bvap{(");
@@ -115,6 +118,7 @@ public class Comment_ESTest extends Comment_ESTest_scaffolding {
       comment0.nodeName();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test09()  throws Throwable  {
       Comment comment0 = new Comment("25");
@@ -156,6 +160,7 @@ public class Comment_ESTest extends Comment_ESTest_scaffolding {
       comment0.getData();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test12()  throws Throwable  {
       Comment comment0 = new Comment("yc4r;gnB7<z");
@@ -222,6 +227,7 @@ public class Comment_ESTest extends Comment_ESTest_scaffolding {
       comment0.getData();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test15()  throws Throwable  {
       Comment comment0 = new Comment("AR$!.=B");
@@ -255,6 +261,7 @@ public class Comment_ESTest extends Comment_ESTest_scaffolding {
       comment1.getData();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test16()  throws Throwable  {
       Comment comment0 = new Comment("link", "o/_4+");
@@ -280,6 +287,7 @@ public class Comment_ESTest extends Comment_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test17()  throws Throwable  {
       Comment comment0 = new Comment((String) null, "SofX]");

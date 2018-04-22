@@ -5,6 +5,7 @@
 
 package org.jsoup.helper;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.shaded.org.mockito.Mockito.*;
@@ -4286,6 +4287,7 @@ public class HttpConnection_ESTest extends HttpConnection_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test47()  throws Throwable  {
       URLStreamHandler uRLStreamHandler0 = mock(URLStreamHandler.class, new ViolatedAssumptionAnswer());
@@ -4346,6 +4348,7 @@ public class HttpConnection_ESTest extends HttpConnection_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test48()  throws Throwable  {
       HttpConnection.Request httpConnection_Request0 = new HttpConnection.Request();

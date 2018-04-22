@@ -5,6 +5,7 @@
 
 package org.jsoup.select;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.shaded.org.mockito.Mockito.*;
@@ -41,6 +42,7 @@ import org.junit.runner.RunWith;
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true, useJEE = true) 
 public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
 
+  @Ignore
   @Test(timeout = 4000)
   public void test00()  throws Throwable  {
       Pattern pattern0 = Pattern.compile((String) null);
@@ -57,6 +59,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test01()  throws Throwable  {
       Pattern pattern0 = Pattern.compile("extended");
@@ -143,6 +146,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test05()  throws Throwable  {
       Evaluator.IsEmpty evaluator_IsEmpty0 = new Evaluator.IsEmpty();
@@ -179,6 +183,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test07()  throws Throwable  {
       StructuralEvaluator.Root structuralEvaluator_Root0 = new StructuralEvaluator.Root();
@@ -216,6 +221,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_IsNthChild0.getPseudoClass();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test10()  throws Throwable  {
       Evaluator.AllElements evaluator_AllElements0 = new Evaluator.AllElements();
@@ -278,6 +284,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_Id0.matches(document0, document0);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test14()  throws Throwable  {
       String string0 = "";
@@ -313,6 +320,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test15()  throws Throwable  {
       Evaluator.Class evaluator_Class0 = new Evaluator.Class("");
@@ -353,6 +361,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       combiningEvaluator_And0.toString();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test18()  throws Throwable  {
       Evaluator.IndexEquals evaluator_IndexEquals0 = new Evaluator.IndexEquals(0);
@@ -377,6 +386,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test19()  throws Throwable  {
       Evaluator.Id evaluator_Id0 = new Evaluator.Id("org.jsoup.select.Evaluator$IsOnlyChild");
@@ -459,6 +469,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test24()  throws Throwable  {
       Evaluator.AttributeWithValue evaluator_AttributeWithValue0 = new Evaluator.AttributeWithValue("\"u8k^)48ngbzg", "\"u8k^)48ngbzg");
@@ -481,6 +492,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test25()  throws Throwable  {
       Evaluator.IsNthLastChild evaluator_IsNthLastChild0 = new Evaluator.IsNthLastChild((-1260), (-1260));
@@ -513,6 +525,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       structuralEvaluator_Has0.toString();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test28()  throws Throwable  {
       Evaluator.IsOnlyOfType evaluator_IsOnlyOfType0 = new Evaluator.IsOnlyOfType();
@@ -575,6 +588,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_TagEndsWith0.matches(element0, document0);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test33()  throws Throwable  {
       Evaluator.IsEmpty evaluator_IsEmpty0 = new Evaluator.IsEmpty();
@@ -595,6 +609,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_AttributeWithValueNot0.matches(document0, document0);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test34()  throws Throwable  {
       Evaluator.IndexLessThan evaluator_IndexLessThan0 = new Evaluator.IndexLessThan(24576);
@@ -675,6 +690,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_Tag0.toString();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test39()  throws Throwable  {
       Evaluator.IndexEquals evaluator_IndexEquals0 = new Evaluator.IndexEquals(1346);
@@ -706,6 +722,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test41()  throws Throwable  {
       Evaluator.IsEmpty evaluator_IsEmpty0 = new Evaluator.IsEmpty();
@@ -761,6 +778,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_IndexLessThan0.toString();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test44()  throws Throwable  {
       Evaluator.AttributeWithValueEnding evaluator_AttributeWithValueEnding0 = new Evaluator.AttributeWithValueEnding("org.jsoup.select.Evaluator$AttributeKeyPair", "TKx3SSxJ5i42i");
@@ -779,6 +797,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluatorArray0[3] = (Evaluator) evaluator_AttributeWithValueEnding0;
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test45()  throws Throwable  {
       Evaluator.Tag evaluator_Tag0 = new Evaluator.Tag("");
@@ -860,6 +879,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_AttributeStarting0.toString();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test48()  throws Throwable  {
       Evaluator.AllElements evaluator_AllElements0 = new Evaluator.AllElements();
@@ -882,6 +902,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test49()  throws Throwable  {
       Evaluator.IsNthChild evaluator_IsNthChild0 = new Evaluator.IsNthChild(0, 0);
@@ -934,6 +955,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_ContainsText0.toString();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test51()  throws Throwable  {
       Evaluator.IsLastChild evaluator_IsLastChild0 = new Evaluator.IsLastChild();
@@ -959,6 +981,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test52()  throws Throwable  {
       StructuralEvaluator.Root structuralEvaluator_Root0 = new StructuralEvaluator.Root();
@@ -1009,6 +1032,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       structuralEvaluator_Not0.toString();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test54()  throws Throwable  {
       Evaluator.IsLastChild evaluator_IsLastChild0 = new Evaluator.IsLastChild();
@@ -1031,6 +1055,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test55()  throws Throwable  {
       Evaluator.Tag evaluator_Tag0 = new Evaluator.Tag("org.jsoup.select.Evaluator$AllElements");
@@ -1052,6 +1077,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_Class0.matches(element0, (Element) null);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test56()  throws Throwable  {
       Evaluator.IsNthLastOfType evaluator_IsNthLastOfType0 = new Evaluator.IsNthLastOfType((-2187), (-2855));
@@ -1084,6 +1110,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test57()  throws Throwable  {
       Evaluator.IsNthLastOfType evaluator_IsNthLastOfType0 = new Evaluator.IsNthLastOfType((-2543), 0);
@@ -1192,6 +1219,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_Tag0.toString();
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test61()  throws Throwable  {
       Evaluator.IsNthLastChild evaluator_IsNthLastChild0 = new Evaluator.IsNthLastChild(1, (-996));
@@ -1262,6 +1290,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       evaluator_Attribute0.matches(document0, element3);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test64()  throws Throwable  {
       Evaluator[] evaluatorArray0 = new Evaluator[1];
@@ -1274,6 +1303,7 @@ public class Evaluator_ESTest extends Evaluator_ESTest_scaffolding {
       boolean boolean0 = false;
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test65()  throws Throwable  {
       Evaluator.ContainsData evaluator_ContainsData0 = new Evaluator.ContainsData("");
