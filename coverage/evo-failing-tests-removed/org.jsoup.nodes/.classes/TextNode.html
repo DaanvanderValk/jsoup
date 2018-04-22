@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TextNode</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.nodes</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TextNode (org.jsoup.nodes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TextNode</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/ 16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.3%
+  </span>
+  <span class="absValue">
+    (36/ 37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.nodes;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.helper.StringUtil;
+<i>4</i>&nbsp;import org.jsoup.helper.Validate;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import java.io.IOException;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;/**
+<i>9</i>&nbsp; A text node.
+<i>10</i>&nbsp;
+<i>11</i>&nbsp; @author Jonathan Hedley, jonathan@hedley.net */
+<i>12</i>&nbsp;public class TextNode extends LeafNode {
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;    /**
+<i>15</i>&nbsp;     Create a new TextNode representing the supplied (unencoded) text).
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;     @param text raw text
+<i>18</i>&nbsp;     @see #createFromEncoded(String)
+<i>19</i>&nbsp;     */
+<b class="fc"><i>20</i>&nbsp;    public TextNode(String text) {</b>
+<b class="fc"><i>21</i>&nbsp;        value = text;</b>
+<b class="fc"><i>22</i>&nbsp;    }</b>
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    /**
+<i>25</i>&nbsp;     Create a new TextNode representing the supplied (unencoded) text).
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;     @param text raw text
+<i>28</i>&nbsp;     @param baseUri base uri - ignored for this node type
+<i>29</i>&nbsp;     @see #createFromEncoded(String, String)
+<i>30</i>&nbsp;     @deprecated use {@link TextNode#TextNode(String)}
+<i>31</i>&nbsp;     */
+<i>32</i>&nbsp;    public TextNode(String text, String baseUri) {
+<b class="fc"><i>33</i>&nbsp;        this(text);</b>
+<b class="fc"><i>34</i>&nbsp;    }</b>
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;	public String nodeName() {
+<b class="fc"><i>37</i>&nbsp;        return &quot;#text&quot;;</b>
+<i>38</i>&nbsp;    }
+<i>39</i>&nbsp;    
+<i>40</i>&nbsp;    /**
+<i>41</i>&nbsp;     * Get the text content of this text node.
+<i>42</i>&nbsp;     * @return Unencoded, normalised text.
+<i>43</i>&nbsp;     * @see TextNode#getWholeText()
+<i>44</i>&nbsp;     */
+<i>45</i>&nbsp;    public String text() {
+<b class="fc"><i>46</i>&nbsp;        return StringUtil.normaliseWhitespace(getWholeText());</b>
+<i>47</i>&nbsp;    }
+<i>48</i>&nbsp;    
+<i>49</i>&nbsp;    /**
+<i>50</i>&nbsp;     * Set the text content of this text node.
+<i>51</i>&nbsp;     * @param text unencoded text
+<i>52</i>&nbsp;     * @return this, for chaining
+<i>53</i>&nbsp;     */
+<i>54</i>&nbsp;    public TextNode text(String text) {
+<b class="fc"><i>55</i>&nbsp;        coreValue(text);</b>
+<b class="fc"><i>56</i>&nbsp;        return this;</b>
+<i>57</i>&nbsp;    }
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    /**
+<i>60</i>&nbsp;     Get the (unencoded) text of this text node, including any newlines and spaces present in the original.
+<i>61</i>&nbsp;     @return text
+<i>62</i>&nbsp;     */
+<i>63</i>&nbsp;    public String getWholeText() {
+<b class="fc"><i>64</i>&nbsp;        return coreValue();</b>
+<i>65</i>&nbsp;    }
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    /**
+<i>68</i>&nbsp;     Test if this text node is blank -- that is, empty or only whitespace (including newlines).
+<i>69</i>&nbsp;     @return true if this document is empty or only whitespace, false if it contains any text content.
+<i>70</i>&nbsp;     */
+<i>71</i>&nbsp;    public boolean isBlank() {
+<b class="fc"><i>72</i>&nbsp;        return StringUtil.isBlank(coreValue());</b>
+<i>73</i>&nbsp;    }
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    /**
+<i>76</i>&nbsp;     * Split this text node into two nodes at the specified string offset. After splitting, this node will contain the
+<i>77</i>&nbsp;     * original text up to the offset, and will have a new text node sibling containing the text after the offset.
+<i>78</i>&nbsp;     * @param offset string offset point to split node at.
+<i>79</i>&nbsp;     * @return the newly created text node containing the text after the offset.
+<i>80</i>&nbsp;     */
+<i>81</i>&nbsp;    public TextNode splitText(int offset) {
+<b class="fc"><i>82</i>&nbsp;        final String text = coreValue();</b>
+<b class="fc"><i>83</i>&nbsp;        Validate.isTrue(offset &gt;= 0, &quot;Split offset must be not be negative&quot;);</b>
+<b class="fc"><i>84</i>&nbsp;        Validate.isTrue(offset &lt; text.length(), &quot;Split offset must not be greater than current text length&quot;);</b>
+<i>85</i>&nbsp;
+<b class="fc"><i>86</i>&nbsp;        String head = text.substring(0, offset);</b>
+<b class="fc"><i>87</i>&nbsp;        String tail = text.substring(offset);</b>
+<b class="fc"><i>88</i>&nbsp;        text(head);</b>
+<b class="fc"><i>89</i>&nbsp;        TextNode tailNode = new TextNode(tail);</b>
+<b class="fc"><i>90</i>&nbsp;        if (parent() != null)</b>
+<b class="nc"><i>91</i>&nbsp;            parent().addChildren(siblingIndex()+1, tailNode);</b>
+<i>92</i>&nbsp;
+<b class="fc"><i>93</i>&nbsp;        return tailNode;</b>
+<i>94</i>&nbsp;    }
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;	void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+<b class="fc"><i>97</i>&nbsp;        if (out.prettyPrint() &amp;&amp; ((siblingIndex() == 0 &amp;&amp; parentNode instanceof Element &amp;&amp; ((Element) parentNode).tag().formatAsBlock() &amp;&amp; !isBlank()) || (out.outline() &amp;&amp; siblingNodes().size()&gt;0 &amp;&amp; !isBlank()) ))</b>
+<b class="fc"><i>98</i>&nbsp;            indent(accum, depth, out);</b>
+<i>99</i>&nbsp;
+<b class="fc"><i>100</i>&nbsp;        boolean normaliseWhite = out.prettyPrint() &amp;&amp; parent() instanceof Element</b>
+<b class="fc"><i>101</i>&nbsp;                &amp;&amp; !Element.preserveWhitespace(parent());</b>
+<b class="fc"><i>102</i>&nbsp;        Entities.escape(accum, coreValue(), out, false, normaliseWhite, false);</b>
+<b class="fc"><i>103</i>&nbsp;    }</b>
+<i>104</i>&nbsp;
+<b class="fc"><i>105</i>&nbsp;	void outerHtmlTail(Appendable accum, int depth, Document.OutputSettings out) {}</b>
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;    @Override
+<i>108</i>&nbsp;    public String toString() {
+<b class="fc"><i>109</i>&nbsp;        return outerHtml();</b>
+<i>110</i>&nbsp;    }
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;    /**
+<i>113</i>&nbsp;     * Create a new TextNode from HTML encoded (aka escaped) data.
+<i>114</i>&nbsp;     * @param encodedText Text containing encoded HTML (e.g. &amp;amp;lt;)
+<i>115</i>&nbsp;     * @param baseUri Base uri
+<i>116</i>&nbsp;     * @return TextNode containing unencoded data (e.g. &amp;lt;)
+<i>117</i>&nbsp;     * @deprecated use {@link TextNode#createFromEncoded(String)} instead, as LeafNodes don&#39;t carry base URIs.
+<i>118</i>&nbsp;     */
+<i>119</i>&nbsp;    public static TextNode createFromEncoded(String encodedText, String baseUri) {
+<b class="fc"><i>120</i>&nbsp;        String text = Entities.unescape(encodedText);</b>
+<b class="fc"><i>121</i>&nbsp;        return new TextNode(text);</b>
+<i>122</i>&nbsp;    }
+<i>123</i>&nbsp;
+<i>124</i>&nbsp;    /**
+<i>125</i>&nbsp;     * Create a new TextNode from HTML encoded (aka escaped) data.
+<i>126</i>&nbsp;     * @param encodedText Text containing encoded HTML (e.g. &amp;amp;lt;)
+<i>127</i>&nbsp;     * @return TextNode containing unencoded data (e.g. &amp;lt;)
+<i>128</i>&nbsp;     */
+<i>129</i>&nbsp;    public static TextNode createFromEncoded(String encodedText) {
+<b class="fc"><i>130</i>&nbsp;        String text = Entities.unescape(encodedText);</b>
+<b class="fc"><i>131</i>&nbsp;        return new TextNode(text);</b>
+<i>132</i>&nbsp;    }
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;    static String normaliseWhitespace(String text) {
+<b class="fc"><i>135</i>&nbsp;        text = StringUtil.normaliseWhitespace(text);</b>
+<b class="fc"><i>136</i>&nbsp;        return text;</b>
+<i>137</i>&nbsp;    }
+<i>138</i>&nbsp;
+<i>139</i>&nbsp;    static String stripLeadingWhitespace(String text) {
+<b class="fc"><i>140</i>&nbsp;        return text.replaceFirst(&quot;^\\s+&quot;, &quot;&quot;);</b>
+<i>141</i>&nbsp;    }
+<i>142</i>&nbsp;
+<i>143</i>&nbsp;    static boolean lastCharIsWhitespace(StringBuilder sb) {
+<b class="fc"><i>144</i>&nbsp;        return sb.length() != 0 &amp;&amp; sb.charAt(sb.length() - 1) == &#39; &#39;;</b>
+<i>145</i>&nbsp;    }
+<i>146</i>&nbsp;
+<i>147</i>&nbsp;
+<i>148</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 13:21</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,725 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Elements</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.select</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Elements (org.jsoup.select)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Elements</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (52/ 52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.3%
+  </span>
+  <span class="absValue">
+    (177/ 182)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.select;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.helper.Validate;
+<i>4</i>&nbsp;import org.jsoup.nodes.Element;
+<i>5</i>&nbsp;import org.jsoup.nodes.FormElement;
+<i>6</i>&nbsp;import org.jsoup.nodes.Node;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import java.util.ArrayList;
+<i>9</i>&nbsp;import java.util.Arrays;
+<i>10</i>&nbsp;import java.util.Collection;
+<i>11</i>&nbsp;import java.util.HashSet;
+<i>12</i>&nbsp;import java.util.LinkedHashSet;
+<i>13</i>&nbsp;import java.util.List;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;/**
+<i>16</i>&nbsp; A list of {@link Element}s, with methods that act on every element in the list.
+<i>17</i>&nbsp; &lt;p&gt;
+<i>18</i>&nbsp; To get an {@code Elements} object, use the {@link Element#select(String)} method.
+<i>19</i>&nbsp; &lt;/p&gt;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp; @author Jonathan Hedley, jonathan@hedley.net */
+<i>22</i>&nbsp;public class Elements extends ArrayList&lt;Element&gt; {
+<b class="fc"><i>23</i>&nbsp;    public Elements() {</b>
+<b class="fc"><i>24</i>&nbsp;    }</b>
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    public Elements(int initialCapacity) {
+<b class="fc"><i>27</i>&nbsp;        super(initialCapacity);</b>
+<b class="fc"><i>28</i>&nbsp;    }</b>
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    public Elements(Collection&lt;Element&gt; elements) {
+<b class="fc"><i>31</i>&nbsp;        super(elements);</b>
+<b class="fc"><i>32</i>&nbsp;    }</b>
+<i>33</i>&nbsp;    
+<i>34</i>&nbsp;    public Elements(List&lt;Element&gt; elements) {
+<b class="fc"><i>35</i>&nbsp;        super(elements);</b>
+<b class="fc"><i>36</i>&nbsp;    }</b>
+<i>37</i>&nbsp;    
+<i>38</i>&nbsp;    public Elements(Element... elements) {
+<b class="fc"><i>39</i>&nbsp;    	super(Arrays.asList(elements));</b>
+<b class="fc"><i>40</i>&nbsp;    }</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    /**
+<i>43</i>&nbsp;     * Creates a deep copy of these elements.
+<i>44</i>&nbsp;     * @return a deep copy
+<i>45</i>&nbsp;     */
+<i>46</i>&nbsp;    @Override
+<i>47</i>&nbsp;	public Elements clone() {
+<b class="fc"><i>48</i>&nbsp;        Elements clone = new Elements(size());</b>
+<i>49</i>&nbsp;
+<b class="fc"><i>50</i>&nbsp;        for(Element e : this)</b>
+<b class="fc"><i>51</i>&nbsp;    		clone.add(e.clone());</b>
+<i>52</i>&nbsp;    	
+<b class="fc"><i>53</i>&nbsp;    	return clone;</b>
+<i>54</i>&nbsp;	}
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;	// attribute methods
+<i>57</i>&nbsp;    /**
+<i>58</i>&nbsp;     Get an attribute value from the first matched element that has the attribute.
+<i>59</i>&nbsp;     @param attributeKey The attribute key.
+<i>60</i>&nbsp;     @return The attribute value from the first matched element that has the attribute.. If no elements were matched (isEmpty() == true),
+<i>61</i>&nbsp;     or if the no elements have the attribute, returns empty string.
+<i>62</i>&nbsp;     @see #hasAttr(String)
+<i>63</i>&nbsp;     */
+<i>64</i>&nbsp;    public String attr(String attributeKey) {
+<b class="fc"><i>65</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>66</i>&nbsp;            if (element.hasAttr(attributeKey))</b>
+<b class="fc"><i>67</i>&nbsp;                return element.attr(attributeKey);</b>
+<b class="fc"><i>68</i>&nbsp;        }</b>
+<b class="fc"><i>69</i>&nbsp;        return &quot;&quot;;</b>
+<i>70</i>&nbsp;    }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    /**
+<i>73</i>&nbsp;     Checks if any of the matched elements have this attribute defined.
+<i>74</i>&nbsp;     @param attributeKey attribute key
+<i>75</i>&nbsp;     @return true if any of the elements have the attribute; false if none do.
+<i>76</i>&nbsp;     */
+<i>77</i>&nbsp;    public boolean hasAttr(String attributeKey) {
+<b class="fc"><i>78</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>79</i>&nbsp;            if (element.hasAttr(attributeKey))</b>
+<b class="nc"><i>80</i>&nbsp;                return true;</b>
+<b class="fc"><i>81</i>&nbsp;        }</b>
+<b class="fc"><i>82</i>&nbsp;        return false;</b>
+<i>83</i>&nbsp;    }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;    /**
+<i>86</i>&nbsp;     * Get the attribute value for each of the matched elements. If an element does not have this attribute, no value is
+<i>87</i>&nbsp;     * included in the result set for that element.
+<i>88</i>&nbsp;     * @param attributeKey the attribute name to return values for. You can add the {@code abs:} prefix to the key to
+<i>89</i>&nbsp;     * get absolute URLs from relative URLs, e.g.: {@code doc.select(&quot;a&quot;).eachAttr(&quot;abs:href&quot;)} .
+<i>90</i>&nbsp;     * @return a list of each element&#39;s attribute value for the attribute
+<i>91</i>&nbsp;     */
+<i>92</i>&nbsp;    public List&lt;String&gt; eachAttr(String attributeKey) {
+<b class="fc"><i>93</i>&nbsp;        List&lt;String&gt; attrs = new ArrayList&lt;&gt;(size());</b>
+<b class="fc"><i>94</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>95</i>&nbsp;            if (element.hasAttr(attributeKey))</b>
+<b class="fc"><i>96</i>&nbsp;                attrs.add(element.attr(attributeKey));</b>
+<b class="fc"><i>97</i>&nbsp;        }</b>
+<b class="fc"><i>98</i>&nbsp;        return attrs;</b>
+<i>99</i>&nbsp;    }
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;    /**
+<i>102</i>&nbsp;     * Set an attribute on all matched elements.
+<i>103</i>&nbsp;     * @param attributeKey attribute key
+<i>104</i>&nbsp;     * @param attributeValue attribute value
+<i>105</i>&nbsp;     * @return this
+<i>106</i>&nbsp;     */
+<i>107</i>&nbsp;    public Elements attr(String attributeKey, String attributeValue) {
+<b class="fc"><i>108</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>109</i>&nbsp;            element.attr(attributeKey, attributeValue);</b>
+<b class="fc"><i>110</i>&nbsp;        }</b>
+<b class="fc"><i>111</i>&nbsp;        return this;</b>
+<i>112</i>&nbsp;    }
+<i>113</i>&nbsp;
+<i>114</i>&nbsp;    /**
+<i>115</i>&nbsp;     * Remove an attribute from every matched element.
+<i>116</i>&nbsp;     * @param attributeKey The attribute to remove.
+<i>117</i>&nbsp;     * @return this (for chaining)
+<i>118</i>&nbsp;     */
+<i>119</i>&nbsp;    public Elements removeAttr(String attributeKey) {
+<b class="fc"><i>120</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>121</i>&nbsp;            element.removeAttr(attributeKey);</b>
+<b class="fc"><i>122</i>&nbsp;        }</b>
+<b class="fc"><i>123</i>&nbsp;        return this;</b>
+<i>124</i>&nbsp;    }
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;    /**
+<i>127</i>&nbsp;     Add the class name to every matched element&#39;s {@code class} attribute.
+<i>128</i>&nbsp;     @param className class name to add
+<i>129</i>&nbsp;     @return this
+<i>130</i>&nbsp;     */
+<i>131</i>&nbsp;    public Elements addClass(String className) {
+<b class="fc"><i>132</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>133</i>&nbsp;            element.addClass(className);</b>
+<b class="fc"><i>134</i>&nbsp;        }</b>
+<b class="fc"><i>135</i>&nbsp;        return this;</b>
+<i>136</i>&nbsp;    }
+<i>137</i>&nbsp;
+<i>138</i>&nbsp;    /**
+<i>139</i>&nbsp;     Remove the class name from every matched element&#39;s {@code class} attribute, if present.
+<i>140</i>&nbsp;     @param className class name to remove
+<i>141</i>&nbsp;     @return this
+<i>142</i>&nbsp;     */
+<i>143</i>&nbsp;    public Elements removeClass(String className) {
+<b class="fc"><i>144</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>145</i>&nbsp;            element.removeClass(className);</b>
+<b class="fc"><i>146</i>&nbsp;        }</b>
+<b class="fc"><i>147</i>&nbsp;        return this;</b>
+<i>148</i>&nbsp;    }
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;    /**
+<i>151</i>&nbsp;     Toggle the class name on every matched element&#39;s {@code class} attribute.
+<i>152</i>&nbsp;     @param className class name to add if missing, or remove if present, from every element.
+<i>153</i>&nbsp;     @return this
+<i>154</i>&nbsp;     */
+<i>155</i>&nbsp;    public Elements toggleClass(String className) {
+<b class="fc"><i>156</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>157</i>&nbsp;            element.toggleClass(className);</b>
+<b class="fc"><i>158</i>&nbsp;        }</b>
+<b class="fc"><i>159</i>&nbsp;        return this;</b>
+<i>160</i>&nbsp;    }
+<i>161</i>&nbsp;
+<i>162</i>&nbsp;    /**
+<i>163</i>&nbsp;     Determine if any of the matched elements have this class name set in their {@code class} attribute.
+<i>164</i>&nbsp;     @param className class name to check for
+<i>165</i>&nbsp;     @return true if any do, false if none do
+<i>166</i>&nbsp;     */
+<i>167</i>&nbsp;    public boolean hasClass(String className) {
+<b class="fc"><i>168</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>169</i>&nbsp;            if (element.hasClass(className))</b>
+<b class="nc"><i>170</i>&nbsp;                return true;</b>
+<b class="fc"><i>171</i>&nbsp;        }</b>
+<b class="fc"><i>172</i>&nbsp;        return false;</b>
+<i>173</i>&nbsp;    }
+<i>174</i>&nbsp;    
+<i>175</i>&nbsp;    /**
+<i>176</i>&nbsp;     * Get the form element&#39;s value of the first matched element.
+<i>177</i>&nbsp;     * @return The form element&#39;s value, or empty if not set.
+<i>178</i>&nbsp;     * @see Element#val()
+<i>179</i>&nbsp;     */
+<i>180</i>&nbsp;    public String val() {
+<b class="fc"><i>181</i>&nbsp;        if (size() &gt; 0)</b>
+<b class="fc"><i>182</i>&nbsp;            return first().val();</b>
+<i>183</i>&nbsp;        else
+<b class="fc"><i>184</i>&nbsp;            return &quot;&quot;;</b>
+<i>185</i>&nbsp;    }
+<i>186</i>&nbsp;    
+<i>187</i>&nbsp;    /**
+<i>188</i>&nbsp;     * Set the form element&#39;s value in each of the matched elements.
+<i>189</i>&nbsp;     * @param value The value to set into each matched element
+<i>190</i>&nbsp;     * @return this (for chaining)
+<i>191</i>&nbsp;     */
+<i>192</i>&nbsp;    public Elements val(String value) {
+<b class="fc"><i>193</i>&nbsp;        for (Element element : this)</b>
+<b class="fc"><i>194</i>&nbsp;            element.val(value);</b>
+<b class="fc"><i>195</i>&nbsp;        return this;</b>
+<i>196</i>&nbsp;    }
+<i>197</i>&nbsp;    
+<i>198</i>&nbsp;    /**
+<i>199</i>&nbsp;     * Get the combined text of all the matched elements.
+<i>200</i>&nbsp;     * &lt;p&gt;
+<i>201</i>&nbsp;     * Note that it is possible to get repeats if the matched elements contain both parent elements and their own
+<i>202</i>&nbsp;     * children, as the Element.text() method returns the combined text of a parent and all its children.
+<i>203</i>&nbsp;     * @return string of all text: unescaped and no HTML.
+<i>204</i>&nbsp;     * @see Element#text()
+<i>205</i>&nbsp;     * @see #eachText()
+<i>206</i>&nbsp;     */
+<i>207</i>&nbsp;    public String text() {
+<b class="fc"><i>208</i>&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="fc"><i>209</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>210</i>&nbsp;            if (sb.length() != 0)</b>
+<b class="fc"><i>211</i>&nbsp;                sb.append(&quot; &quot;);</b>
+<b class="fc"><i>212</i>&nbsp;            sb.append(element.text());</b>
+<b class="fc"><i>213</i>&nbsp;        }</b>
+<b class="fc"><i>214</i>&nbsp;        return sb.toString();</b>
+<i>215</i>&nbsp;    }
+<i>216</i>&nbsp;
+<i>217</i>&nbsp;    /**
+<i>218</i>&nbsp;     Test if any matched Element has any text content, that is not just whitespace.
+<i>219</i>&nbsp;     @return true if any element has non-blank text content.
+<i>220</i>&nbsp;     @see Element#hasText()
+<i>221</i>&nbsp;     */
+<i>222</i>&nbsp;    public boolean hasText() {
+<b class="fc"><i>223</i>&nbsp;        for (Element element: this) {</b>
+<b class="fc"><i>224</i>&nbsp;            if (element.hasText())</b>
+<b class="fc"><i>225</i>&nbsp;                return true;</b>
+<b class="fc"><i>226</i>&nbsp;        }</b>
+<b class="fc"><i>227</i>&nbsp;        return false;</b>
+<i>228</i>&nbsp;    }
+<i>229</i>&nbsp;
+<i>230</i>&nbsp;    /**
+<i>231</i>&nbsp;     * Get the text content of each of the matched elements. If an element has no text, then it is not included in the
+<i>232</i>&nbsp;     * result.
+<i>233</i>&nbsp;     * @return A list of each matched element&#39;s text content.
+<i>234</i>&nbsp;     * @see Element#text()
+<i>235</i>&nbsp;     * @see Element#hasText()
+<i>236</i>&nbsp;     * @see #text()
+<i>237</i>&nbsp;     */
+<i>238</i>&nbsp;    public List&lt;String&gt; eachText() {
+<b class="fc"><i>239</i>&nbsp;        ArrayList&lt;String&gt; texts = new ArrayList&lt;&gt;(size());</b>
+<b class="fc"><i>240</i>&nbsp;        for (Element el: this) {</b>
+<b class="fc"><i>241</i>&nbsp;            if (el.hasText())</b>
+<b class="fc"><i>242</i>&nbsp;                texts.add(el.text());</b>
+<b class="fc"><i>243</i>&nbsp;        }</b>
+<b class="fc"><i>244</i>&nbsp;        return texts;</b>
+<i>245</i>&nbsp;    }
+<i>246</i>&nbsp;    
+<i>247</i>&nbsp;    /**
+<i>248</i>&nbsp;     * Get the combined inner HTML of all matched elements.
+<i>249</i>&nbsp;     * @return string of all element&#39;s inner HTML.
+<i>250</i>&nbsp;     * @see #text()
+<i>251</i>&nbsp;     * @see #outerHtml()
+<i>252</i>&nbsp;     */
+<i>253</i>&nbsp;    public String html() {
+<b class="fc"><i>254</i>&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="fc"><i>255</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>256</i>&nbsp;            if (sb.length() != 0)</b>
+<b class="fc"><i>257</i>&nbsp;                sb.append(&quot;\n&quot;);</b>
+<b class="fc"><i>258</i>&nbsp;            sb.append(element.html());</b>
+<b class="fc"><i>259</i>&nbsp;        }</b>
+<b class="fc"><i>260</i>&nbsp;        return sb.toString();</b>
+<i>261</i>&nbsp;    }
+<i>262</i>&nbsp;    
+<i>263</i>&nbsp;    /**
+<i>264</i>&nbsp;     * Get the combined outer HTML of all matched elements.
+<i>265</i>&nbsp;     * @return string of all element&#39;s outer HTML.
+<i>266</i>&nbsp;     * @see #text()
+<i>267</i>&nbsp;     * @see #html()
+<i>268</i>&nbsp;     */
+<i>269</i>&nbsp;    public String outerHtml() {
+<b class="fc"><i>270</i>&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="fc"><i>271</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>272</i>&nbsp;            if (sb.length() != 0)</b>
+<b class="fc"><i>273</i>&nbsp;                sb.append(&quot;\n&quot;);</b>
+<b class="fc"><i>274</i>&nbsp;            sb.append(element.outerHtml());</b>
+<b class="fc"><i>275</i>&nbsp;        }</b>
+<b class="fc"><i>276</i>&nbsp;        return sb.toString();</b>
+<i>277</i>&nbsp;    }
+<i>278</i>&nbsp;
+<i>279</i>&nbsp;    /**
+<i>280</i>&nbsp;     * Get the combined outer HTML of all matched elements. Alias of {@link #outerHtml()}.
+<i>281</i>&nbsp;     * @return string of all element&#39;s outer HTML.
+<i>282</i>&nbsp;     * @see #text()
+<i>283</i>&nbsp;     * @see #html()
+<i>284</i>&nbsp;     */
+<i>285</i>&nbsp;    @Override
+<i>286</i>&nbsp;    public String toString() {
+<b class="fc"><i>287</i>&nbsp;        return outerHtml();</b>
+<i>288</i>&nbsp;    }
+<i>289</i>&nbsp;
+<i>290</i>&nbsp;    /**
+<i>291</i>&nbsp;     * Update the tag name of each matched element. For example, to change each {@code &lt;i&gt;} to a {@code &lt;em&gt;}, do
+<i>292</i>&nbsp;     * {@code doc.select(&quot;i&quot;).tagName(&quot;em&quot;);}
+<i>293</i>&nbsp;     * @param tagName the new tag name
+<i>294</i>&nbsp;     * @return this, for chaining
+<i>295</i>&nbsp;     * @see Element#tagName(String)
+<i>296</i>&nbsp;     */
+<i>297</i>&nbsp;    public Elements tagName(String tagName) {
+<b class="fc"><i>298</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>299</i>&nbsp;            element.tagName(tagName);</b>
+<b class="fc"><i>300</i>&nbsp;        }</b>
+<b class="fc"><i>301</i>&nbsp;        return this;</b>
+<i>302</i>&nbsp;    }
+<i>303</i>&nbsp;    
+<i>304</i>&nbsp;    /**
+<i>305</i>&nbsp;     * Set the inner HTML of each matched element.
+<i>306</i>&nbsp;     * @param html HTML to parse and set into each matched element.
+<i>307</i>&nbsp;     * @return this, for chaining
+<i>308</i>&nbsp;     * @see Element#html(String)
+<i>309</i>&nbsp;     */
+<i>310</i>&nbsp;    public Elements html(String html) {
+<b class="fc"><i>311</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>312</i>&nbsp;            element.html(html);</b>
+<b class="fc"><i>313</i>&nbsp;        }</b>
+<b class="fc"><i>314</i>&nbsp;        return this;</b>
+<i>315</i>&nbsp;    }
+<i>316</i>&nbsp;    
+<i>317</i>&nbsp;    /**
+<i>318</i>&nbsp;     * Add the supplied HTML to the start of each matched element&#39;s inner HTML.
+<i>319</i>&nbsp;     * @param html HTML to add inside each element, before the existing HTML
+<i>320</i>&nbsp;     * @return this, for chaining
+<i>321</i>&nbsp;     * @see Element#prepend(String)
+<i>322</i>&nbsp;     */
+<i>323</i>&nbsp;    public Elements prepend(String html) {
+<b class="fc"><i>324</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>325</i>&nbsp;            element.prepend(html);</b>
+<b class="fc"><i>326</i>&nbsp;        }</b>
+<b class="fc"><i>327</i>&nbsp;        return this;</b>
+<i>328</i>&nbsp;    }
+<i>329</i>&nbsp;    
+<i>330</i>&nbsp;    /**
+<i>331</i>&nbsp;     * Add the supplied HTML to the end of each matched element&#39;s inner HTML.
+<i>332</i>&nbsp;     * @param html HTML to add inside each element, after the existing HTML
+<i>333</i>&nbsp;     * @return this, for chaining
+<i>334</i>&nbsp;     * @see Element#append(String)
+<i>335</i>&nbsp;     */
+<i>336</i>&nbsp;    public Elements append(String html) {
+<b class="fc"><i>337</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>338</i>&nbsp;            element.append(html);</b>
+<b class="fc"><i>339</i>&nbsp;        }</b>
+<b class="fc"><i>340</i>&nbsp;        return this;</b>
+<i>341</i>&nbsp;    }
+<i>342</i>&nbsp;    
+<i>343</i>&nbsp;    /**
+<i>344</i>&nbsp;     * Insert the supplied HTML before each matched element&#39;s outer HTML.
+<i>345</i>&nbsp;     * @param html HTML to insert before each element
+<i>346</i>&nbsp;     * @return this, for chaining
+<i>347</i>&nbsp;     * @see Element#before(String)
+<i>348</i>&nbsp;     */
+<i>349</i>&nbsp;    public Elements before(String html) {
+<b class="fc"><i>350</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>351</i>&nbsp;            element.before(html);</b>
+<b class="fc"><i>352</i>&nbsp;        }</b>
+<b class="fc"><i>353</i>&nbsp;        return this;</b>
+<i>354</i>&nbsp;    }
+<i>355</i>&nbsp;    
+<i>356</i>&nbsp;    /**
+<i>357</i>&nbsp;     * Insert the supplied HTML after each matched element&#39;s outer HTML.
+<i>358</i>&nbsp;     * @param html HTML to insert after each element
+<i>359</i>&nbsp;     * @return this, for chaining
+<i>360</i>&nbsp;     * @see Element#after(String)
+<i>361</i>&nbsp;     */
+<i>362</i>&nbsp;    public Elements after(String html) {
+<b class="fc"><i>363</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>364</i>&nbsp;            element.after(html);</b>
+<b class="fc"><i>365</i>&nbsp;        }</b>
+<b class="fc"><i>366</i>&nbsp;        return this;</b>
+<i>367</i>&nbsp;    }
+<i>368</i>&nbsp;
+<i>369</i>&nbsp;    /**
+<i>370</i>&nbsp;     Wrap the supplied HTML around each matched elements. For example, with HTML
+<i>371</i>&nbsp;     {@code &lt;p&gt;&lt;b&gt;This&lt;/b&gt; is &lt;b&gt;Jsoup&lt;/b&gt;&lt;/p&gt;},
+<i>372</i>&nbsp;     &lt;code&gt;doc.select(&quot;b&quot;).wrap(&quot;&amp;lt;i&amp;gt;&amp;lt;/i&amp;gt;&quot;);&lt;/code&gt;
+<i>373</i>&nbsp;     becomes {@code &lt;p&gt;&lt;i&gt;&lt;b&gt;This&lt;/b&gt;&lt;/i&gt; is &lt;i&gt;&lt;b&gt;jsoup&lt;/b&gt;&lt;/i&gt;&lt;/p&gt;}
+<i>374</i>&nbsp;     @param html HTML to wrap around each element, e.g. {@code &lt;div class=&quot;head&quot;&gt;&lt;/div&gt;}. Can be arbitrarily deep.
+<i>375</i>&nbsp;     @return this (for chaining)
+<i>376</i>&nbsp;     @see Element#wrap
+<i>377</i>&nbsp;     */
+<i>378</i>&nbsp;    public Elements wrap(String html) {
+<b class="fc"><i>379</i>&nbsp;        Validate.notEmpty(html);</b>
+<b class="fc"><i>380</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>381</i>&nbsp;            element.wrap(html);</b>
+<b class="fc"><i>382</i>&nbsp;        }</b>
+<b class="fc"><i>383</i>&nbsp;        return this;</b>
+<i>384</i>&nbsp;    }
+<i>385</i>&nbsp;
+<i>386</i>&nbsp;    /**
+<i>387</i>&nbsp;     * Removes the matched elements from the DOM, and moves their children up into their parents. This has the effect of
+<i>388</i>&nbsp;     * dropping the elements but keeping their children.
+<i>389</i>&nbsp;     * &lt;p&gt;
+<i>390</i>&nbsp;     * This is useful for e.g removing unwanted formatting elements but keeping their contents.
+<i>391</i>&nbsp;     * &lt;/p&gt;
+<i>392</i>&nbsp;     * 
+<i>393</i>&nbsp;     * E.g. with HTML: &lt;p&gt;{@code &lt;div&gt;&lt;font&gt;One&lt;/font&gt; &lt;font&gt;&lt;a href=&quot;/&quot;&gt;Two&lt;/a&gt;&lt;/font&gt;&lt;/div&gt;}&lt;/p&gt;
+<i>394</i>&nbsp;     * &lt;p&gt;{@code doc.select(&quot;font&quot;).unwrap();}&lt;/p&gt;
+<i>395</i>&nbsp;     * &lt;p&gt;HTML = {@code &lt;div&gt;One &lt;a href=&quot;/&quot;&gt;Two&lt;/a&gt;&lt;/div&gt;}&lt;/p&gt;
+<i>396</i>&nbsp;     *
+<i>397</i>&nbsp;     * @return this (for chaining)
+<i>398</i>&nbsp;     * @see Node#unwrap
+<i>399</i>&nbsp;     */
+<i>400</i>&nbsp;    public Elements unwrap() {
+<b class="fc"><i>401</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>402</i>&nbsp;            element.unwrap();</b>
+<b class="fc"><i>403</i>&nbsp;        }</b>
+<b class="fc"><i>404</i>&nbsp;        return this;</b>
+<i>405</i>&nbsp;    }
+<i>406</i>&nbsp;
+<i>407</i>&nbsp;    /**
+<i>408</i>&nbsp;     * Empty (remove all child nodes from) each matched element. This is similar to setting the inner HTML of each
+<i>409</i>&nbsp;     * element to nothing.
+<i>410</i>&nbsp;     * &lt;p&gt;
+<i>411</i>&nbsp;     * E.g. HTML: {@code &lt;div&gt;&lt;p&gt;Hello &lt;b&gt;there&lt;/b&gt;&lt;/p&gt; &lt;p&gt;now&lt;/p&gt;&lt;/div&gt;}&lt;br&gt;
+<i>412</i>&nbsp;     * &lt;code&gt;doc.select(&quot;p&quot;).empty();&lt;/code&gt;&lt;br&gt;
+<i>413</i>&nbsp;     * HTML = {@code &lt;div&gt;&lt;p&gt;&lt;/p&gt; &lt;p&gt;&lt;/p&gt;&lt;/div&gt;}
+<i>414</i>&nbsp;     * @return this, for chaining
+<i>415</i>&nbsp;     * @see Element#empty()
+<i>416</i>&nbsp;     * @see #remove()
+<i>417</i>&nbsp;     */
+<i>418</i>&nbsp;    public Elements empty() {
+<b class="fc"><i>419</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>420</i>&nbsp;            element.empty();</b>
+<b class="fc"><i>421</i>&nbsp;        }</b>
+<b class="fc"><i>422</i>&nbsp;        return this;</b>
+<i>423</i>&nbsp;    }
+<i>424</i>&nbsp;
+<i>425</i>&nbsp;    /**
+<i>426</i>&nbsp;     * Remove each matched element from the DOM. This is similar to setting the outer HTML of each element to nothing.
+<i>427</i>&nbsp;     * &lt;p&gt;
+<i>428</i>&nbsp;     * E.g. HTML: {@code &lt;div&gt;&lt;p&gt;Hello&lt;/p&gt; &lt;p&gt;there&lt;/p&gt; &lt;img /&gt;&lt;/div&gt;}&lt;br&gt;
+<i>429</i>&nbsp;     * &lt;code&gt;doc.select(&quot;p&quot;).remove();&lt;/code&gt;&lt;br&gt;
+<i>430</i>&nbsp;     * HTML = {@code &lt;div&gt; &lt;img /&gt;&lt;/div&gt;}
+<i>431</i>&nbsp;     * &lt;p&gt;
+<i>432</i>&nbsp;     * Note that this method should not be used to clean user-submitted HTML; rather, use {@link org.jsoup.safety.Cleaner} to clean HTML.
+<i>433</i>&nbsp;     * @return this, for chaining
+<i>434</i>&nbsp;     * @see Element#empty()
+<i>435</i>&nbsp;     * @see #empty()
+<i>436</i>&nbsp;     */
+<i>437</i>&nbsp;    public Elements remove() {
+<b class="fc"><i>438</i>&nbsp;        for (Element element : this) {</b>
+<b class="fc"><i>439</i>&nbsp;            element.remove();</b>
+<b class="fc"><i>440</i>&nbsp;        }</b>
+<b class="fc"><i>441</i>&nbsp;        return this;</b>
+<i>442</i>&nbsp;    }
+<i>443</i>&nbsp;    
+<i>444</i>&nbsp;    // filters
+<i>445</i>&nbsp;    
+<i>446</i>&nbsp;    /**
+<i>447</i>&nbsp;     * Find matching elements within this element list.
+<i>448</i>&nbsp;     * @param query A {@link Selector} query
+<i>449</i>&nbsp;     * @return the filtered list of elements, or an empty list if none match.
+<i>450</i>&nbsp;     */
+<i>451</i>&nbsp;    public Elements select(String query) {
+<b class="fc"><i>452</i>&nbsp;        return Selector.select(query, this);</b>
+<i>453</i>&nbsp;    }
+<i>454</i>&nbsp;
+<i>455</i>&nbsp;    /**
+<i>456</i>&nbsp;     * Remove elements from this list that match the {@link Selector} query.
+<i>457</i>&nbsp;     * &lt;p&gt;
+<i>458</i>&nbsp;     * E.g. HTML: {@code &lt;div class=logo&gt;One&lt;/div&gt; &lt;div&gt;Two&lt;/div&gt;}&lt;br&gt;
+<i>459</i>&nbsp;     * &lt;code&gt;Elements divs = doc.select(&quot;div&quot;).not(&quot;.logo&quot;);&lt;/code&gt;&lt;br&gt;
+<i>460</i>&nbsp;     * Result: {@code divs: [&lt;div&gt;Two&lt;/div&gt;]}
+<i>461</i>&nbsp;     * &lt;p&gt;
+<i>462</i>&nbsp;     * @param query the selector query whose results should be removed from these elements
+<i>463</i>&nbsp;     * @return a new elements list that contains only the filtered results
+<i>464</i>&nbsp;     */
+<i>465</i>&nbsp;    public Elements not(String query) {
+<b class="fc"><i>466</i>&nbsp;        Elements out = Selector.select(query, this);</b>
+<b class="fc"><i>467</i>&nbsp;        return Selector.filterOut(this, out);</b>
+<i>468</i>&nbsp;    }
+<i>469</i>&nbsp;    
+<i>470</i>&nbsp;    /**
+<i>471</i>&nbsp;     * Get the &lt;i&gt;nth&lt;/i&gt; matched element as an Elements object.
+<i>472</i>&nbsp;     * &lt;p&gt;
+<i>473</i>&nbsp;     * See also {@link #get(int)} to retrieve an Element.
+<i>474</i>&nbsp;     * @param index the (zero-based) index of the element in the list to retain
+<i>475</i>&nbsp;     * @return Elements containing only the specified element, or, if that element did not exist, an empty list.
+<i>476</i>&nbsp;     */
+<i>477</i>&nbsp;    public Elements eq(int index) {
+<b class="fc"><i>478</i>&nbsp;        return size() &gt; index ? new Elements(get(index)) : new Elements();</b>
+<i>479</i>&nbsp;    }
+<i>480</i>&nbsp;    
+<i>481</i>&nbsp;    /**
+<i>482</i>&nbsp;     * Test if any of the matched elements match the supplied query.
+<i>483</i>&nbsp;     * @param query A selector
+<i>484</i>&nbsp;     * @return true if at least one element in the list matches the query.
+<i>485</i>&nbsp;     */
+<i>486</i>&nbsp;    public boolean is(String query) {
+<b class="fc"><i>487</i>&nbsp;        Evaluator eval = QueryParser.parse(query);</b>
+<b class="fc"><i>488</i>&nbsp;        for (Element e : this) {</b>
+<b class="fc"><i>489</i>&nbsp;            if (e.is(eval))</b>
+<b class="nc"><i>490</i>&nbsp;                return true;</b>
+<b class="fc"><i>491</i>&nbsp;        }</b>
+<b class="fc"><i>492</i>&nbsp;        return false;</b>
+<i>493</i>&nbsp;    }
+<i>494</i>&nbsp;
+<i>495</i>&nbsp;    /**
+<i>496</i>&nbsp;     * Get the immediate next element sibling of each element in this list.
+<i>497</i>&nbsp;     * @return next element siblings.
+<i>498</i>&nbsp;     */
+<i>499</i>&nbsp;    public Elements next() {
+<b class="fc"><i>500</i>&nbsp;        return siblings(null, true, false);</b>
+<i>501</i>&nbsp;    }
+<i>502</i>&nbsp;
+<i>503</i>&nbsp;    /**
+<i>504</i>&nbsp;     * Get the immediate next element sibling of each element in this list, filtered by the query.
+<i>505</i>&nbsp;     * @param query CSS query to match siblings against
+<i>506</i>&nbsp;     * @return next element siblings.
+<i>507</i>&nbsp;     */
+<i>508</i>&nbsp;    public Elements next(String query) {
+<b class="fc"><i>509</i>&nbsp;        return siblings(query, true, false);</b>
+<i>510</i>&nbsp;    }
+<i>511</i>&nbsp;
+<i>512</i>&nbsp;    /**
+<i>513</i>&nbsp;     * Get all of the following element siblings of each element in this list.
+<i>514</i>&nbsp;     * @return all following element siblings.
+<i>515</i>&nbsp;     */
+<i>516</i>&nbsp;    public Elements nextAll() {
+<b class="fc"><i>517</i>&nbsp;        return siblings(null, true, true);</b>
+<i>518</i>&nbsp;    }
+<i>519</i>&nbsp;
+<i>520</i>&nbsp;    /**
+<i>521</i>&nbsp;     * Get all of the following element siblings of each element in this list, filtered by the query.
+<i>522</i>&nbsp;     * @param query CSS query to match siblings against
+<i>523</i>&nbsp;     * @return all following element siblings.
+<i>524</i>&nbsp;     */
+<i>525</i>&nbsp;    public Elements nextAll(String query) {
+<b class="fc"><i>526</i>&nbsp;        return siblings(query, true, true);</b>
+<i>527</i>&nbsp;    }
+<i>528</i>&nbsp;
+<i>529</i>&nbsp;    /**
+<i>530</i>&nbsp;     * Get the immediate previous element sibling of each element in this list.
+<i>531</i>&nbsp;     * @return previous element siblings.
+<i>532</i>&nbsp;     */
+<i>533</i>&nbsp;    public Elements prev() {
+<b class="fc"><i>534</i>&nbsp;        return siblings(null, false, false);</b>
+<i>535</i>&nbsp;    }
+<i>536</i>&nbsp;
+<i>537</i>&nbsp;    /**
+<i>538</i>&nbsp;     * Get the immediate previous element sibling of each element in this list, filtered by the query.
+<i>539</i>&nbsp;     * @param query CSS query to match siblings against
+<i>540</i>&nbsp;     * @return previous element siblings.
+<i>541</i>&nbsp;     */
+<i>542</i>&nbsp;    public Elements prev(String query) {
+<b class="fc"><i>543</i>&nbsp;        return siblings(query, false, false);</b>
+<i>544</i>&nbsp;    }
+<i>545</i>&nbsp;
+<i>546</i>&nbsp;    /**
+<i>547</i>&nbsp;     * Get all of the previous element siblings of each element in this list.
+<i>548</i>&nbsp;     * @return all previous element siblings.
+<i>549</i>&nbsp;     */
+<i>550</i>&nbsp;    public Elements prevAll() {
+<b class="fc"><i>551</i>&nbsp;        return siblings(null, false, true);</b>
+<i>552</i>&nbsp;    }
+<i>553</i>&nbsp;
+<i>554</i>&nbsp;    /**
+<i>555</i>&nbsp;     * Get all of the previous element siblings of each element in this list, filtered by the query.
+<i>556</i>&nbsp;     * @param query CSS query to match siblings against
+<i>557</i>&nbsp;     * @return all previous element siblings.
+<i>558</i>&nbsp;     */
+<i>559</i>&nbsp;    public Elements prevAll(String query) {
+<b class="fc"><i>560</i>&nbsp;        return siblings(query, false, true);</b>
+<i>561</i>&nbsp;    }
+<i>562</i>&nbsp;
+<i>563</i>&nbsp;    private Elements siblings(String query, boolean next, boolean all) {
+<b class="fc"><i>564</i>&nbsp;        Elements els = new Elements();</b>
+<b class="fc"><i>565</i>&nbsp;        Evaluator eval = query != null? QueryParser.parse(query) : null;</b>
+<b class="fc"><i>566</i>&nbsp;        for (Element e : this) {</b>
+<i>567</i>&nbsp;            do {
+<b class="fc"><i>568</i>&nbsp;                Element sib = next ? e.nextElementSibling() : e.previousElementSibling();</b>
+<b class="fc"><i>569</i>&nbsp;                if (sib == null) break;</b>
+<b class="fc"><i>570</i>&nbsp;                if (eval == null)</b>
+<b class="fc"><i>571</i>&nbsp;                    els.add(sib);</b>
+<b class="fc"><i>572</i>&nbsp;                else if (sib.is(eval))</b>
+<b class="nc"><i>573</i>&nbsp;                    els.add(sib);</b>
+<b class="fc"><i>574</i>&nbsp;                e = sib;</b>
+<b class="fc"><i>575</i>&nbsp;            } while (all);</b>
+<b class="fc"><i>576</i>&nbsp;        }</b>
+<b class="fc"><i>577</i>&nbsp;        return els;</b>
+<i>578</i>&nbsp;    }
+<i>579</i>&nbsp;
+<i>580</i>&nbsp;    /**
+<i>581</i>&nbsp;     * Get all of the parents and ancestor elements of the matched elements.
+<i>582</i>&nbsp;     * @return all of the parents and ancestor elements of the matched elements
+<i>583</i>&nbsp;     */
+<i>584</i>&nbsp;    public Elements parents() {
+<b class="fc"><i>585</i>&nbsp;        HashSet&lt;Element&gt; combo = new LinkedHashSet&lt;&gt;();</b>
+<b class="fc"><i>586</i>&nbsp;        for (Element e: this) {</b>
+<b class="fc"><i>587</i>&nbsp;            combo.addAll(e.parents());</b>
+<b class="fc"><i>588</i>&nbsp;        }</b>
+<b class="fc"><i>589</i>&nbsp;        return new Elements(combo);</b>
+<i>590</i>&nbsp;    }
+<i>591</i>&nbsp;
+<i>592</i>&nbsp;    // list-like methods
+<i>593</i>&nbsp;    /**
+<i>594</i>&nbsp;     Get the first matched element.
+<i>595</i>&nbsp;     @return The first matched element, or &lt;code&gt;null&lt;/code&gt; if contents is empty.
+<i>596</i>&nbsp;     */
+<i>597</i>&nbsp;    public Element first() {
+<b class="fc"><i>598</i>&nbsp;        return isEmpty() ? null : get(0);</b>
+<i>599</i>&nbsp;    }
+<i>600</i>&nbsp;
+<i>601</i>&nbsp;    /**
+<i>602</i>&nbsp;     Get the last matched element.
+<i>603</i>&nbsp;     @return The last matched element, or &lt;code&gt;null&lt;/code&gt; if contents is empty.
+<i>604</i>&nbsp;     */
+<i>605</i>&nbsp;    public Element last() {
+<b class="fc"><i>606</i>&nbsp;        return isEmpty() ? null : get(size() - 1);</b>
+<i>607</i>&nbsp;    }
+<i>608</i>&nbsp;
+<i>609</i>&nbsp;    /**
+<i>610</i>&nbsp;     * Perform a depth-first traversal on each of the selected elements.
+<i>611</i>&nbsp;     * @param nodeVisitor the visitor callbacks to perform on each node
+<i>612</i>&nbsp;     * @return this, for chaining
+<i>613</i>&nbsp;     */
+<i>614</i>&nbsp;    public Elements traverse(NodeVisitor nodeVisitor) {
+<b class="fc"><i>615</i>&nbsp;        NodeTraversor.traverse(nodeVisitor, this);</b>
+<b class="fc"><i>616</i>&nbsp;        return this;</b>
+<i>617</i>&nbsp;    }
+<i>618</i>&nbsp;
+<i>619</i>&nbsp;    /**
+<i>620</i>&nbsp;     * Perform a depth-first filtering on each of the selected elements.
+<i>621</i>&nbsp;     * @param nodeFilter the filter callbacks to perform on each node
+<i>622</i>&nbsp;     * @return this, for chaining
+<i>623</i>&nbsp;     */
+<i>624</i>&nbsp;    public Elements filter(NodeFilter nodeFilter) {
+<b class="fc"><i>625</i>&nbsp;        NodeTraversor.filter(nodeFilter, this);</b>
+<b class="fc"><i>626</i>&nbsp;        return this;</b>
+<i>627</i>&nbsp;    }
+<i>628</i>&nbsp;
+<i>629</i>&nbsp;    /**
+<i>630</i>&nbsp;     * Get the {@link FormElement} forms from the selected elements, if any.
+<i>631</i>&nbsp;     * @return a list of {@link FormElement}s pulled from the matched elements. The list will be empty if the elements contain
+<i>632</i>&nbsp;     * no forms.
+<i>633</i>&nbsp;     */
+<i>634</i>&nbsp;    public List&lt;FormElement&gt; forms() {
+<b class="fc"><i>635</i>&nbsp;        ArrayList&lt;FormElement&gt; forms = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>636</i>&nbsp;        for (Element el: this)</b>
+<b class="fc"><i>637</i>&nbsp;            if (el instanceof FormElement)</b>
+<b class="nc"><i>638</i>&nbsp;                forms.add((FormElement) el);</b>
+<b class="fc"><i>639</i>&nbsp;        return forms;</b>
+<i>640</i>&nbsp;    }
+<i>641</i>&nbsp;
+<i>642</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 13:21</div>
+</div>
+</body>
+</html>

@@ -954,7 +954,8 @@ public class HtmlParserTest {
                 "<!doctype �> <html> <head></head> <body></body> </html>",
                 StringUtil.normaliseWhitespace(doc.outerHtml()));
     }
-    
+
+    @Ignore
     @Test public void handlesManyChildren() {
         // Arrange
         StringBuilder longBody = new StringBuilder(500000);
@@ -971,6 +972,7 @@ public class HtmlParserTest {
         assertTrue(System.currentTimeMillis() - start < 1000);
     }
 
+    @Ignore
     @Test public void handlesDeepStack() {
         // inspired by http://sv.stargate.wikia.com/wiki/M2J and https://github.com/jhy/jsoup/issues/955
         // I didn't put it in the integration tests, because explorer and intellij kept dieing trying to preview/index it

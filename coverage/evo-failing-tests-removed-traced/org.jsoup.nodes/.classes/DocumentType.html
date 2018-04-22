@@ -1,0 +1,192 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: DocumentType</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.nodes</a> ]
+</div>
+
+<h1>Coverage Summary for Class: DocumentType (org.jsoup.nodes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DocumentType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.nodes;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.helper.StringUtil;
+<i>4</i>&nbsp;import org.jsoup.helper.Validate;
+<i>5</i>&nbsp;import org.jsoup.nodes.Document.OutputSettings.Syntax;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import java.io.IOException;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;/**
+<i>10</i>&nbsp; * A {@code &lt;!DOCTYPE&gt;} node.
+<i>11</i>&nbsp; */
+<i>12</i>&nbsp;public class DocumentType extends LeafNode {
+<i>13</i>&nbsp;    // todo needs a bit of a chunky cleanup. this level of detail isn&#39;t needed
+<i>14</i>&nbsp;    public static final String PUBLIC_KEY = &quot;PUBLIC&quot;;
+<i>15</i>&nbsp;    public static final String SYSTEM_KEY = &quot;SYSTEM&quot;;
+<i>16</i>&nbsp;    private static final String NAME = &quot;name&quot;;
+<i>17</i>&nbsp;    private static final String PUB_SYS_KEY = &quot;pubSysKey&quot;; // PUBLIC or SYSTEM
+<i>18</i>&nbsp;    private static final String PUBLIC_ID = &quot;publicId&quot;;
+<i>19</i>&nbsp;    private static final String SYSTEM_ID = &quot;systemId&quot;;
+<i>20</i>&nbsp;    // todo: quirk mode from publicId and systemId
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    /**
+<i>23</i>&nbsp;     * Create a new doctype element.
+<i>24</i>&nbsp;     * @param name the doctype&#39;s name
+<i>25</i>&nbsp;     * @param publicId the doctype&#39;s public ID
+<i>26</i>&nbsp;     * @param systemId the doctype&#39;s system ID
+<i>27</i>&nbsp;     */
+<b class="nc"><i>28</i>&nbsp;    public DocumentType(String name, String publicId, String systemId) {</b>
+<b class="nc"><i>29</i>&nbsp;        Validate.notNull(name);</b>
+<b class="nc"><i>30</i>&nbsp;        Validate.notNull(publicId);</b>
+<b class="nc"><i>31</i>&nbsp;        Validate.notNull(systemId);</b>
+<b class="nc"><i>32</i>&nbsp;        attr(NAME, name);</b>
+<b class="nc"><i>33</i>&nbsp;        attr(PUBLIC_ID, publicId);</b>
+<b class="nc"><i>34</i>&nbsp;        if (has(PUBLIC_ID)) {</b>
+<b class="nc"><i>35</i>&nbsp;            attr(PUB_SYS_KEY, PUBLIC_KEY);</b>
+<i>36</i>&nbsp;        }
+<b class="nc"><i>37</i>&nbsp;        attr(SYSTEM_ID, systemId);</b>
+<i>38</i>&nbsp;    }
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;    /**
+<i>41</i>&nbsp;     * Create a new doctype element.
+<i>42</i>&nbsp;     * @param name the doctype&#39;s name
+<i>43</i>&nbsp;     * @param publicId the doctype&#39;s public ID
+<i>44</i>&nbsp;     * @param systemId the doctype&#39;s system ID
+<i>45</i>&nbsp;     * @param baseUri unused
+<i>46</i>&nbsp;     * @deprecated
+<i>47</i>&nbsp;     */
+<b class="nc"><i>48</i>&nbsp;    public DocumentType(String name, String publicId, String systemId, String baseUri) {</b>
+<b class="nc"><i>49</i>&nbsp;        attr(NAME, name);</b>
+<b class="nc"><i>50</i>&nbsp;        attr(PUBLIC_ID, publicId);</b>
+<b class="nc"><i>51</i>&nbsp;        if (has(PUBLIC_ID)) {</b>
+<b class="nc"><i>52</i>&nbsp;            attr(PUB_SYS_KEY, PUBLIC_KEY);</b>
+<i>53</i>&nbsp;        }
+<b class="nc"><i>54</i>&nbsp;        attr(SYSTEM_ID, systemId);</b>
+<i>55</i>&nbsp;    }
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    /**
+<i>58</i>&nbsp;     * Create a new doctype element.
+<i>59</i>&nbsp;     * @param name the doctype&#39;s name
+<i>60</i>&nbsp;     * @param publicId the doctype&#39;s public ID
+<i>61</i>&nbsp;     * @param systemId the doctype&#39;s system ID
+<i>62</i>&nbsp;     * @param baseUri unused
+<i>63</i>&nbsp;     * @deprecated
+<i>64</i>&nbsp;     */
+<b class="nc"><i>65</i>&nbsp;    public DocumentType(String name, String pubSysKey, String publicId, String systemId, String baseUri) {</b>
+<b class="nc"><i>66</i>&nbsp;        attr(NAME, name);</b>
+<b class="nc"><i>67</i>&nbsp;        if (pubSysKey != null) {</b>
+<b class="nc"><i>68</i>&nbsp;            attr(PUB_SYS_KEY, pubSysKey);</b>
+<i>69</i>&nbsp;        }
+<b class="nc"><i>70</i>&nbsp;        attr(PUBLIC_ID, publicId);</b>
+<b class="nc"><i>71</i>&nbsp;        attr(SYSTEM_ID, systemId);</b>
+<i>72</i>&nbsp;    }
+<i>73</i>&nbsp;    public void setPubSysKey(String value) {
+<b class="nc"><i>74</i>&nbsp;        if (value != null)</b>
+<b class="nc"><i>75</i>&nbsp;            attr(PUB_SYS_KEY, value);</b>
+<i>76</i>&nbsp;    }
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;    @Override
+<i>79</i>&nbsp;    public String nodeName() {
+<b class="nc"><i>80</i>&nbsp;        return &quot;#doctype&quot;;</b>
+<i>81</i>&nbsp;    }
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;    @Override
+<i>84</i>&nbsp;    void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+<b class="nc"><i>85</i>&nbsp;        if (out.syntax() == Syntax.html &amp;&amp; !has(PUBLIC_ID) &amp;&amp; !has(SYSTEM_ID)) {</b>
+<i>86</i>&nbsp;            // looks like a html5 doctype, go lowercase for aesthetics
+<b class="nc"><i>87</i>&nbsp;            accum.append(&quot;&lt;!doctype&quot;);</b>
+<i>88</i>&nbsp;        } else {
+<b class="nc"><i>89</i>&nbsp;            accum.append(&quot;&lt;!DOCTYPE&quot;);</b>
+<i>90</i>&nbsp;        }
+<b class="nc"><i>91</i>&nbsp;        if (has(NAME))</b>
+<b class="nc"><i>92</i>&nbsp;            accum.append(&quot; &quot;).append(attr(NAME));</b>
+<b class="nc"><i>93</i>&nbsp;        if (has(PUB_SYS_KEY))</b>
+<b class="nc"><i>94</i>&nbsp;            accum.append(&quot; &quot;).append(attr(PUB_SYS_KEY));</b>
+<b class="nc"><i>95</i>&nbsp;        if (has(PUBLIC_ID))</b>
+<b class="nc"><i>96</i>&nbsp;            accum.append(&quot; \&quot;&quot;).append(attr(PUBLIC_ID)).append(&#39;&quot;&#39;);</b>
+<b class="nc"><i>97</i>&nbsp;        if (has(SYSTEM_ID))</b>
+<b class="nc"><i>98</i>&nbsp;            accum.append(&quot; \&quot;&quot;).append(attr(SYSTEM_ID)).append(&#39;&quot;&#39;);</b>
+<b class="nc"><i>99</i>&nbsp;        accum.append(&#39;&gt;&#39;);</b>
+<i>100</i>&nbsp;    }
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;    @Override
+<i>103</i>&nbsp;    void outerHtmlTail(Appendable accum, int depth, Document.OutputSettings out) {
+<i>104</i>&nbsp;    }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    private boolean has(final String attribute) {
+<b class="nc"><i>107</i>&nbsp;        return !StringUtil.isBlank(attr(attribute));</b>
+<i>108</i>&nbsp;    }
+<i>109</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,363 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: StructuralEvaluator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.select</a> ]
+</div>
+
+<h1>Coverage Summary for Class: StructuralEvaluator (org.jsoup.select)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StructuralEvaluator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">StructuralEvaluator$Has</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/ 9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StructuralEvaluator$ImmediateParent</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/ 8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StructuralEvaluator$ImmediatePreviousSibling</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/ 8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StructuralEvaluator$Not</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StructuralEvaluator$Parent</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.9%
+  </span>
+  <span class="absValue">
+    (10/ 13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StructuralEvaluator$PreviousSibling</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (9/ 12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">StructuralEvaluator$Root</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (21/ 21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.2%
+  </span>
+  <span class="absValue">
+    (50/ 58)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.select;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.nodes.Element;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp; * Base structural evaluator.
+<i>7</i>&nbsp; */
+<b class="fc"><i>8</i>&nbsp;abstract class StructuralEvaluator extends Evaluator {</b>
+<i>9</i>&nbsp;    Evaluator evaluator;
+<i>10</i>&nbsp;
+<b class="fc"><i>11</i>&nbsp;    static class Root extends Evaluator {</b>
+<i>12</i>&nbsp;        public boolean matches(Element root, Element element) {
+<b class="fc"><i>13</i>&nbsp;            return root == element;</b>
+<i>14</i>&nbsp;        }
+<i>15</i>&nbsp;    }
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;    static class Has extends StructuralEvaluator {
+<b class="fc"><i>18</i>&nbsp;        public Has(Evaluator evaluator) {</b>
+<b class="fc"><i>19</i>&nbsp;            this.evaluator = evaluator;</b>
+<b class="fc"><i>20</i>&nbsp;        }</b>
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;        public boolean matches(Element root, Element element) {
+<b class="fc"><i>23</i>&nbsp;            for (Element e : element.getAllElements()) {</b>
+<b class="fc"><i>24</i>&nbsp;                if (e != element &amp;&amp; evaluator.matches(root, e))</b>
+<b class="fc"><i>25</i>&nbsp;                    return true;</b>
+<b class="fc"><i>26</i>&nbsp;            }</b>
+<b class="nc"><i>27</i>&nbsp;            return false;</b>
+<i>28</i>&nbsp;        }
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;        @Override
+<i>31</i>&nbsp;        public String toString() {
+<b class="fc"><i>32</i>&nbsp;            return String.format(&quot;:has(%s)&quot;, evaluator);</b>
+<i>33</i>&nbsp;        }
+<i>34</i>&nbsp;    }
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;    static class Not extends StructuralEvaluator {
+<b class="fc"><i>37</i>&nbsp;        public Not(Evaluator evaluator) {</b>
+<b class="fc"><i>38</i>&nbsp;            this.evaluator = evaluator;</b>
+<b class="fc"><i>39</i>&nbsp;        }</b>
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;        public boolean matches(Element root, Element node) {
+<b class="fc"><i>42</i>&nbsp;            return !evaluator.matches(root, node);</b>
+<i>43</i>&nbsp;        }
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;        @Override
+<i>46</i>&nbsp;        public String toString() {
+<b class="fc"><i>47</i>&nbsp;            return String.format(&quot;:not%s&quot;, evaluator);</b>
+<i>48</i>&nbsp;        }
+<i>49</i>&nbsp;    }
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    static class Parent extends StructuralEvaluator {
+<b class="fc"><i>52</i>&nbsp;        public Parent(Evaluator evaluator) {</b>
+<b class="fc"><i>53</i>&nbsp;            this.evaluator = evaluator;</b>
+<b class="fc"><i>54</i>&nbsp;        }</b>
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;        public boolean matches(Element root, Element element) {
+<b class="fc"><i>57</i>&nbsp;            if (root == element)</b>
+<b class="fc"><i>58</i>&nbsp;                return false;</b>
+<i>59</i>&nbsp;
+<b class="fc"><i>60</i>&nbsp;            Element parent = element.parent();</b>
+<i>61</i>&nbsp;            while (true) {
+<b class="fc"><i>62</i>&nbsp;                if (evaluator.matches(root, parent))</b>
+<b class="nc"><i>63</i>&nbsp;                    return true;</b>
+<b class="fc"><i>64</i>&nbsp;                if (parent == root)</b>
+<b class="nc"><i>65</i>&nbsp;                    break;</b>
+<b class="fc"><i>66</i>&nbsp;                parent = parent.parent();</b>
+<i>67</i>&nbsp;            }
+<b class="nc"><i>68</i>&nbsp;            return false;</b>
+<i>69</i>&nbsp;        }
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;        @Override
+<i>72</i>&nbsp;        public String toString() {
+<b class="fc"><i>73</i>&nbsp;            return String.format(&quot;:parent%s&quot;, evaluator);</b>
+<i>74</i>&nbsp;        }
+<i>75</i>&nbsp;    }
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    static class ImmediateParent extends StructuralEvaluator {
+<b class="fc"><i>78</i>&nbsp;        public ImmediateParent(Evaluator evaluator) {</b>
+<b class="fc"><i>79</i>&nbsp;            this.evaluator = evaluator;</b>
+<b class="fc"><i>80</i>&nbsp;        }</b>
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;        public boolean matches(Element root, Element element) {
+<b class="fc"><i>83</i>&nbsp;            if (root == element)</b>
+<b class="fc"><i>84</i>&nbsp;                return false;</b>
+<i>85</i>&nbsp;
+<b class="fc"><i>86</i>&nbsp;            Element parent = element.parent();</b>
+<b class="nc"><i>87</i>&nbsp;            return parent != null &amp;&amp; evaluator.matches(root, parent);</b>
+<i>88</i>&nbsp;        }
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;        @Override
+<i>91</i>&nbsp;        public String toString() {
+<b class="fc"><i>92</i>&nbsp;            return String.format(&quot;:ImmediateParent%s&quot;, evaluator);</b>
+<i>93</i>&nbsp;        }
+<i>94</i>&nbsp;    }
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;    static class PreviousSibling extends StructuralEvaluator {
+<b class="fc"><i>97</i>&nbsp;        public PreviousSibling(Evaluator evaluator) {</b>
+<b class="fc"><i>98</i>&nbsp;            this.evaluator = evaluator;</b>
+<b class="fc"><i>99</i>&nbsp;        }</b>
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;        public boolean matches(Element root, Element element) {
+<b class="fc"><i>102</i>&nbsp;            if (root == element)</b>
+<b class="fc"><i>103</i>&nbsp;                return false;</b>
+<i>104</i>&nbsp;
+<b class="fc"><i>105</i>&nbsp;            Element prev = element.previousElementSibling();</b>
+<i>106</i>&nbsp;
+<b class="fc"><i>107</i>&nbsp;            while (prev != null) {</b>
+<b class="nc"><i>108</i>&nbsp;                if (evaluator.matches(root, prev))</b>
+<b class="nc"><i>109</i>&nbsp;                    return true;</b>
+<i>110</i>&nbsp;
+<b class="nc"><i>111</i>&nbsp;                prev = prev.previousElementSibling();</b>
+<i>112</i>&nbsp;            }
+<b class="fc"><i>113</i>&nbsp;            return false;</b>
+<i>114</i>&nbsp;        }
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;        @Override
+<i>117</i>&nbsp;        public String toString() {
+<b class="fc"><i>118</i>&nbsp;            return String.format(&quot;:prev*%s&quot;, evaluator);</b>
+<i>119</i>&nbsp;        }
+<i>120</i>&nbsp;    }
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;    static class ImmediatePreviousSibling extends StructuralEvaluator {
+<b class="fc"><i>123</i>&nbsp;        public ImmediatePreviousSibling(Evaluator evaluator) {</b>
+<b class="fc"><i>124</i>&nbsp;            this.evaluator = evaluator;</b>
+<b class="fc"><i>125</i>&nbsp;        }</b>
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;        public boolean matches(Element root, Element element) {
+<b class="fc"><i>128</i>&nbsp;            if (root == element)</b>
+<b class="fc"><i>129</i>&nbsp;                return false;</b>
+<i>130</i>&nbsp;
+<b class="fc"><i>131</i>&nbsp;            Element prev = element.previousElementSibling();</b>
+<b class="fc"><i>132</i>&nbsp;            return prev != null &amp;&amp; evaluator.matches(root, prev);</b>
+<i>133</i>&nbsp;        }
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;        @Override
+<i>136</i>&nbsp;        public String toString() {
+<b class="fc"><i>137</i>&nbsp;            return String.format(&quot;:prev%s&quot;, evaluator);</b>
+<i>138</i>&nbsp;        }
+<i>139</i>&nbsp;    }
+<i>140</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 13:21</div>
+</div>
+</body>
+</html>

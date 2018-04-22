@@ -1,0 +1,853 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Node</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.nodes</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Node (org.jsoup.nodes)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Node</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 194)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Node$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Node$OuterHtmlVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 57)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 209)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.nodes;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.SerializationException;
+<i>4</i>&nbsp;import org.jsoup.helper.StringUtil;
+<i>5</i>&nbsp;import org.jsoup.helper.Validate;
+<i>6</i>&nbsp;import org.jsoup.parser.Parser;
+<i>7</i>&nbsp;import org.jsoup.select.NodeFilter;
+<i>8</i>&nbsp;import org.jsoup.select.NodeTraversor;
+<i>9</i>&nbsp;import org.jsoup.select.NodeVisitor;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import java.io.IOException;
+<i>12</i>&nbsp;import java.util.*;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;/**
+<i>15</i>&nbsp; The base, abstract Node model. Elements, Documents, Comments etc are all Node instances.
+<i>16</i>&nbsp;
+<i>17</i>&nbsp; @author Jonathan Hedley, jonathan@hedley.net */
+<i>18</i>&nbsp;public abstract class Node implements Cloneable {
+<i>19</i>&nbsp;    static final String EmptyString = &quot;&quot;;
+<i>20</i>&nbsp;    Node parentNode;
+<i>21</i>&nbsp;    int siblingIndex;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    /**
+<i>24</i>&nbsp;     * Default constructor. Doesn&#39;t setup base uri, children, or attributes; use with caution.
+<i>25</i>&nbsp;     */
+<b class="nc"><i>26</i>&nbsp;    protected Node() {</b>
+<i>27</i>&nbsp;    }
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    /**
+<i>30</i>&nbsp;     Get the node name of this node. Use for debugging purposes and not logic switching (for that, use instanceof).
+<i>31</i>&nbsp;     @return node name
+<i>32</i>&nbsp;     */
+<i>33</i>&nbsp;    public abstract String nodeName();
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    /**
+<i>36</i>&nbsp;     * Check if this Node has an actual Attributes object.
+<i>37</i>&nbsp;     */
+<i>38</i>&nbsp;    protected abstract boolean hasAttributes();
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;    public boolean hasParent() {
+<b class="nc"><i>41</i>&nbsp;        return parentNode != null;</b>
+<i>42</i>&nbsp;    }
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;    /**
+<i>45</i>&nbsp;     * Get an attribute&#39;s value by its key. &lt;b&gt;Case insensitive&lt;/b&gt;
+<i>46</i>&nbsp;     * &lt;p&gt;
+<i>47</i>&nbsp;     * To get an absolute URL from an attribute that may be a relative URL, prefix the key with &lt;code&gt;&lt;b&gt;abs&lt;/b&gt;&lt;/code&gt;,
+<i>48</i>&nbsp;     * which is a shortcut to the {@link #absUrl} method.
+<i>49</i>&nbsp;     * &lt;/p&gt;
+<i>50</i>&nbsp;     * E.g.:
+<i>51</i>&nbsp;     * &lt;blockquote&gt;&lt;code&gt;String url = a.attr(&quot;abs:href&quot;);&lt;/code&gt;&lt;/blockquote&gt;
+<i>52</i>&nbsp;     *
+<i>53</i>&nbsp;     * @param attributeKey The attribute key.
+<i>54</i>&nbsp;     * @return The attribute, or empty string if not present (to avoid nulls).
+<i>55</i>&nbsp;     * @see #attributes()
+<i>56</i>&nbsp;     * @see #hasAttr(String)
+<i>57</i>&nbsp;     * @see #absUrl(String)
+<i>58</i>&nbsp;     */
+<i>59</i>&nbsp;    public String attr(String attributeKey) {
+<b class="nc"><i>60</i>&nbsp;        Validate.notNull(attributeKey);</b>
+<b class="nc"><i>61</i>&nbsp;        if (!hasAttributes())</b>
+<b class="nc"><i>62</i>&nbsp;            return EmptyString;</b>
+<i>63</i>&nbsp;
+<b class="nc"><i>64</i>&nbsp;        String val = attributes().getIgnoreCase(attributeKey);</b>
+<b class="nc"><i>65</i>&nbsp;        if (val.length() &gt; 0)</b>
+<b class="nc"><i>66</i>&nbsp;            return val;</b>
+<b class="nc"><i>67</i>&nbsp;        else if (attributeKey.startsWith(&quot;abs:&quot;))</b>
+<b class="nc"><i>68</i>&nbsp;            return absUrl(attributeKey.substring(&quot;abs:&quot;.length()));</b>
+<b class="nc"><i>69</i>&nbsp;        else return &quot;&quot;;</b>
+<i>70</i>&nbsp;    }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    /**
+<i>73</i>&nbsp;     * Get all of the element&#39;s attributes.
+<i>74</i>&nbsp;     * @return attributes (which implements iterable, in same order as presented in original HTML).
+<i>75</i>&nbsp;     */
+<i>76</i>&nbsp;    public abstract Attributes attributes();
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;    /**
+<i>79</i>&nbsp;     * Set an attribute (key=value). If the attribute already exists, it is replaced. The attribute key comparison is
+<i>80</i>&nbsp;     * &lt;b&gt;case insensitive&lt;/b&gt;.
+<i>81</i>&nbsp;     * @param attributeKey The attribute key.
+<i>82</i>&nbsp;     * @param attributeValue The attribute value.
+<i>83</i>&nbsp;     * @return this (for chaining)
+<i>84</i>&nbsp;     */
+<i>85</i>&nbsp;    public Node attr(String attributeKey, String attributeValue) {
+<b class="nc"><i>86</i>&nbsp;        attributes().putIgnoreCase(attributeKey, attributeValue);</b>
+<b class="nc"><i>87</i>&nbsp;        return this;</b>
+<i>88</i>&nbsp;    }
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;    /**
+<i>91</i>&nbsp;     * Test if this element has an attribute. &lt;b&gt;Case insensitive&lt;/b&gt;
+<i>92</i>&nbsp;     * @param attributeKey The attribute key to check.
+<i>93</i>&nbsp;     * @return true if the attribute exists, false if not.
+<i>94</i>&nbsp;     */
+<i>95</i>&nbsp;    public boolean hasAttr(String attributeKey) {
+<b class="nc"><i>96</i>&nbsp;        Validate.notNull(attributeKey);</b>
+<i>97</i>&nbsp;
+<b class="nc"><i>98</i>&nbsp;        if (attributeKey.startsWith(&quot;abs:&quot;)) {</b>
+<b class="nc"><i>99</i>&nbsp;            String key = attributeKey.substring(&quot;abs:&quot;.length());</b>
+<b class="nc"><i>100</i>&nbsp;            if (attributes().hasKeyIgnoreCase(key) &amp;&amp; !absUrl(key).equals(&quot;&quot;))</b>
+<b class="nc"><i>101</i>&nbsp;                return true;</b>
+<i>102</i>&nbsp;        }
+<b class="nc"><i>103</i>&nbsp;        return attributes().hasKeyIgnoreCase(attributeKey);</b>
+<i>104</i>&nbsp;    }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    /**
+<i>107</i>&nbsp;     * Remove an attribute from this element.
+<i>108</i>&nbsp;     * @param attributeKey The attribute to remove.
+<i>109</i>&nbsp;     * @return this (for chaining)
+<i>110</i>&nbsp;     */
+<i>111</i>&nbsp;    public Node removeAttr(String attributeKey) {
+<b class="nc"><i>112</i>&nbsp;        Validate.notNull(attributeKey);</b>
+<b class="nc"><i>113</i>&nbsp;        attributes().removeIgnoreCase(attributeKey);</b>
+<b class="nc"><i>114</i>&nbsp;        return this;</b>
+<i>115</i>&nbsp;    }
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;    /**
+<i>118</i>&nbsp;     * Clear (remove) all of the attributes in this node.
+<i>119</i>&nbsp;     * @return this, for chaining
+<i>120</i>&nbsp;     */
+<i>121</i>&nbsp;    public Node clearAttributes() {
+<b class="nc"><i>122</i>&nbsp;        Iterator&lt;Attribute&gt; it = attributes().iterator();</b>
+<b class="nc"><i>123</i>&nbsp;        while (it.hasNext()) {</b>
+<b class="nc"><i>124</i>&nbsp;            it.next();</b>
+<b class="nc"><i>125</i>&nbsp;            it.remove();</b>
+<i>126</i>&nbsp;        }
+<b class="nc"><i>127</i>&nbsp;        return this;</b>
+<i>128</i>&nbsp;    }
+<i>129</i>&nbsp;
+<i>130</i>&nbsp;    /**
+<i>131</i>&nbsp;     Get the base URI of this node.
+<i>132</i>&nbsp;     @return base URI
+<i>133</i>&nbsp;     */
+<i>134</i>&nbsp;    public abstract String baseUri();
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;    /**
+<i>137</i>&nbsp;     * Set the baseUri for just this node (not its descendants), if this Node tracks base URIs.
+<i>138</i>&nbsp;     * @param baseUri new URI
+<i>139</i>&nbsp;     */
+<i>140</i>&nbsp;    protected abstract void doSetBaseUri(String baseUri);
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;    /**
+<i>143</i>&nbsp;     Update the base URI of this node and all of its descendants.
+<i>144</i>&nbsp;     @param baseUri base URI to set
+<i>145</i>&nbsp;     */
+<i>146</i>&nbsp;    public void setBaseUri(final String baseUri) {
+<b class="nc"><i>147</i>&nbsp;        Validate.notNull(baseUri);</b>
+<i>148</i>&nbsp;
+<b class="nc"><i>149</i>&nbsp;        traverse(new NodeVisitor() {</b>
+<i>150</i>&nbsp;            public void head(Node node, int depth) {
+<b class="nc"><i>151</i>&nbsp;                node.doSetBaseUri(baseUri);</b>
+<i>152</i>&nbsp;            }
+<i>153</i>&nbsp;
+<i>154</i>&nbsp;            public void tail(Node node, int depth) {
+<i>155</i>&nbsp;            }
+<i>156</i>&nbsp;        });
+<i>157</i>&nbsp;    }
+<i>158</i>&nbsp;
+<i>159</i>&nbsp;    /**
+<i>160</i>&nbsp;     * Get an absolute URL from a URL attribute that may be relative (i.e. an &lt;code&gt;&amp;lt;a href&amp;gt;&lt;/code&gt; or
+<i>161</i>&nbsp;     * &lt;code&gt;&amp;lt;img src&amp;gt;&lt;/code&gt;).
+<i>162</i>&nbsp;     * &lt;p&gt;
+<i>163</i>&nbsp;     * E.g.: &lt;code&gt;String absUrl = linkEl.absUrl(&quot;href&quot;);&lt;/code&gt;
+<i>164</i>&nbsp;     * &lt;/p&gt;
+<i>165</i>&nbsp;     * &lt;p&gt;
+<i>166</i>&nbsp;     * If the attribute value is already absolute (i.e. it starts with a protocol, like
+<i>167</i>&nbsp;     * &lt;code&gt;http://&lt;/code&gt; or &lt;code&gt;https://&lt;/code&gt; etc), and it successfully parses as a URL, the attribute is
+<i>168</i>&nbsp;     * returned directly. Otherwise, it is treated as a URL relative to the element&#39;s {@link #baseUri}, and made
+<i>169</i>&nbsp;     * absolute using that.
+<i>170</i>&nbsp;     * &lt;/p&gt;
+<i>171</i>&nbsp;     * &lt;p&gt;
+<i>172</i>&nbsp;     * As an alternate, you can use the {@link #attr} method with the &lt;code&gt;abs:&lt;/code&gt; prefix, e.g.:
+<i>173</i>&nbsp;     * &lt;code&gt;String absUrl = linkEl.attr(&quot;abs:href&quot;);&lt;/code&gt;
+<i>174</i>&nbsp;     * &lt;/p&gt;
+<i>175</i>&nbsp;     *
+<i>176</i>&nbsp;     * @param attributeKey The attribute key
+<i>177</i>&nbsp;     * @return An absolute URL if one could be made, or an empty string (not null) if the attribute was missing or
+<i>178</i>&nbsp;     * could not be made successfully into a URL.
+<i>179</i>&nbsp;     * @see #attr
+<i>180</i>&nbsp;     * @see java.net.URL#URL(java.net.URL, String)
+<i>181</i>&nbsp;     */
+<i>182</i>&nbsp;    public String absUrl(String attributeKey) {
+<b class="nc"><i>183</i>&nbsp;        Validate.notEmpty(attributeKey);</b>
+<i>184</i>&nbsp;
+<b class="nc"><i>185</i>&nbsp;        if (!hasAttr(attributeKey)) {</b>
+<b class="nc"><i>186</i>&nbsp;            return &quot;&quot;; // nothing to make absolute with</b>
+<i>187</i>&nbsp;        } else {
+<b class="nc"><i>188</i>&nbsp;            return StringUtil.resolve(baseUri(), attr(attributeKey));</b>
+<i>189</i>&nbsp;        }
+<i>190</i>&nbsp;    }
+<i>191</i>&nbsp;
+<i>192</i>&nbsp;    protected abstract List&lt;Node&gt; ensureChildNodes();
+<i>193</i>&nbsp;
+<i>194</i>&nbsp;    /**
+<i>195</i>&nbsp;     Get a child node by its 0-based index.
+<i>196</i>&nbsp;     @param index index of child node
+<i>197</i>&nbsp;     @return the child node at this index. Throws a {@code IndexOutOfBoundsException} if the index is out of bounds.
+<i>198</i>&nbsp;     */
+<i>199</i>&nbsp;    public Node childNode(int index) {
+<b class="nc"><i>200</i>&nbsp;        return ensureChildNodes().get(index);</b>
+<i>201</i>&nbsp;    }
+<i>202</i>&nbsp;
+<i>203</i>&nbsp;    /**
+<i>204</i>&nbsp;     Get this node&#39;s children. Presented as an unmodifiable list: new children can not be added, but the child nodes
+<i>205</i>&nbsp;     themselves can be manipulated.
+<i>206</i>&nbsp;     @return list of children. If no children, returns an empty list.
+<i>207</i>&nbsp;     */
+<i>208</i>&nbsp;    public List&lt;Node&gt; childNodes() {
+<b class="nc"><i>209</i>&nbsp;        return Collections.unmodifiableList(ensureChildNodes());</b>
+<i>210</i>&nbsp;    }
+<i>211</i>&nbsp;
+<i>212</i>&nbsp;    /**
+<i>213</i>&nbsp;     * Returns a deep copy of this node&#39;s children. Changes made to these nodes will not be reflected in the original
+<i>214</i>&nbsp;     * nodes
+<i>215</i>&nbsp;     * @return a deep copy of this node&#39;s children
+<i>216</i>&nbsp;     */
+<i>217</i>&nbsp;    public List&lt;Node&gt; childNodesCopy() {
+<b class="nc"><i>218</i>&nbsp;        final List&lt;Node&gt; nodes = ensureChildNodes();</b>
+<b class="nc"><i>219</i>&nbsp;        final ArrayList&lt;Node&gt; children = new ArrayList&lt;&gt;(nodes.size());</b>
+<b class="nc"><i>220</i>&nbsp;        for (Node node : nodes) {</b>
+<b class="nc"><i>221</i>&nbsp;            children.add(node.clone());</b>
+<b class="nc"><i>222</i>&nbsp;        }</b>
+<b class="nc"><i>223</i>&nbsp;        return children;</b>
+<i>224</i>&nbsp;    }
+<i>225</i>&nbsp;
+<i>226</i>&nbsp;    /**
+<i>227</i>&nbsp;     * Get the number of child nodes that this node holds.
+<i>228</i>&nbsp;     * @return the number of child nodes that this node holds.
+<i>229</i>&nbsp;     */
+<i>230</i>&nbsp;    public abstract int childNodeSize();
+<i>231</i>&nbsp;
+<i>232</i>&nbsp;    protected Node[] childNodesAsArray() {
+<b class="nc"><i>233</i>&nbsp;        return ensureChildNodes().toArray(new Node[childNodeSize()]);</b>
+<i>234</i>&nbsp;    }
+<i>235</i>&nbsp;
+<i>236</i>&nbsp;    /**
+<i>237</i>&nbsp;     Gets this node&#39;s parent node.
+<i>238</i>&nbsp;     @return parent node; or null if no parent.
+<i>239</i>&nbsp;     */
+<i>240</i>&nbsp;    public Node parent() {
+<b class="nc"><i>241</i>&nbsp;        return parentNode;</b>
+<i>242</i>&nbsp;    }
+<i>243</i>&nbsp;
+<i>244</i>&nbsp;    /**
+<i>245</i>&nbsp;     Gets this node&#39;s parent node. Not overridable by extending classes, so useful if you really just need the Node type.
+<i>246</i>&nbsp;     @return parent node; or null if no parent.
+<i>247</i>&nbsp;     */
+<i>248</i>&nbsp;    public final Node parentNode() {
+<b class="nc"><i>249</i>&nbsp;        return parentNode;</b>
+<i>250</i>&nbsp;    }
+<i>251</i>&nbsp;
+<i>252</i>&nbsp;    /**
+<i>253</i>&nbsp;     * Get this node&#39;s root node; that is, its topmost ancestor. If this node is the top ancestor, returns {@code this}.
+<i>254</i>&nbsp;     * @return topmost ancestor.
+<i>255</i>&nbsp;     */
+<i>256</i>&nbsp;    public Node root() {
+<b class="nc"><i>257</i>&nbsp;        Node node = this;</b>
+<b class="nc"><i>258</i>&nbsp;        while (node.parentNode != null)</b>
+<b class="nc"><i>259</i>&nbsp;            node = node.parentNode;</b>
+<b class="nc"><i>260</i>&nbsp;        return node;</b>
+<i>261</i>&nbsp;    }
+<i>262</i>&nbsp;
+<i>263</i>&nbsp;    /**
+<i>264</i>&nbsp;     * Gets the Document associated with this Node.
+<i>265</i>&nbsp;     * @return the Document associated with this Node, or null if there is no such Document.
+<i>266</i>&nbsp;     */
+<i>267</i>&nbsp;    public Document ownerDocument() {
+<b class="nc"><i>268</i>&nbsp;        Node root = root();</b>
+<b class="nc"><i>269</i>&nbsp;        return (root instanceof Document) ? (Document) root : null;</b>
+<i>270</i>&nbsp;    }
+<i>271</i>&nbsp;
+<i>272</i>&nbsp;    /**
+<i>273</i>&nbsp;     * Remove (delete) this node from the DOM tree. If this node has children, they are also removed.
+<i>274</i>&nbsp;     */
+<i>275</i>&nbsp;    public void remove() {
+<b class="nc"><i>276</i>&nbsp;        Validate.notNull(parentNode);</b>
+<b class="nc"><i>277</i>&nbsp;        parentNode.removeChild(this);</b>
+<i>278</i>&nbsp;    }
+<i>279</i>&nbsp;
+<i>280</i>&nbsp;    /**
+<i>281</i>&nbsp;     * Insert the specified HTML into the DOM before this node (i.e. as a preceding sibling).
+<i>282</i>&nbsp;     * @param html HTML to add before this node
+<i>283</i>&nbsp;     * @return this node, for chaining
+<i>284</i>&nbsp;     * @see #after(String)
+<i>285</i>&nbsp;     */
+<i>286</i>&nbsp;    public Node before(String html) {
+<b class="nc"><i>287</i>&nbsp;        addSiblingHtml(siblingIndex, html);</b>
+<b class="nc"><i>288</i>&nbsp;        return this;</b>
+<i>289</i>&nbsp;    }
+<i>290</i>&nbsp;
+<i>291</i>&nbsp;    /**
+<i>292</i>&nbsp;     * Insert the specified node into the DOM before this node (i.e. as a preceding sibling).
+<i>293</i>&nbsp;     * @param node to add before this node
+<i>294</i>&nbsp;     * @return this node, for chaining
+<i>295</i>&nbsp;     * @see #after(Node)
+<i>296</i>&nbsp;     */
+<i>297</i>&nbsp;    public Node before(Node node) {
+<b class="nc"><i>298</i>&nbsp;        Validate.notNull(node);</b>
+<b class="nc"><i>299</i>&nbsp;        Validate.notNull(parentNode);</b>
+<i>300</i>&nbsp;
+<b class="nc"><i>301</i>&nbsp;        parentNode.addChildren(siblingIndex, node);</b>
+<b class="nc"><i>302</i>&nbsp;        return this;</b>
+<i>303</i>&nbsp;    }
+<i>304</i>&nbsp;
+<i>305</i>&nbsp;    /**
+<i>306</i>&nbsp;     * Insert the specified HTML into the DOM after this node (i.e. as a following sibling).
+<i>307</i>&nbsp;     * @param html HTML to add after this node
+<i>308</i>&nbsp;     * @return this node, for chaining
+<i>309</i>&nbsp;     * @see #before(String)
+<i>310</i>&nbsp;     */
+<i>311</i>&nbsp;    public Node after(String html) {
+<b class="nc"><i>312</i>&nbsp;        addSiblingHtml(siblingIndex + 1, html);</b>
+<b class="nc"><i>313</i>&nbsp;        return this;</b>
+<i>314</i>&nbsp;    }
+<i>315</i>&nbsp;
+<i>316</i>&nbsp;    /**
+<i>317</i>&nbsp;     * Insert the specified node into the DOM after this node (i.e. as a following sibling).
+<i>318</i>&nbsp;     * @param node to add after this node
+<i>319</i>&nbsp;     * @return this node, for chaining
+<i>320</i>&nbsp;     * @see #before(Node)
+<i>321</i>&nbsp;     */
+<i>322</i>&nbsp;    public Node after(Node node) {
+<b class="nc"><i>323</i>&nbsp;        Validate.notNull(node);</b>
+<b class="nc"><i>324</i>&nbsp;        Validate.notNull(parentNode);</b>
+<i>325</i>&nbsp;
+<b class="nc"><i>326</i>&nbsp;        parentNode.addChildren(siblingIndex + 1, node);</b>
+<b class="nc"><i>327</i>&nbsp;        return this;</b>
+<i>328</i>&nbsp;    }
+<i>329</i>&nbsp;
+<i>330</i>&nbsp;    private void addSiblingHtml(int index, String html) {
+<b class="nc"><i>331</i>&nbsp;        Validate.notNull(html);</b>
+<b class="nc"><i>332</i>&nbsp;        Validate.notNull(parentNode);</b>
+<i>333</i>&nbsp;
+<b class="nc"><i>334</i>&nbsp;        Element context = parent() instanceof Element ? (Element) parent() : null;</b>
+<b class="nc"><i>335</i>&nbsp;        List&lt;Node&gt; nodes = Parser.parseFragment(html, context, baseUri());</b>
+<b class="nc"><i>336</i>&nbsp;        parentNode.addChildren(index, nodes.toArray(new Node[nodes.size()]));</b>
+<i>337</i>&nbsp;    }
+<i>338</i>&nbsp;
+<i>339</i>&nbsp;    /**
+<i>340</i>&nbsp;     Wrap the supplied HTML around this node.
+<i>341</i>&nbsp;     @param html HTML to wrap around this element, e.g. {@code &lt;div class=&quot;head&quot;&gt;&lt;/div&gt;}. Can be arbitrarily deep.
+<i>342</i>&nbsp;     @return this node, for chaining.
+<i>343</i>&nbsp;     */
+<i>344</i>&nbsp;    public Node wrap(String html) {
+<b class="nc"><i>345</i>&nbsp;        Validate.notEmpty(html);</b>
+<i>346</i>&nbsp;
+<b class="nc"><i>347</i>&nbsp;        Element context = parent() instanceof Element ? (Element) parent() : null;</b>
+<b class="nc"><i>348</i>&nbsp;        List&lt;Node&gt; wrapChildren = Parser.parseFragment(html, context, baseUri());</b>
+<b class="nc"><i>349</i>&nbsp;        Node wrapNode = wrapChildren.get(0);</b>
+<b class="nc"><i>350</i>&nbsp;        if (wrapNode == null || !(wrapNode instanceof Element)) // nothing to wrap with; noop</b>
+<b class="nc"><i>351</i>&nbsp;            return null;</b>
+<i>352</i>&nbsp;
+<b class="nc"><i>353</i>&nbsp;        Element wrap = (Element) wrapNode;</b>
+<b class="nc"><i>354</i>&nbsp;        Element deepest = getDeepChild(wrap);</b>
+<b class="nc"><i>355</i>&nbsp;        parentNode.replaceChild(this, wrap);</b>
+<b class="nc"><i>356</i>&nbsp;        deepest.addChildren(this);</b>
+<i>357</i>&nbsp;
+<i>358</i>&nbsp;        // remainder (unbalanced wrap, like &lt;div&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt; -- The &lt;p&gt; is remainder
+<b class="nc"><i>359</i>&nbsp;        if (wrapChildren.size() &gt; 0) {</b>
+<i>360</i>&nbsp;            //noinspection ForLoopReplaceableByForEach (beacause it allocates an Iterator which is wasteful here)
+<b class="nc"><i>361</i>&nbsp;            for (int i = 0; i &lt; wrapChildren.size(); i++) {</b>
+<b class="nc"><i>362</i>&nbsp;                Node remainder = wrapChildren.get(i);</b>
+<b class="nc"><i>363</i>&nbsp;                remainder.parentNode.removeChild(remainder);</b>
+<b class="nc"><i>364</i>&nbsp;                wrap.appendChild(remainder);</b>
+<i>365</i>&nbsp;            }
+<i>366</i>&nbsp;        }
+<b class="nc"><i>367</i>&nbsp;        return this;</b>
+<i>368</i>&nbsp;    }
+<i>369</i>&nbsp;
+<i>370</i>&nbsp;    /**
+<i>371</i>&nbsp;     * Removes this node from the DOM, and moves its children up into the node&#39;s parent. This has the effect of dropping
+<i>372</i>&nbsp;     * the node but keeping its children.
+<i>373</i>&nbsp;     * &lt;p&gt;
+<i>374</i>&nbsp;     * For example, with the input html:
+<i>375</i>&nbsp;     * &lt;/p&gt;
+<i>376</i>&nbsp;     * &lt;p&gt;{@code &lt;div&gt;One &lt;span&gt;Two &lt;b&gt;Three&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;}&lt;/p&gt;
+<i>377</i>&nbsp;     * Calling {@code element.unwrap()} on the {@code span} element will result in the html:
+<i>378</i>&nbsp;     * &lt;p&gt;{@code &lt;div&gt;One Two &lt;b&gt;Three&lt;/b&gt;&lt;/div&gt;}&lt;/p&gt;
+<i>379</i>&nbsp;     * and the {@code &quot;Two &quot;} {@link TextNode} being returned.
+<i>380</i>&nbsp;     *
+<i>381</i>&nbsp;     * @return the first child of this node, after the node has been unwrapped. Null if the node had no children.
+<i>382</i>&nbsp;     * @see #remove()
+<i>383</i>&nbsp;     * @see #wrap(String)
+<i>384</i>&nbsp;     */
+<i>385</i>&nbsp;    public Node unwrap() {
+<b class="nc"><i>386</i>&nbsp;        Validate.notNull(parentNode);</b>
+<b class="nc"><i>387</i>&nbsp;        final List&lt;Node&gt; childNodes = ensureChildNodes();</b>
+<b class="nc"><i>388</i>&nbsp;        Node firstChild = childNodes.size() &gt; 0 ? childNodes.get(0) : null;</b>
+<b class="nc"><i>389</i>&nbsp;        parentNode.addChildren(siblingIndex, this.childNodesAsArray());</b>
+<b class="nc"><i>390</i>&nbsp;        this.remove();</b>
+<i>391</i>&nbsp;
+<b class="nc"><i>392</i>&nbsp;        return firstChild;</b>
+<i>393</i>&nbsp;    }
+<i>394</i>&nbsp;
+<i>395</i>&nbsp;    private Element getDeepChild(Element el) {
+<b class="nc"><i>396</i>&nbsp;        List&lt;Element&gt; children = el.children();</b>
+<b class="nc"><i>397</i>&nbsp;        if (children.size() &gt; 0)</b>
+<b class="nc"><i>398</i>&nbsp;            return getDeepChild(children.get(0));</b>
+<i>399</i>&nbsp;        else
+<b class="nc"><i>400</i>&nbsp;            return el;</b>
+<i>401</i>&nbsp;    }
+<i>402</i>&nbsp;
+<i>403</i>&nbsp;    void nodelistChanged() {
+<i>404</i>&nbsp;        // Element overrides this to clear its shadow children elements
+<i>405</i>&nbsp;    }
+<i>406</i>&nbsp;
+<i>407</i>&nbsp;    /**
+<i>408</i>&nbsp;     * Replace this node in the DOM with the supplied node.
+<i>409</i>&nbsp;     * @param in the node that will will replace the existing node.
+<i>410</i>&nbsp;     */
+<i>411</i>&nbsp;    public void replaceWith(Node in) {
+<b class="nc"><i>412</i>&nbsp;        Validate.notNull(in);</b>
+<b class="nc"><i>413</i>&nbsp;        Validate.notNull(parentNode);</b>
+<b class="nc"><i>414</i>&nbsp;        parentNode.replaceChild(this, in);</b>
+<i>415</i>&nbsp;    }
+<i>416</i>&nbsp;
+<i>417</i>&nbsp;    protected void setParentNode(Node parentNode) {
+<b class="nc"><i>418</i>&nbsp;        Validate.notNull(parentNode);</b>
+<b class="nc"><i>419</i>&nbsp;        if (this.parentNode != null)</b>
+<b class="nc"><i>420</i>&nbsp;            this.parentNode.removeChild(this);</b>
+<b class="nc"><i>421</i>&nbsp;        this.parentNode = parentNode;</b>
+<i>422</i>&nbsp;    }
+<i>423</i>&nbsp;
+<i>424</i>&nbsp;    protected void replaceChild(Node out, Node in) {
+<b class="nc"><i>425</i>&nbsp;        Validate.isTrue(out.parentNode == this);</b>
+<b class="nc"><i>426</i>&nbsp;        Validate.notNull(in);</b>
+<b class="nc"><i>427</i>&nbsp;        if (in.parentNode != null)</b>
+<b class="nc"><i>428</i>&nbsp;            in.parentNode.removeChild(in);</b>
+<i>429</i>&nbsp;
+<b class="nc"><i>430</i>&nbsp;        final int index = out.siblingIndex;</b>
+<b class="nc"><i>431</i>&nbsp;        ensureChildNodes().set(index, in);</b>
+<b class="nc"><i>432</i>&nbsp;        in.parentNode = this;</b>
+<b class="nc"><i>433</i>&nbsp;        in.setSiblingIndex(index);</b>
+<b class="nc"><i>434</i>&nbsp;        out.parentNode = null;</b>
+<i>435</i>&nbsp;    }
+<i>436</i>&nbsp;
+<i>437</i>&nbsp;    protected void removeChild(Node out) {
+<b class="nc"><i>438</i>&nbsp;        Validate.isTrue(out.parentNode == this);</b>
+<b class="nc"><i>439</i>&nbsp;        final int index = out.siblingIndex;</b>
+<b class="nc"><i>440</i>&nbsp;        ensureChildNodes().remove(index);</b>
+<b class="nc"><i>441</i>&nbsp;        reindexChildren(index);</b>
+<b class="nc"><i>442</i>&nbsp;        out.parentNode = null;</b>
+<i>443</i>&nbsp;    }
+<i>444</i>&nbsp;
+<i>445</i>&nbsp;    protected void addChildren(Node... children) {
+<i>446</i>&nbsp;        //most used. short circuit addChildren(int), which hits reindex children and array copy
+<b class="nc"><i>447</i>&nbsp;        final List&lt;Node&gt; nodes = ensureChildNodes();</b>
+<i>448</i>&nbsp;
+<b class="nc"><i>449</i>&nbsp;        for (Node child: children) {</b>
+<b class="nc"><i>450</i>&nbsp;            reparentChild(child);</b>
+<b class="nc"><i>451</i>&nbsp;            nodes.add(child);</b>
+<b class="nc"><i>452</i>&nbsp;            child.setSiblingIndex(nodes.size()-1);</b>
+<i>453</i>&nbsp;        }
+<i>454</i>&nbsp;    }
+<i>455</i>&nbsp;
+<i>456</i>&nbsp;    protected void addChildren(int index, Node... children) {
+<b class="nc"><i>457</i>&nbsp;        Validate.noNullElements(children);</b>
+<b class="nc"><i>458</i>&nbsp;        final List&lt;Node&gt; nodes = ensureChildNodes();</b>
+<i>459</i>&nbsp;
+<b class="nc"><i>460</i>&nbsp;        for (Node child : children) {</b>
+<b class="nc"><i>461</i>&nbsp;            reparentChild(child);</b>
+<i>462</i>&nbsp;        }
+<b class="nc"><i>463</i>&nbsp;        nodes.addAll(index, Arrays.asList(children));</b>
+<b class="nc"><i>464</i>&nbsp;        reindexChildren(index);</b>
+<i>465</i>&nbsp;    }
+<i>466</i>&nbsp;    
+<i>467</i>&nbsp;    protected void reparentChild(Node child) {
+<b class="nc"><i>468</i>&nbsp;        child.setParentNode(this);</b>
+<i>469</i>&nbsp;    }
+<i>470</i>&nbsp;
+<i>471</i>&nbsp;    private void reindexChildren(int start) {
+<b class="nc"><i>472</i>&nbsp;        final List&lt;Node&gt; childNodes = ensureChildNodes();</b>
+<i>473</i>&nbsp;
+<b class="nc"><i>474</i>&nbsp;        for (int i = start; i &lt; childNodes.size(); i++) {</b>
+<b class="nc"><i>475</i>&nbsp;            childNodes.get(i).setSiblingIndex(i);</b>
+<i>476</i>&nbsp;        }
+<i>477</i>&nbsp;    }
+<i>478</i>&nbsp;
+<i>479</i>&nbsp;    /**
+<i>480</i>&nbsp;     Retrieves this node&#39;s sibling nodes. Similar to {@link #childNodes()  node.parent.childNodes()}, but does not
+<i>481</i>&nbsp;     include this node (a node is not a sibling of itself).
+<i>482</i>&nbsp;     @return node siblings. If the node has no parent, returns an empty list.
+<i>483</i>&nbsp;     */
+<i>484</i>&nbsp;    public List&lt;Node&gt; siblingNodes() {
+<b class="nc"><i>485</i>&nbsp;        if (parentNode == null)</b>
+<b class="nc"><i>486</i>&nbsp;            return Collections.emptyList();</b>
+<i>487</i>&nbsp;
+<b class="nc"><i>488</i>&nbsp;        List&lt;Node&gt; nodes = parentNode.ensureChildNodes();</b>
+<b class="nc"><i>489</i>&nbsp;        List&lt;Node&gt; siblings = new ArrayList&lt;&gt;(nodes.size() - 1);</b>
+<b class="nc"><i>490</i>&nbsp;        for (Node node: nodes)</b>
+<b class="nc"><i>491</i>&nbsp;            if (node != this)</b>
+<b class="nc"><i>492</i>&nbsp;                siblings.add(node);</b>
+<b class="nc"><i>493</i>&nbsp;        return siblings;</b>
+<i>494</i>&nbsp;    }
+<i>495</i>&nbsp;
+<i>496</i>&nbsp;    /**
+<i>497</i>&nbsp;     Get this node&#39;s next sibling.
+<i>498</i>&nbsp;     @return next sibling, or null if this is the last sibling
+<i>499</i>&nbsp;     */
+<i>500</i>&nbsp;    public Node nextSibling() {
+<b class="nc"><i>501</i>&nbsp;        if (parentNode == null)</b>
+<b class="nc"><i>502</i>&nbsp;            return null; // root</b>
+<i>503</i>&nbsp;
+<b class="nc"><i>504</i>&nbsp;        final List&lt;Node&gt; siblings = parentNode.ensureChildNodes();</b>
+<b class="nc"><i>505</i>&nbsp;        final int index = siblingIndex+1;</b>
+<b class="nc"><i>506</i>&nbsp;        if (siblings.size() &gt; index)</b>
+<b class="nc"><i>507</i>&nbsp;            return siblings.get(index);</b>
+<i>508</i>&nbsp;        else
+<b class="nc"><i>509</i>&nbsp;            return null;</b>
+<i>510</i>&nbsp;    }
+<i>511</i>&nbsp;
+<i>512</i>&nbsp;    /**
+<i>513</i>&nbsp;     Get this node&#39;s previous sibling.
+<i>514</i>&nbsp;     @return the previous sibling, or null if this is the first sibling
+<i>515</i>&nbsp;     */
+<i>516</i>&nbsp;    public Node previousSibling() {
+<b class="nc"><i>517</i>&nbsp;        if (parentNode == null)</b>
+<b class="nc"><i>518</i>&nbsp;            return null; // root</b>
+<i>519</i>&nbsp;
+<b class="nc"><i>520</i>&nbsp;        if (siblingIndex &gt; 0)</b>
+<b class="nc"><i>521</i>&nbsp;            return parentNode.ensureChildNodes().get(siblingIndex-1);</b>
+<i>522</i>&nbsp;        else
+<b class="nc"><i>523</i>&nbsp;            return null;</b>
+<i>524</i>&nbsp;    }
+<i>525</i>&nbsp;
+<i>526</i>&nbsp;    /**
+<i>527</i>&nbsp;     * Get the list index of this node in its node sibling list. I.e. if this is the first node
+<i>528</i>&nbsp;     * sibling, returns 0.
+<i>529</i>&nbsp;     * @return position in node sibling list
+<i>530</i>&nbsp;     * @see org.jsoup.nodes.Element#elementSiblingIndex()
+<i>531</i>&nbsp;     */
+<i>532</i>&nbsp;    public int siblingIndex() {
+<b class="nc"><i>533</i>&nbsp;        return siblingIndex;</b>
+<i>534</i>&nbsp;    }
+<i>535</i>&nbsp;
+<i>536</i>&nbsp;    protected void setSiblingIndex(int siblingIndex) {
+<b class="nc"><i>537</i>&nbsp;        this.siblingIndex = siblingIndex;</b>
+<i>538</i>&nbsp;    }
+<i>539</i>&nbsp;
+<i>540</i>&nbsp;    /**
+<i>541</i>&nbsp;     * Perform a depth-first traversal through this node and its descendants.
+<i>542</i>&nbsp;     * @param nodeVisitor the visitor callbacks to perform on each node
+<i>543</i>&nbsp;     * @return this node, for chaining
+<i>544</i>&nbsp;     */
+<i>545</i>&nbsp;    public Node traverse(NodeVisitor nodeVisitor) {
+<b class="nc"><i>546</i>&nbsp;        Validate.notNull(nodeVisitor);</b>
+<b class="nc"><i>547</i>&nbsp;        NodeTraversor.traverse(nodeVisitor, this);</b>
+<b class="nc"><i>548</i>&nbsp;        return this;</b>
+<i>549</i>&nbsp;    }
+<i>550</i>&nbsp;
+<i>551</i>&nbsp;    /**
+<i>552</i>&nbsp;     * Perform a depth-first filtering through this node and its descendants.
+<i>553</i>&nbsp;     * @param nodeFilter the filter callbacks to perform on each node
+<i>554</i>&nbsp;     * @return this node, for chaining
+<i>555</i>&nbsp;     */
+<i>556</i>&nbsp;    public Node filter(NodeFilter nodeFilter) {
+<b class="nc"><i>557</i>&nbsp;        Validate.notNull(nodeFilter);</b>
+<b class="nc"><i>558</i>&nbsp;        NodeTraversor.filter(nodeFilter, this);</b>
+<b class="nc"><i>559</i>&nbsp;        return this;</b>
+<i>560</i>&nbsp;    }
+<i>561</i>&nbsp;
+<i>562</i>&nbsp;    /**
+<i>563</i>&nbsp;     Get the outer HTML of this node.
+<i>564</i>&nbsp;     @return HTML
+<i>565</i>&nbsp;     */
+<i>566</i>&nbsp;    public String outerHtml() {
+<b class="nc"><i>567</i>&nbsp;        StringBuilder accum = new StringBuilder(128);</b>
+<b class="nc"><i>568</i>&nbsp;        outerHtml(accum);</b>
+<b class="nc"><i>569</i>&nbsp;        return accum.toString();</b>
+<i>570</i>&nbsp;    }
+<i>571</i>&nbsp;
+<i>572</i>&nbsp;    protected void outerHtml(Appendable accum) {
+<b class="nc"><i>573</i>&nbsp;        NodeTraversor.traverse(new OuterHtmlVisitor(accum, getOutputSettings()), this);</b>
+<i>574</i>&nbsp;    }
+<i>575</i>&nbsp;
+<i>576</i>&nbsp;    // if this node has no document (or parent), retrieve the default output settings
+<i>577</i>&nbsp;    Document.OutputSettings getOutputSettings() {
+<b class="nc"><i>578</i>&nbsp;        Document owner = ownerDocument();</b>
+<b class="nc"><i>579</i>&nbsp;        return owner != null ? owner.outputSettings() : (new Document(&quot;&quot;)).outputSettings();</b>
+<i>580</i>&nbsp;    }
+<i>581</i>&nbsp;
+<i>582</i>&nbsp;    /**
+<i>583</i>&nbsp;     Get the outer HTML of this node.
+<i>584</i>&nbsp;     @param accum accumulator to place HTML into
+<i>585</i>&nbsp;     @throws IOException if appending to the given accumulator fails.
+<i>586</i>&nbsp;     */
+<i>587</i>&nbsp;    abstract void outerHtmlHead(final Appendable accum, int depth, final Document.OutputSettings out) throws IOException;
+<i>588</i>&nbsp;
+<i>589</i>&nbsp;    abstract void outerHtmlTail(final Appendable accum, int depth, final Document.OutputSettings out) throws IOException;
+<i>590</i>&nbsp;
+<i>591</i>&nbsp;    /**
+<i>592</i>&nbsp;     * Write this node and its children to the given {@link Appendable}.
+<i>593</i>&nbsp;     *
+<i>594</i>&nbsp;     * @param appendable the {@link Appendable} to write to.
+<i>595</i>&nbsp;     * @return the supplied {@link Appendable}, for chaining.
+<i>596</i>&nbsp;     */
+<i>597</i>&nbsp;    public &lt;T extends Appendable&gt; T html(T appendable) {
+<b class="nc"><i>598</i>&nbsp;        outerHtml(appendable);</b>
+<b class="nc"><i>599</i>&nbsp;        return appendable;</b>
+<i>600</i>&nbsp;    }
+<i>601</i>&nbsp;
+<i>602</i>&nbsp;	public String toString() {
+<b class="nc"><i>603</i>&nbsp;        return outerHtml();</b>
+<i>604</i>&nbsp;    }
+<i>605</i>&nbsp;
+<i>606</i>&nbsp;    protected void indent(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+<b class="nc"><i>607</i>&nbsp;        accum.append(&#39;\n&#39;).append(StringUtil.padding(depth * out.indentAmount()));</b>
+<i>608</i>&nbsp;    }
+<i>609</i>&nbsp;
+<i>610</i>&nbsp;    /**
+<i>611</i>&nbsp;     * Check if this node is the same instance of another (object identity test).
+<i>612</i>&nbsp;     * @param o other object to compare to
+<i>613</i>&nbsp;     * @return true if the content of this node is the same as the other
+<i>614</i>&nbsp;     * @see Node#hasSameValue(Object) to compare nodes by their value
+<i>615</i>&nbsp;     */
+<i>616</i>&nbsp;    @Override
+<i>617</i>&nbsp;    public boolean equals(Object o) {
+<i>618</i>&nbsp;        // implemented just so that javadoc is clear this is an identity test
+<b class="nc"><i>619</i>&nbsp;        return this == o;</b>
+<i>620</i>&nbsp;    }
+<i>621</i>&nbsp;
+<i>622</i>&nbsp;    /**
+<i>623</i>&nbsp;     * Check if this node is has the same content as another node. A node is considered the same if its name, attributes and content match the
+<i>624</i>&nbsp;     * other node; particularly its position in the tree does not influence its similarity.
+<i>625</i>&nbsp;     * @param o other object to compare to
+<i>626</i>&nbsp;     * @return true if the content of this node is the same as the other
+<i>627</i>&nbsp;     */
+<i>628</i>&nbsp;
+<i>629</i>&nbsp;    public boolean hasSameValue(Object o) {
+<b class="nc"><i>630</i>&nbsp;        if (this == o) return true;</b>
+<b class="nc"><i>631</i>&nbsp;        if (o == null || getClass() != o.getClass()) return false;</b>
+<i>632</i>&nbsp;
+<b class="nc"><i>633</i>&nbsp;        return this.outerHtml().equals(((Node) o).outerHtml());</b>
+<i>634</i>&nbsp;    }
+<i>635</i>&nbsp;
+<i>636</i>&nbsp;    /**
+<i>637</i>&nbsp;     * Create a stand-alone, deep copy of this node, and all of its children. The cloned node will have no siblings or
+<i>638</i>&nbsp;     * parent node. As a stand-alone object, any changes made to the clone or any of its children will not impact the
+<i>639</i>&nbsp;     * original node.
+<i>640</i>&nbsp;     * &lt;p&gt;
+<i>641</i>&nbsp;     * The cloned node may be adopted into another Document or node structure using {@link Element#appendChild(Node)}.
+<i>642</i>&nbsp;     * @return a stand-alone cloned node, including clones of any children
+<i>643</i>&nbsp;     * @see #shallowClone()
+<i>644</i>&nbsp;     */
+<i>645</i>&nbsp;    @Override
+<i>646</i>&nbsp;    public Node clone() {
+<b class="nc"><i>647</i>&nbsp;        Node thisClone = doClone(null); // splits for orphan</b>
+<i>648</i>&nbsp;
+<i>649</i>&nbsp;        // Queue up nodes that need their children cloned (BFS).
+<b class="nc"><i>650</i>&nbsp;        final LinkedList&lt;Node&gt; nodesToProcess = new LinkedList&lt;&gt;();</b>
+<b class="nc"><i>651</i>&nbsp;        nodesToProcess.add(thisClone);</b>
+<i>652</i>&nbsp;
+<b class="nc"><i>653</i>&nbsp;        while (!nodesToProcess.isEmpty()) {</b>
+<b class="nc"><i>654</i>&nbsp;            Node currParent = nodesToProcess.remove();</b>
+<i>655</i>&nbsp;
+<b class="nc"><i>656</i>&nbsp;            final int size = currParent.childNodeSize();</b>
+<b class="nc"><i>657</i>&nbsp;            for (int i = 0; i &lt; size; i++) {</b>
+<b class="nc"><i>658</i>&nbsp;                final List&lt;Node&gt; childNodes = currParent.ensureChildNodes();</b>
+<b class="nc"><i>659</i>&nbsp;                Node childClone = childNodes.get(i).doClone(currParent);</b>
+<b class="nc"><i>660</i>&nbsp;                childNodes.set(i, childClone);</b>
+<b class="nc"><i>661</i>&nbsp;                nodesToProcess.add(childClone);</b>
+<i>662</i>&nbsp;            }
+<b class="nc"><i>663</i>&nbsp;        }</b>
+<i>664</i>&nbsp;
+<b class="nc"><i>665</i>&nbsp;        return thisClone;</b>
+<i>666</i>&nbsp;    }
+<i>667</i>&nbsp;
+<i>668</i>&nbsp;    /**
+<i>669</i>&nbsp;     * Create a stand-alone, shallow copy of this node. None of its children (if any) will be cloned, and it will have
+<i>670</i>&nbsp;     * no parent or sibling nodes.
+<i>671</i>&nbsp;     * @return a single independent copy of this node
+<i>672</i>&nbsp;     * @see #clone()
+<i>673</i>&nbsp;     */
+<i>674</i>&nbsp;    public Node shallowClone() {
+<b class="nc"><i>675</i>&nbsp;        return doClone(null);</b>
+<i>676</i>&nbsp;    }
+<i>677</i>&nbsp;
+<i>678</i>&nbsp;    /*
+<i>679</i>&nbsp;     * Return a clone of the node using the given parent (which can be null).
+<i>680</i>&nbsp;     * Not a deep copy of children.
+<i>681</i>&nbsp;     */
+<i>682</i>&nbsp;    protected Node doClone(Node parent) {
+<i>683</i>&nbsp;        Node clone;
+<i>684</i>&nbsp;
+<i>685</i>&nbsp;        try {
+<b class="nc"><i>686</i>&nbsp;            clone = (Node) super.clone();</b>
+<b class="nc"><i>687</i>&nbsp;        } catch (CloneNotSupportedException e) {</b>
+<b class="nc"><i>688</i>&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc"><i>689</i>&nbsp;        }</b>
+<i>690</i>&nbsp;
+<b class="nc"><i>691</i>&nbsp;        clone.parentNode = parent; // can be null, to create an orphan split</b>
+<b class="nc"><i>692</i>&nbsp;        clone.siblingIndex = parent == null ? 0 : siblingIndex;</b>
+<i>693</i>&nbsp;
+<b class="nc"><i>694</i>&nbsp;        return clone;</b>
+<i>695</i>&nbsp;    }
+<i>696</i>&nbsp;
+<i>697</i>&nbsp;    private static class OuterHtmlVisitor implements NodeVisitor {
+<i>698</i>&nbsp;        private Appendable accum;
+<i>699</i>&nbsp;        private Document.OutputSettings out;
+<i>700</i>&nbsp;
+<b class="nc"><i>701</i>&nbsp;        OuterHtmlVisitor(Appendable accum, Document.OutputSettings out) {</b>
+<b class="nc"><i>702</i>&nbsp;            this.accum = accum;</b>
+<b class="nc"><i>703</i>&nbsp;            this.out = out;</b>
+<b class="nc"><i>704</i>&nbsp;            out.prepareEncoder();</b>
+<i>705</i>&nbsp;        }
+<i>706</i>&nbsp;
+<i>707</i>&nbsp;        public void head(Node node, int depth) {
+<i>708</i>&nbsp;            try {
+<b class="nc"><i>709</i>&nbsp;				node.outerHtmlHead(accum, depth, out);</b>
+<b class="nc"><i>710</i>&nbsp;			} catch (IOException exception) {</b>
+<b class="nc"><i>711</i>&nbsp;				throw new SerializationException(exception);</b>
+<b class="nc"><i>712</i>&nbsp;			}</b>
+<i>713</i>&nbsp;        }
+<i>714</i>&nbsp;
+<i>715</i>&nbsp;        public void tail(Node node, int depth) {
+<b class="nc"><i>716</i>&nbsp;            if (!node.nodeName().equals(&quot;#text&quot;)) { // saves a void hit.</b>
+<i>717</i>&nbsp;				try {
+<b class="nc"><i>718</i>&nbsp;					node.outerHtmlTail(accum, depth, out);</b>
+<b class="nc"><i>719</i>&nbsp;				} catch (IOException exception) {</b>
+<b class="nc"><i>720</i>&nbsp;					throw new SerializationException(exception);</b>
+<b class="nc"><i>721</i>&nbsp;				}</b>
+<i>722</i>&nbsp;            }
+<i>723</i>&nbsp;        }
+<i>724</i>&nbsp;    }
+<i>725</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 17:37</div>
+</div>
+</body>
+</html>

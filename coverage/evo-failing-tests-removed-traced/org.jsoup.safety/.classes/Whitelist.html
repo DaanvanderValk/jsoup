@@ -1,0 +1,831 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Whitelist</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.safety</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Whitelist (org.jsoup.safety)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Whitelist</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 192)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Whitelist$AttributeKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Whitelist$AttributeValue</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Whitelist$Protocol</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Whitelist$TagName</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Whitelist$TypedValue</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 216)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.safety;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;/*
+<i>4</i>&nbsp;    Thank you to Ryan Grove (wonko.com) for the Ruby HTML cleaner http://github.com/rgrove/sanitize/, which inspired
+<i>5</i>&nbsp;    this whitelist configuration, and the initial defaults.
+<i>6</i>&nbsp; */
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import org.jsoup.helper.Validate;
+<i>9</i>&nbsp;import org.jsoup.nodes.Attribute;
+<i>10</i>&nbsp;import org.jsoup.nodes.Attributes;
+<i>11</i>&nbsp;import org.jsoup.nodes.Element;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;import java.util.HashMap;
+<i>14</i>&nbsp;import java.util.HashSet;
+<i>15</i>&nbsp;import java.util.Map;
+<i>16</i>&nbsp;import java.util.Set;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import static org.jsoup.internal.Normalizer.lowerCase;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;/**
+<i>22</i>&nbsp; Whitelists define what HTML (elements and attributes) to allow through the cleaner. Everything else is removed.
+<i>23</i>&nbsp; &lt;p&gt;
+<i>24</i>&nbsp; Start with one of the defaults:
+<i>25</i>&nbsp; &lt;/p&gt;
+<i>26</i>&nbsp; &lt;ul&gt;
+<i>27</i>&nbsp; &lt;li&gt;{@link #none}
+<i>28</i>&nbsp; &lt;li&gt;{@link #simpleText}
+<i>29</i>&nbsp; &lt;li&gt;{@link #basic}
+<i>30</i>&nbsp; &lt;li&gt;{@link #basicWithImages}
+<i>31</i>&nbsp; &lt;li&gt;{@link #relaxed}
+<i>32</i>&nbsp; &lt;/ul&gt;
+<i>33</i>&nbsp; &lt;p&gt;
+<i>34</i>&nbsp; If you need to allow more through (please be careful!), tweak a base whitelist with:
+<i>35</i>&nbsp; &lt;/p&gt;
+<i>36</i>&nbsp; &lt;ul&gt;
+<i>37</i>&nbsp; &lt;li&gt;{@link #addTags}
+<i>38</i>&nbsp; &lt;li&gt;{@link #addAttributes}
+<i>39</i>&nbsp; &lt;li&gt;{@link #addEnforcedAttribute}
+<i>40</i>&nbsp; &lt;li&gt;{@link #addProtocols}
+<i>41</i>&nbsp; &lt;/ul&gt;
+<i>42</i>&nbsp; &lt;p&gt;
+<i>43</i>&nbsp; You can remove any setting from an existing whitelist with:
+<i>44</i>&nbsp; &lt;/p&gt;
+<i>45</i>&nbsp; &lt;ul&gt;
+<i>46</i>&nbsp; &lt;li&gt;{@link #removeTags}
+<i>47</i>&nbsp; &lt;li&gt;{@link #removeAttributes}
+<i>48</i>&nbsp; &lt;li&gt;{@link #removeEnforcedAttribute}
+<i>49</i>&nbsp; &lt;li&gt;{@link #removeProtocols}
+<i>50</i>&nbsp; &lt;/ul&gt;
+<i>51</i>&nbsp; 
+<i>52</i>&nbsp; &lt;p&gt;
+<i>53</i>&nbsp; The cleaner and these whitelists assume that you want to clean a &lt;code&gt;body&lt;/code&gt; fragment of HTML (to add user
+<i>54</i>&nbsp; supplied HTML into a templated page), and not to clean a full HTML document. If the latter is the case, either wrap the
+<i>55</i>&nbsp; document HTML around the cleaned body HTML, or create a whitelist that allows &lt;code&gt;html&lt;/code&gt; and &lt;code&gt;head&lt;/code&gt;
+<i>56</i>&nbsp; elements as appropriate.
+<i>57</i>&nbsp; &lt;/p&gt;
+<i>58</i>&nbsp; &lt;p&gt;
+<i>59</i>&nbsp; If you are going to extend a whitelist, please be very careful. Make sure you understand what attributes may lead to
+<i>60</i>&nbsp; XSS attack vectors. URL attributes are particularly vulnerable and require careful validation. See 
+<i>61</i>&nbsp; http://ha.ckers.org/xss.html for some XSS attack examples.
+<i>62</i>&nbsp; &lt;/p&gt;
+<i>63</i>&nbsp;
+<i>64</i>&nbsp; @author Jonathan Hedley
+<i>65</i>&nbsp; */
+<i>66</i>&nbsp;public class Whitelist {
+<i>67</i>&nbsp;    private Set&lt;TagName&gt; tagNames; // tags allowed, lower case. e.g. [p, br, span]
+<i>68</i>&nbsp;    private Map&lt;TagName, Set&lt;AttributeKey&gt;&gt; attributes; // tag -&gt; attribute[]. allowed attributes [href] for a tag.
+<i>69</i>&nbsp;    private Map&lt;TagName, Map&lt;AttributeKey, AttributeValue&gt;&gt; enforcedAttributes; // always set these attribute values
+<i>70</i>&nbsp;    private Map&lt;TagName, Map&lt;AttributeKey, Set&lt;Protocol&gt;&gt;&gt; protocols; // allowed URL protocols for attributes
+<i>71</i>&nbsp;    private boolean preserveRelativeLinks; // option to preserve relative links
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    /**
+<i>74</i>&nbsp;     This whitelist allows only text nodes: all HTML will be stripped.
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;     @return whitelist
+<i>77</i>&nbsp;     */
+<i>78</i>&nbsp;    public static Whitelist none() {
+<b class="nc"><i>79</i>&nbsp;        return new Whitelist();</b>
+<i>80</i>&nbsp;    }
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    /**
+<i>83</i>&nbsp;     This whitelist allows only simple text formatting: &lt;code&gt;b, em, i, strong, u&lt;/code&gt;. All other HTML (tags and
+<i>84</i>&nbsp;     attributes) will be removed.
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;     @return whitelist
+<i>87</i>&nbsp;     */
+<i>88</i>&nbsp;    public static Whitelist simpleText() {
+<b class="nc"><i>89</i>&nbsp;        return new Whitelist()</b>
+<b class="nc"><i>90</i>&nbsp;                .addTags(&quot;b&quot;, &quot;em&quot;, &quot;i&quot;, &quot;strong&quot;, &quot;u&quot;)</b>
+<i>91</i>&nbsp;                ;
+<i>92</i>&nbsp;    }
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;    /**
+<i>95</i>&nbsp;     &lt;p&gt;
+<i>96</i>&nbsp;     This whitelist allows a fuller range of text nodes: &lt;code&gt;a, b, blockquote, br, cite, code, dd, dl, dt, em, i, li,
+<i>97</i>&nbsp;     ol, p, pre, q, small, span, strike, strong, sub, sup, u, ul&lt;/code&gt;, and appropriate attributes.
+<i>98</i>&nbsp;     &lt;/p&gt;
+<i>99</i>&nbsp;     &lt;p&gt;
+<i>100</i>&nbsp;     Links (&lt;code&gt;a&lt;/code&gt; elements) can point to &lt;code&gt;http, https, ftp, mailto&lt;/code&gt;, and have an enforced
+<i>101</i>&nbsp;     &lt;code&gt;rel=nofollow&lt;/code&gt; attribute.
+<i>102</i>&nbsp;     &lt;/p&gt;
+<i>103</i>&nbsp;     &lt;p&gt;
+<i>104</i>&nbsp;     Does not allow images.
+<i>105</i>&nbsp;     &lt;/p&gt;
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;     @return whitelist
+<i>108</i>&nbsp;     */
+<i>109</i>&nbsp;    public static Whitelist basic() {
+<b class="nc"><i>110</i>&nbsp;        return new Whitelist()</b>
+<b class="nc"><i>111</i>&nbsp;                .addTags(</b>
+<i>112</i>&nbsp;                        &quot;a&quot;, &quot;b&quot;, &quot;blockquote&quot;, &quot;br&quot;, &quot;cite&quot;, &quot;code&quot;, &quot;dd&quot;, &quot;dl&quot;, &quot;dt&quot;, &quot;em&quot;,
+<i>113</i>&nbsp;                        &quot;i&quot;, &quot;li&quot;, &quot;ol&quot;, &quot;p&quot;, &quot;pre&quot;, &quot;q&quot;, &quot;small&quot;, &quot;span&quot;, &quot;strike&quot;, &quot;strong&quot;, &quot;sub&quot;,
+<i>114</i>&nbsp;                        &quot;sup&quot;, &quot;u&quot;, &quot;ul&quot;)
+<i>115</i>&nbsp;
+<b class="nc"><i>116</i>&nbsp;                .addAttributes(&quot;a&quot;, &quot;href&quot;)</b>
+<b class="nc"><i>117</i>&nbsp;                .addAttributes(&quot;blockquote&quot;, &quot;cite&quot;)</b>
+<b class="nc"><i>118</i>&nbsp;                .addAttributes(&quot;q&quot;, &quot;cite&quot;)</b>
+<i>119</i>&nbsp;
+<b class="nc"><i>120</i>&nbsp;                .addProtocols(&quot;a&quot;, &quot;href&quot;, &quot;ftp&quot;, &quot;http&quot;, &quot;https&quot;, &quot;mailto&quot;)</b>
+<b class="nc"><i>121</i>&nbsp;                .addProtocols(&quot;blockquote&quot;, &quot;cite&quot;, &quot;http&quot;, &quot;https&quot;)</b>
+<b class="nc"><i>122</i>&nbsp;                .addProtocols(&quot;cite&quot;, &quot;cite&quot;, &quot;http&quot;, &quot;https&quot;)</b>
+<i>123</i>&nbsp;
+<b class="nc"><i>124</i>&nbsp;                .addEnforcedAttribute(&quot;a&quot;, &quot;rel&quot;, &quot;nofollow&quot;)</b>
+<i>125</i>&nbsp;                ;
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;    }
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;    /**
+<i>130</i>&nbsp;     This whitelist allows the same text tags as {@link #basic}, and also allows &lt;code&gt;img&lt;/code&gt; tags, with appropriate
+<i>131</i>&nbsp;     attributes, with &lt;code&gt;src&lt;/code&gt; pointing to &lt;code&gt;http&lt;/code&gt; or &lt;code&gt;https&lt;/code&gt;.
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;     @return whitelist
+<i>134</i>&nbsp;     */
+<i>135</i>&nbsp;    public static Whitelist basicWithImages() {
+<b class="nc"><i>136</i>&nbsp;        return basic()</b>
+<b class="nc"><i>137</i>&nbsp;                .addTags(&quot;img&quot;)</b>
+<b class="nc"><i>138</i>&nbsp;                .addAttributes(&quot;img&quot;, &quot;align&quot;, &quot;alt&quot;, &quot;height&quot;, &quot;src&quot;, &quot;title&quot;, &quot;width&quot;)</b>
+<b class="nc"><i>139</i>&nbsp;                .addProtocols(&quot;img&quot;, &quot;src&quot;, &quot;http&quot;, &quot;https&quot;)</b>
+<i>140</i>&nbsp;                ;
+<i>141</i>&nbsp;    }
+<i>142</i>&nbsp;
+<i>143</i>&nbsp;    /**
+<i>144</i>&nbsp;     This whitelist allows a full range of text and structural body HTML: &lt;code&gt;a, b, blockquote, br, caption, cite,
+<i>145</i>&nbsp;     code, col, colgroup, dd, div, dl, dt, em, h1, h2, h3, h4, h5, h6, i, img, li, ol, p, pre, q, small, span, strike, strong, sub,
+<i>146</i>&nbsp;     sup, table, tbody, td, tfoot, th, thead, tr, u, ul&lt;/code&gt;
+<i>147</i>&nbsp;     &lt;p&gt;
+<i>148</i>&nbsp;     Links do not have an enforced &lt;code&gt;rel=nofollow&lt;/code&gt; attribute, but you can add that if desired.
+<i>149</i>&nbsp;     &lt;/p&gt;
+<i>150</i>&nbsp;
+<i>151</i>&nbsp;     @return whitelist
+<i>152</i>&nbsp;     */
+<i>153</i>&nbsp;    public static Whitelist relaxed() {
+<b class="nc"><i>154</i>&nbsp;        return new Whitelist()</b>
+<b class="nc"><i>155</i>&nbsp;                .addTags(</b>
+<i>156</i>&nbsp;                        &quot;a&quot;, &quot;b&quot;, &quot;blockquote&quot;, &quot;br&quot;, &quot;caption&quot;, &quot;cite&quot;, &quot;code&quot;, &quot;col&quot;,
+<i>157</i>&nbsp;                        &quot;colgroup&quot;, &quot;dd&quot;, &quot;div&quot;, &quot;dl&quot;, &quot;dt&quot;, &quot;em&quot;, &quot;h1&quot;, &quot;h2&quot;, &quot;h3&quot;, &quot;h4&quot;, &quot;h5&quot;, &quot;h6&quot;,
+<i>158</i>&nbsp;                        &quot;i&quot;, &quot;img&quot;, &quot;li&quot;, &quot;ol&quot;, &quot;p&quot;, &quot;pre&quot;, &quot;q&quot;, &quot;small&quot;, &quot;span&quot;, &quot;strike&quot;, &quot;strong&quot;,
+<i>159</i>&nbsp;                        &quot;sub&quot;, &quot;sup&quot;, &quot;table&quot;, &quot;tbody&quot;, &quot;td&quot;, &quot;tfoot&quot;, &quot;th&quot;, &quot;thead&quot;, &quot;tr&quot;, &quot;u&quot;,
+<i>160</i>&nbsp;                        &quot;ul&quot;)
+<i>161</i>&nbsp;
+<b class="nc"><i>162</i>&nbsp;                .addAttributes(&quot;a&quot;, &quot;href&quot;, &quot;title&quot;)</b>
+<b class="nc"><i>163</i>&nbsp;                .addAttributes(&quot;blockquote&quot;, &quot;cite&quot;)</b>
+<b class="nc"><i>164</i>&nbsp;                .addAttributes(&quot;col&quot;, &quot;span&quot;, &quot;width&quot;)</b>
+<b class="nc"><i>165</i>&nbsp;                .addAttributes(&quot;colgroup&quot;, &quot;span&quot;, &quot;width&quot;)</b>
+<b class="nc"><i>166</i>&nbsp;                .addAttributes(&quot;img&quot;, &quot;align&quot;, &quot;alt&quot;, &quot;height&quot;, &quot;src&quot;, &quot;title&quot;, &quot;width&quot;)</b>
+<b class="nc"><i>167</i>&nbsp;                .addAttributes(&quot;ol&quot;, &quot;start&quot;, &quot;type&quot;)</b>
+<b class="nc"><i>168</i>&nbsp;                .addAttributes(&quot;q&quot;, &quot;cite&quot;)</b>
+<b class="nc"><i>169</i>&nbsp;                .addAttributes(&quot;table&quot;, &quot;summary&quot;, &quot;width&quot;)</b>
+<b class="nc"><i>170</i>&nbsp;                .addAttributes(&quot;td&quot;, &quot;abbr&quot;, &quot;axis&quot;, &quot;colspan&quot;, &quot;rowspan&quot;, &quot;width&quot;)</b>
+<b class="nc"><i>171</i>&nbsp;                .addAttributes(</b>
+<i>172</i>&nbsp;                        &quot;th&quot;, &quot;abbr&quot;, &quot;axis&quot;, &quot;colspan&quot;, &quot;rowspan&quot;, &quot;scope&quot;,
+<i>173</i>&nbsp;                        &quot;width&quot;)
+<b class="nc"><i>174</i>&nbsp;                .addAttributes(&quot;ul&quot;, &quot;type&quot;)</b>
+<i>175</i>&nbsp;
+<b class="nc"><i>176</i>&nbsp;                .addProtocols(&quot;a&quot;, &quot;href&quot;, &quot;ftp&quot;, &quot;http&quot;, &quot;https&quot;, &quot;mailto&quot;)</b>
+<b class="nc"><i>177</i>&nbsp;                .addProtocols(&quot;blockquote&quot;, &quot;cite&quot;, &quot;http&quot;, &quot;https&quot;)</b>
+<b class="nc"><i>178</i>&nbsp;                .addProtocols(&quot;cite&quot;, &quot;cite&quot;, &quot;http&quot;, &quot;https&quot;)</b>
+<b class="nc"><i>179</i>&nbsp;                .addProtocols(&quot;img&quot;, &quot;src&quot;, &quot;http&quot;, &quot;https&quot;)</b>
+<b class="nc"><i>180</i>&nbsp;                .addProtocols(&quot;q&quot;, &quot;cite&quot;, &quot;http&quot;, &quot;https&quot;)</b>
+<i>181</i>&nbsp;                ;
+<i>182</i>&nbsp;    }
+<i>183</i>&nbsp;
+<i>184</i>&nbsp;    /**
+<i>185</i>&nbsp;     Create a new, empty whitelist. Generally it will be better to start with a default prepared whitelist instead.
+<i>186</i>&nbsp;
+<i>187</i>&nbsp;     @see #basic()
+<i>188</i>&nbsp;     @see #basicWithImages()
+<i>189</i>&nbsp;     @see #simpleText()
+<i>190</i>&nbsp;     @see #relaxed()
+<i>191</i>&nbsp;     */
+<b class="nc"><i>192</i>&nbsp;    public Whitelist() {</b>
+<b class="nc"><i>193</i>&nbsp;        tagNames = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>194</i>&nbsp;        attributes = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>195</i>&nbsp;        enforcedAttributes = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>196</i>&nbsp;        protocols = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>197</i>&nbsp;        preserveRelativeLinks = false;</b>
+<i>198</i>&nbsp;    }
+<i>199</i>&nbsp;
+<i>200</i>&nbsp;    /**
+<i>201</i>&nbsp;     Add a list of allowed elements to a whitelist. (If a tag is not allowed, it will be removed from the HTML.)
+<i>202</i>&nbsp;
+<i>203</i>&nbsp;     @param tags tag names to allow
+<i>204</i>&nbsp;     @return this (for chaining)
+<i>205</i>&nbsp;     */
+<i>206</i>&nbsp;    public Whitelist addTags(String... tags) {
+<b class="nc"><i>207</i>&nbsp;        Validate.notNull(tags);</b>
+<i>208</i>&nbsp;
+<b class="nc"><i>209</i>&nbsp;        for (String tagName : tags) {</b>
+<b class="nc"><i>210</i>&nbsp;            Validate.notEmpty(tagName);</b>
+<b class="nc"><i>211</i>&nbsp;            tagNames.add(TagName.valueOf(tagName));</b>
+<i>212</i>&nbsp;        }
+<b class="nc"><i>213</i>&nbsp;        return this;</b>
+<i>214</i>&nbsp;    }
+<i>215</i>&nbsp;
+<i>216</i>&nbsp;    /**
+<i>217</i>&nbsp;     Remove a list of allowed elements from a whitelist. (If a tag is not allowed, it will be removed from the HTML.)
+<i>218</i>&nbsp;
+<i>219</i>&nbsp;     @param tags tag names to disallow
+<i>220</i>&nbsp;     @return this (for chaining)
+<i>221</i>&nbsp;     */
+<i>222</i>&nbsp;    public Whitelist removeTags(String... tags) {
+<b class="nc"><i>223</i>&nbsp;        Validate.notNull(tags);</b>
+<i>224</i>&nbsp;
+<b class="nc"><i>225</i>&nbsp;        for(String tag: tags) {</b>
+<b class="nc"><i>226</i>&nbsp;            Validate.notEmpty(tag);</b>
+<b class="nc"><i>227</i>&nbsp;            TagName tagName = TagName.valueOf(tag);</b>
+<i>228</i>&nbsp;
+<b class="nc"><i>229</i>&nbsp;            if(tagNames.remove(tagName)) { // Only look in sub-maps if tag was allowed</b>
+<b class="nc"><i>230</i>&nbsp;                attributes.remove(tagName);</b>
+<b class="nc"><i>231</i>&nbsp;                enforcedAttributes.remove(tagName);</b>
+<b class="nc"><i>232</i>&nbsp;                protocols.remove(tagName);</b>
+<i>233</i>&nbsp;            }
+<i>234</i>&nbsp;        }
+<b class="nc"><i>235</i>&nbsp;        return this;</b>
+<i>236</i>&nbsp;    }
+<i>237</i>&nbsp;
+<i>238</i>&nbsp;    /**
+<i>239</i>&nbsp;     Add a list of allowed attributes to a tag. (If an attribute is not allowed on an element, it will be removed.)
+<i>240</i>&nbsp;     &lt;p&gt;
+<i>241</i>&nbsp;     E.g.: &lt;code&gt;addAttributes(&quot;a&quot;, &quot;href&quot;, &quot;class&quot;)&lt;/code&gt; allows &lt;code&gt;href&lt;/code&gt; and &lt;code&gt;class&lt;/code&gt; attributes
+<i>242</i>&nbsp;     on &lt;code&gt;a&lt;/code&gt; tags.
+<i>243</i>&nbsp;     &lt;/p&gt;
+<i>244</i>&nbsp;     &lt;p&gt;
+<i>245</i>&nbsp;     To make an attribute valid for &lt;b&gt;all tags&lt;/b&gt;, use the pseudo tag &lt;code&gt;:all&lt;/code&gt;, e.g.
+<i>246</i>&nbsp;     &lt;code&gt;addAttributes(&quot;:all&quot;, &quot;class&quot;)&lt;/code&gt;.
+<i>247</i>&nbsp;     &lt;/p&gt;
+<i>248</i>&nbsp;
+<i>249</i>&nbsp;     @param tag  The tag the attributes are for. The tag will be added to the allowed tag list if necessary.
+<i>250</i>&nbsp;     @param attributes List of valid attributes for the tag
+<i>251</i>&nbsp;     @return this (for chaining)
+<i>252</i>&nbsp;     */
+<i>253</i>&nbsp;    public Whitelist addAttributes(String tag, String... attributes) {
+<b class="nc"><i>254</i>&nbsp;        Validate.notEmpty(tag);</b>
+<b class="nc"><i>255</i>&nbsp;        Validate.notNull(attributes);</b>
+<b class="nc"><i>256</i>&nbsp;        Validate.isTrue(attributes.length &gt; 0, &quot;No attribute names supplied.&quot;);</b>
+<i>257</i>&nbsp;
+<b class="nc"><i>258</i>&nbsp;        TagName tagName = TagName.valueOf(tag);</b>
+<b class="nc"><i>259</i>&nbsp;        if (!tagNames.contains(tagName))</b>
+<b class="nc"><i>260</i>&nbsp;            tagNames.add(tagName);</b>
+<b class="nc"><i>261</i>&nbsp;        Set&lt;AttributeKey&gt; attributeSet = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>262</i>&nbsp;        for (String key : attributes) {</b>
+<b class="nc"><i>263</i>&nbsp;            Validate.notEmpty(key);</b>
+<b class="nc"><i>264</i>&nbsp;            attributeSet.add(AttributeKey.valueOf(key));</b>
+<i>265</i>&nbsp;        }
+<b class="nc"><i>266</i>&nbsp;        if (this.attributes.containsKey(tagName)) {</b>
+<b class="nc"><i>267</i>&nbsp;            Set&lt;AttributeKey&gt; currentSet = this.attributes.get(tagName);</b>
+<b class="nc"><i>268</i>&nbsp;            currentSet.addAll(attributeSet);</b>
+<b class="nc"><i>269</i>&nbsp;        } else {</b>
+<b class="nc"><i>270</i>&nbsp;            this.attributes.put(tagName, attributeSet);</b>
+<i>271</i>&nbsp;        }
+<b class="nc"><i>272</i>&nbsp;        return this;</b>
+<i>273</i>&nbsp;    }
+<i>274</i>&nbsp;
+<i>275</i>&nbsp;    /**
+<i>276</i>&nbsp;     Remove a list of allowed attributes from a tag. (If an attribute is not allowed on an element, it will be removed.)
+<i>277</i>&nbsp;     &lt;p&gt;
+<i>278</i>&nbsp;     E.g.: &lt;code&gt;removeAttributes(&quot;a&quot;, &quot;href&quot;, &quot;class&quot;)&lt;/code&gt; disallows &lt;code&gt;href&lt;/code&gt; and &lt;code&gt;class&lt;/code&gt;
+<i>279</i>&nbsp;     attributes on &lt;code&gt;a&lt;/code&gt; tags.
+<i>280</i>&nbsp;     &lt;/p&gt;
+<i>281</i>&nbsp;     &lt;p&gt;
+<i>282</i>&nbsp;     To make an attribute invalid for &lt;b&gt;all tags&lt;/b&gt;, use the pseudo tag &lt;code&gt;:all&lt;/code&gt;, e.g.
+<i>283</i>&nbsp;     &lt;code&gt;removeAttributes(&quot;:all&quot;, &quot;class&quot;)&lt;/code&gt;.
+<i>284</i>&nbsp;     &lt;/p&gt;
+<i>285</i>&nbsp;
+<i>286</i>&nbsp;     @param tag  The tag the attributes are for.
+<i>287</i>&nbsp;     @param attributes List of invalid attributes for the tag
+<i>288</i>&nbsp;     @return this (for chaining)
+<i>289</i>&nbsp;     */
+<i>290</i>&nbsp;    public Whitelist removeAttributes(String tag, String... attributes) {
+<b class="nc"><i>291</i>&nbsp;        Validate.notEmpty(tag);</b>
+<b class="nc"><i>292</i>&nbsp;        Validate.notNull(attributes);</b>
+<b class="nc"><i>293</i>&nbsp;        Validate.isTrue(attributes.length &gt; 0, &quot;No attribute names supplied.&quot;);</b>
+<i>294</i>&nbsp;
+<b class="nc"><i>295</i>&nbsp;        TagName tagName = TagName.valueOf(tag);</b>
+<b class="nc"><i>296</i>&nbsp;        Set&lt;AttributeKey&gt; attributeSet = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>297</i>&nbsp;        for (String key : attributes) {</b>
+<b class="nc"><i>298</i>&nbsp;            Validate.notEmpty(key);</b>
+<b class="nc"><i>299</i>&nbsp;            attributeSet.add(AttributeKey.valueOf(key));</b>
+<i>300</i>&nbsp;        }
+<b class="nc"><i>301</i>&nbsp;        if(tagNames.contains(tagName) &amp;&amp; this.attributes.containsKey(tagName)) { // Only look in sub-maps if tag was allowed</b>
+<b class="nc"><i>302</i>&nbsp;            Set&lt;AttributeKey&gt; currentSet = this.attributes.get(tagName);</b>
+<b class="nc"><i>303</i>&nbsp;            currentSet.removeAll(attributeSet);</b>
+<i>304</i>&nbsp;
+<b class="nc"><i>305</i>&nbsp;            if(currentSet.isEmpty()) // Remove tag from attribute map if no attributes are allowed for tag</b>
+<b class="nc"><i>306</i>&nbsp;                this.attributes.remove(tagName);</b>
+<i>307</i>&nbsp;        }
+<b class="nc"><i>308</i>&nbsp;        if(tag.equals(&quot;:all&quot;)) // Attribute needs to be removed from all individually set tags</b>
+<b class="nc"><i>309</i>&nbsp;            for(TagName name: this.attributes.keySet()) {</b>
+<b class="nc"><i>310</i>&nbsp;                Set&lt;AttributeKey&gt; currentSet = this.attributes.get(name);</b>
+<b class="nc"><i>311</i>&nbsp;                currentSet.removeAll(attributeSet);</b>
+<i>312</i>&nbsp;
+<b class="nc"><i>313</i>&nbsp;                if(currentSet.isEmpty()) // Remove tag from attribute map if no attributes are allowed for tag</b>
+<b class="nc"><i>314</i>&nbsp;                    this.attributes.remove(name);</b>
+<b class="nc"><i>315</i>&nbsp;            }</b>
+<b class="nc"><i>316</i>&nbsp;        return this;</b>
+<i>317</i>&nbsp;    }
+<i>318</i>&nbsp;
+<i>319</i>&nbsp;    /**
+<i>320</i>&nbsp;     Add an enforced attribute to a tag. An enforced attribute will always be added to the element. If the element
+<i>321</i>&nbsp;     already has the attribute set, it will be overridden with this value.
+<i>322</i>&nbsp;     &lt;p&gt;
+<i>323</i>&nbsp;     E.g.: &lt;code&gt;addEnforcedAttribute(&quot;a&quot;, &quot;rel&quot;, &quot;nofollow&quot;)&lt;/code&gt; will make all &lt;code&gt;a&lt;/code&gt; tags output as
+<i>324</i>&nbsp;     &lt;code&gt;&amp;lt;a href=&quot;...&quot; rel=&quot;nofollow&quot;&amp;gt;&lt;/code&gt;
+<i>325</i>&nbsp;     &lt;/p&gt;
+<i>326</i>&nbsp;
+<i>327</i>&nbsp;     @param tag   The tag the enforced attribute is for. The tag will be added to the allowed tag list if necessary.
+<i>328</i>&nbsp;     @param attribute   The attribute name
+<i>329</i>&nbsp;     @param value The enforced attribute value
+<i>330</i>&nbsp;     @return this (for chaining)
+<i>331</i>&nbsp;     */
+<i>332</i>&nbsp;    public Whitelist addEnforcedAttribute(String tag, String attribute, String value) {
+<b class="nc"><i>333</i>&nbsp;        Validate.notEmpty(tag);</b>
+<b class="nc"><i>334</i>&nbsp;        Validate.notEmpty(attribute);</b>
+<b class="nc"><i>335</i>&nbsp;        Validate.notEmpty(value);</b>
+<i>336</i>&nbsp;
+<b class="nc"><i>337</i>&nbsp;        TagName tagName = TagName.valueOf(tag);</b>
+<b class="nc"><i>338</i>&nbsp;        if (!tagNames.contains(tagName))</b>
+<b class="nc"><i>339</i>&nbsp;            tagNames.add(tagName);</b>
+<b class="nc"><i>340</i>&nbsp;        AttributeKey attrKey = AttributeKey.valueOf(attribute);</b>
+<b class="nc"><i>341</i>&nbsp;        AttributeValue attrVal = AttributeValue.valueOf(value);</b>
+<i>342</i>&nbsp;
+<b class="nc"><i>343</i>&nbsp;        if (enforcedAttributes.containsKey(tagName)) {</b>
+<b class="nc"><i>344</i>&nbsp;            enforcedAttributes.get(tagName).put(attrKey, attrVal);</b>
+<i>345</i>&nbsp;        } else {
+<b class="nc"><i>346</i>&nbsp;            Map&lt;AttributeKey, AttributeValue&gt; attrMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>347</i>&nbsp;            attrMap.put(attrKey, attrVal);</b>
+<b class="nc"><i>348</i>&nbsp;            enforcedAttributes.put(tagName, attrMap);</b>
+<i>349</i>&nbsp;        }
+<b class="nc"><i>350</i>&nbsp;        return this;</b>
+<i>351</i>&nbsp;    }
+<i>352</i>&nbsp;
+<i>353</i>&nbsp;    /**
+<i>354</i>&nbsp;     Remove a previously configured enforced attribute from a tag.
+<i>355</i>&nbsp;
+<i>356</i>&nbsp;     @param tag   The tag the enforced attribute is for.
+<i>357</i>&nbsp;     @param attribute   The attribute name
+<i>358</i>&nbsp;     @return this (for chaining)
+<i>359</i>&nbsp;     */
+<i>360</i>&nbsp;    public Whitelist removeEnforcedAttribute(String tag, String attribute) {
+<b class="nc"><i>361</i>&nbsp;        Validate.notEmpty(tag);</b>
+<b class="nc"><i>362</i>&nbsp;        Validate.notEmpty(attribute);</b>
+<i>363</i>&nbsp;
+<b class="nc"><i>364</i>&nbsp;        TagName tagName = TagName.valueOf(tag);</b>
+<b class="nc"><i>365</i>&nbsp;        if(tagNames.contains(tagName) &amp;&amp; enforcedAttributes.containsKey(tagName)) {</b>
+<b class="nc"><i>366</i>&nbsp;            AttributeKey attrKey = AttributeKey.valueOf(attribute);</b>
+<b class="nc"><i>367</i>&nbsp;            Map&lt;AttributeKey, AttributeValue&gt; attrMap = enforcedAttributes.get(tagName);</b>
+<b class="nc"><i>368</i>&nbsp;            attrMap.remove(attrKey);</b>
+<i>369</i>&nbsp;
+<b class="nc"><i>370</i>&nbsp;            if(attrMap.isEmpty()) // Remove tag from enforced attribute map if no enforced attributes are present</b>
+<b class="nc"><i>371</i>&nbsp;                enforcedAttributes.remove(tagName);</b>
+<i>372</i>&nbsp;        }
+<b class="nc"><i>373</i>&nbsp;        return this;</b>
+<i>374</i>&nbsp;    }
+<i>375</i>&nbsp;
+<i>376</i>&nbsp;    /**
+<i>377</i>&nbsp;     * Configure this Whitelist to preserve relative links in an element&#39;s URL attribute, or convert them to absolute
+<i>378</i>&nbsp;     * links. By default, this is &lt;b&gt;false&lt;/b&gt;: URLs will be  made absolute (e.g. start with an allowed protocol, like
+<i>379</i>&nbsp;     * e.g. {@code http://}.
+<i>380</i>&nbsp;     * &lt;p&gt;
+<i>381</i>&nbsp;     * Note that when handling relative links, the input document must have an appropriate {@code base URI} set when
+<i>382</i>&nbsp;     * parsing, so that the link&#39;s protocol can be confirmed. Regardless of the setting of the {@code preserve relative
+<i>383</i>&nbsp;     * links} option, the link must be resolvable against the base URI to an allowed protocol; otherwise the attribute
+<i>384</i>&nbsp;     * will be removed.
+<i>385</i>&nbsp;     * &lt;/p&gt;
+<i>386</i>&nbsp;     *
+<i>387</i>&nbsp;     * @param preserve {@code true} to allow relative links, {@code false} (default) to deny
+<i>388</i>&nbsp;     * @return this Whitelist, for chaining.
+<i>389</i>&nbsp;     * @see #addProtocols
+<i>390</i>&nbsp;     */
+<i>391</i>&nbsp;    public Whitelist preserveRelativeLinks(boolean preserve) {
+<b class="nc"><i>392</i>&nbsp;        preserveRelativeLinks = preserve;</b>
+<b class="nc"><i>393</i>&nbsp;        return this;</b>
+<i>394</i>&nbsp;    }
+<i>395</i>&nbsp;
+<i>396</i>&nbsp;    /**
+<i>397</i>&nbsp;     Add allowed URL protocols for an element&#39;s URL attribute. This restricts the possible values of the attribute to
+<i>398</i>&nbsp;     URLs with the defined protocol.
+<i>399</i>&nbsp;     &lt;p&gt;
+<i>400</i>&nbsp;     E.g.: &lt;code&gt;addProtocols(&quot;a&quot;, &quot;href&quot;, &quot;ftp&quot;, &quot;http&quot;, &quot;https&quot;)&lt;/code&gt;
+<i>401</i>&nbsp;     &lt;/p&gt;
+<i>402</i>&nbsp;     &lt;p&gt;
+<i>403</i>&nbsp;     To allow a link to an in-page URL anchor (i.e. &lt;code&gt;&amp;lt;a href=&quot;#anchor&quot;&amp;gt;&lt;/code&gt;, add a &lt;code&gt;#&lt;/code&gt;:&lt;br&gt;
+<i>404</i>&nbsp;     E.g.: &lt;code&gt;addProtocols(&quot;a&quot;, &quot;href&quot;, &quot;#&quot;)&lt;/code&gt;
+<i>405</i>&nbsp;     &lt;/p&gt;
+<i>406</i>&nbsp;
+<i>407</i>&nbsp;     @param tag       Tag the URL protocol is for
+<i>408</i>&nbsp;     @param attribute       Attribute name
+<i>409</i>&nbsp;     @param protocols List of valid protocols
+<i>410</i>&nbsp;     @return this, for chaining
+<i>411</i>&nbsp;     */
+<i>412</i>&nbsp;    public Whitelist addProtocols(String tag, String attribute, String... protocols) {
+<b class="nc"><i>413</i>&nbsp;        Validate.notEmpty(tag);</b>
+<b class="nc"><i>414</i>&nbsp;        Validate.notEmpty(attribute);</b>
+<b class="nc"><i>415</i>&nbsp;        Validate.notNull(protocols);</b>
+<i>416</i>&nbsp;
+<b class="nc"><i>417</i>&nbsp;        TagName tagName = TagName.valueOf(tag);</b>
+<b class="nc"><i>418</i>&nbsp;        AttributeKey attrKey = AttributeKey.valueOf(attribute);</b>
+<i>419</i>&nbsp;        Map&lt;AttributeKey, Set&lt;Protocol&gt;&gt; attrMap;
+<i>420</i>&nbsp;        Set&lt;Protocol&gt; protSet;
+<i>421</i>&nbsp;
+<b class="nc"><i>422</i>&nbsp;        if (this.protocols.containsKey(tagName)) {</b>
+<b class="nc"><i>423</i>&nbsp;            attrMap = this.protocols.get(tagName);</b>
+<i>424</i>&nbsp;        } else {
+<b class="nc"><i>425</i>&nbsp;            attrMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>426</i>&nbsp;            this.protocols.put(tagName, attrMap);</b>
+<i>427</i>&nbsp;        }
+<b class="nc"><i>428</i>&nbsp;        if (attrMap.containsKey(attrKey)) {</b>
+<b class="nc"><i>429</i>&nbsp;            protSet = attrMap.get(attrKey);</b>
+<i>430</i>&nbsp;        } else {
+<b class="nc"><i>431</i>&nbsp;            protSet = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>432</i>&nbsp;            attrMap.put(attrKey, protSet);</b>
+<i>433</i>&nbsp;        }
+<b class="nc"><i>434</i>&nbsp;        for (String protocol : protocols) {</b>
+<b class="nc"><i>435</i>&nbsp;            Validate.notEmpty(protocol);</b>
+<b class="nc"><i>436</i>&nbsp;            Protocol prot = Protocol.valueOf(protocol);</b>
+<b class="nc"><i>437</i>&nbsp;            protSet.add(prot);</b>
+<i>438</i>&nbsp;        }
+<b class="nc"><i>439</i>&nbsp;        return this;</b>
+<i>440</i>&nbsp;    }
+<i>441</i>&nbsp;
+<i>442</i>&nbsp;    /**
+<i>443</i>&nbsp;     Remove allowed URL protocols for an element&#39;s URL attribute. If you remove all protocols for an attribute, that
+<i>444</i>&nbsp;     attribute will allow any protocol.
+<i>445</i>&nbsp;     &lt;p&gt;
+<i>446</i>&nbsp;     E.g.: &lt;code&gt;removeProtocols(&quot;a&quot;, &quot;href&quot;, &quot;ftp&quot;)&lt;/code&gt;
+<i>447</i>&nbsp;     &lt;/p&gt;
+<i>448</i>&nbsp;
+<i>449</i>&nbsp;     @param tag Tag the URL protocol is for
+<i>450</i>&nbsp;     @param attribute Attribute name
+<i>451</i>&nbsp;     @param removeProtocols List of invalid protocols
+<i>452</i>&nbsp;     @return this, for chaining
+<i>453</i>&nbsp;     */
+<i>454</i>&nbsp;    public Whitelist removeProtocols(String tag, String attribute, String... removeProtocols) {
+<b class="nc"><i>455</i>&nbsp;        Validate.notEmpty(tag);</b>
+<b class="nc"><i>456</i>&nbsp;        Validate.notEmpty(attribute);</b>
+<b class="nc"><i>457</i>&nbsp;        Validate.notNull(removeProtocols);</b>
+<i>458</i>&nbsp;
+<b class="nc"><i>459</i>&nbsp;        TagName tagName = TagName.valueOf(tag);</b>
+<b class="nc"><i>460</i>&nbsp;        AttributeKey attr = AttributeKey.valueOf(attribute);</b>
+<i>461</i>&nbsp;
+<i>462</i>&nbsp;        // make sure that what we&#39;re removing actually exists; otherwise can open the tag to any data and that can
+<i>463</i>&nbsp;        // be surprising
+<b class="nc"><i>464</i>&nbsp;        Validate.isTrue(protocols.containsKey(tagName), &quot;Cannot remove a protocol that is not set.&quot;);</b>
+<b class="nc"><i>465</i>&nbsp;        Map&lt;AttributeKey, Set&lt;Protocol&gt;&gt; tagProtocols = protocols.get(tagName);</b>
+<b class="nc"><i>466</i>&nbsp;        Validate.isTrue(tagProtocols.containsKey(attr), &quot;Cannot remove a protocol that is not set.&quot;);</b>
+<i>467</i>&nbsp;
+<b class="nc"><i>468</i>&nbsp;        Set&lt;Protocol&gt; attrProtocols = tagProtocols.get(attr);</b>
+<b class="nc"><i>469</i>&nbsp;        for (String protocol : removeProtocols) {</b>
+<b class="nc"><i>470</i>&nbsp;            Validate.notEmpty(protocol);</b>
+<b class="nc"><i>471</i>&nbsp;            attrProtocols.remove(Protocol.valueOf(protocol));</b>
+<i>472</i>&nbsp;        }
+<i>473</i>&nbsp;
+<b class="nc"><i>474</i>&nbsp;        if (attrProtocols.isEmpty()) { // Remove protocol set if empty</b>
+<b class="nc"><i>475</i>&nbsp;            tagProtocols.remove(attr);</b>
+<b class="nc"><i>476</i>&nbsp;            if (tagProtocols.isEmpty()) // Remove entry for tag if empty</b>
+<b class="nc"><i>477</i>&nbsp;                protocols.remove(tagName);</b>
+<i>478</i>&nbsp;        }
+<b class="nc"><i>479</i>&nbsp;        return this;</b>
+<i>480</i>&nbsp;    }
+<i>481</i>&nbsp;
+<i>482</i>&nbsp;    /**
+<i>483</i>&nbsp;     * Test if the supplied tag is allowed by this whitelist
+<i>484</i>&nbsp;     * @param tag test tag
+<i>485</i>&nbsp;     * @return true if allowed
+<i>486</i>&nbsp;     */
+<i>487</i>&nbsp;    protected boolean isSafeTag(String tag) {
+<b class="nc"><i>488</i>&nbsp;        return tagNames.contains(TagName.valueOf(tag));</b>
+<i>489</i>&nbsp;    }
+<i>490</i>&nbsp;
+<i>491</i>&nbsp;    /**
+<i>492</i>&nbsp;     * Test if the supplied attribute is allowed by this whitelist for this tag
+<i>493</i>&nbsp;     * @param tagName tag to consider allowing the attribute in
+<i>494</i>&nbsp;     * @param el element under test, to confirm protocol
+<i>495</i>&nbsp;     * @param attr attribute under test
+<i>496</i>&nbsp;     * @return true if allowed
+<i>497</i>&nbsp;     */
+<i>498</i>&nbsp;    protected boolean isSafeAttribute(String tagName, Element el, Attribute attr) {
+<b class="nc"><i>499</i>&nbsp;        TagName tag = TagName.valueOf(tagName);</b>
+<b class="nc"><i>500</i>&nbsp;        AttributeKey key = AttributeKey.valueOf(attr.getKey());</b>
+<i>501</i>&nbsp;
+<b class="nc"><i>502</i>&nbsp;        Set&lt;AttributeKey&gt; okSet = attributes.get(tag);</b>
+<b class="nc"><i>503</i>&nbsp;        if (okSet != null &amp;&amp; okSet.contains(key)) {</b>
+<b class="nc"><i>504</i>&nbsp;            if (protocols.containsKey(tag)) {</b>
+<b class="nc"><i>505</i>&nbsp;                Map&lt;AttributeKey, Set&lt;Protocol&gt;&gt; attrProts = protocols.get(tag);</b>
+<i>506</i>&nbsp;                // ok if not defined protocol; otherwise test
+<b class="nc"><i>507</i>&nbsp;                return !attrProts.containsKey(key) || testValidProtocol(el, attr, attrProts.get(key));</b>
+<i>508</i>&nbsp;            } else { // attribute found, no protocols defined, so OK
+<b class="nc"><i>509</i>&nbsp;                return true;</b>
+<i>510</i>&nbsp;            }
+<i>511</i>&nbsp;        }
+<i>512</i>&nbsp;        // might be an enforced attribute?
+<b class="nc"><i>513</i>&nbsp;        Map&lt;AttributeKey, AttributeValue&gt; enforcedSet = enforcedAttributes.get(tag);</b>
+<b class="nc"><i>514</i>&nbsp;        if (enforcedSet != null) {</b>
+<b class="nc"><i>515</i>&nbsp;            Attributes expect = getEnforcedAttributes(tagName);</b>
+<b class="nc"><i>516</i>&nbsp;            String attrKey = attr.getKey();</b>
+<b class="nc"><i>517</i>&nbsp;            if (expect.hasKeyIgnoreCase(attrKey)) {</b>
+<b class="nc"><i>518</i>&nbsp;                return expect.getIgnoreCase(attrKey).equals(attr.getValue());</b>
+<i>519</i>&nbsp;            }
+<i>520</i>&nbsp;        }
+<i>521</i>&nbsp;        // no attributes defined for tag, try :all tag
+<b class="nc"><i>522</i>&nbsp;        return !tagName.equals(&quot;:all&quot;) &amp;&amp; isSafeAttribute(&quot;:all&quot;, el, attr);</b>
+<i>523</i>&nbsp;    }
+<i>524</i>&nbsp;
+<i>525</i>&nbsp;    private boolean testValidProtocol(Element el, Attribute attr, Set&lt;Protocol&gt; protocols) {
+<i>526</i>&nbsp;        // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+<i>527</i>&nbsp;        // rels without a baseuri get removed
+<b class="nc"><i>528</i>&nbsp;        String value = el.absUrl(attr.getKey());</b>
+<b class="nc"><i>529</i>&nbsp;        if (value.length() == 0)</b>
+<b class="nc"><i>530</i>&nbsp;            value = attr.getValue(); // if it could not be made abs, run as-is to allow custom unknown protocols</b>
+<b class="nc"><i>531</i>&nbsp;        if (!preserveRelativeLinks)</b>
+<b class="nc"><i>532</i>&nbsp;            attr.setValue(value);</b>
+<i>533</i>&nbsp;        
+<b class="nc"><i>534</i>&nbsp;        for (Protocol protocol : protocols) {</b>
+<b class="nc"><i>535</i>&nbsp;            String prot = protocol.toString();</b>
+<i>536</i>&nbsp;
+<b class="nc"><i>537</i>&nbsp;            if (prot.equals(&quot;#&quot;)) { // allows anchor links</b>
+<b class="nc"><i>538</i>&nbsp;                if (isValidAnchor(value)) {</b>
+<b class="nc"><i>539</i>&nbsp;                    return true;</b>
+<i>540</i>&nbsp;                } else {
+<i>541</i>&nbsp;                    continue;
+<i>542</i>&nbsp;                }
+<i>543</i>&nbsp;            }
+<i>544</i>&nbsp;
+<b class="nc"><i>545</i>&nbsp;            prot += &quot;:&quot;;</b>
+<i>546</i>&nbsp;
+<b class="nc"><i>547</i>&nbsp;            if (lowerCase(value).startsWith(prot)) {</b>
+<b class="nc"><i>548</i>&nbsp;                return true;</b>
+<i>549</i>&nbsp;            }
+<b class="nc"><i>550</i>&nbsp;        }</b>
+<b class="nc"><i>551</i>&nbsp;        return false;</b>
+<i>552</i>&nbsp;    }
+<i>553</i>&nbsp;
+<i>554</i>&nbsp;    private boolean isValidAnchor(String value) {
+<b class="nc"><i>555</i>&nbsp;        return value.startsWith(&quot;#&quot;) &amp;&amp; !value.matches(&quot;.*\\s.*&quot;);</b>
+<i>556</i>&nbsp;    }
+<i>557</i>&nbsp;
+<i>558</i>&nbsp;    Attributes getEnforcedAttributes(String tagName) {
+<b class="nc"><i>559</i>&nbsp;        Attributes attrs = new Attributes();</b>
+<b class="nc"><i>560</i>&nbsp;        TagName tag = TagName.valueOf(tagName);</b>
+<b class="nc"><i>561</i>&nbsp;        if (enforcedAttributes.containsKey(tag)) {</b>
+<b class="nc"><i>562</i>&nbsp;            Map&lt;AttributeKey, AttributeValue&gt; keyVals = enforcedAttributes.get(tag);</b>
+<b class="nc"><i>563</i>&nbsp;            for (Map.Entry&lt;AttributeKey, AttributeValue&gt; entry : keyVals.entrySet()) {</b>
+<b class="nc"><i>564</i>&nbsp;                attrs.put(entry.getKey().toString(), entry.getValue().toString());</b>
+<b class="nc"><i>565</i>&nbsp;            }</b>
+<i>566</i>&nbsp;        }
+<b class="nc"><i>567</i>&nbsp;        return attrs;</b>
+<i>568</i>&nbsp;    }
+<i>569</i>&nbsp;    
+<i>570</i>&nbsp;    // named types for config. All just hold strings, but here for my sanity.
+<i>571</i>&nbsp;
+<i>572</i>&nbsp;    static class TagName extends TypedValue {
+<i>573</i>&nbsp;        TagName(String value) {
+<b class="nc"><i>574</i>&nbsp;            super(value);</b>
+<i>575</i>&nbsp;        }
+<i>576</i>&nbsp;
+<i>577</i>&nbsp;        static TagName valueOf(String value) {
+<b class="nc"><i>578</i>&nbsp;            return new TagName(value);</b>
+<i>579</i>&nbsp;        }
+<i>580</i>&nbsp;    }
+<i>581</i>&nbsp;
+<i>582</i>&nbsp;    static class AttributeKey extends TypedValue {
+<i>583</i>&nbsp;        AttributeKey(String value) {
+<b class="nc"><i>584</i>&nbsp;            super(value);</b>
+<i>585</i>&nbsp;        }
+<i>586</i>&nbsp;
+<i>587</i>&nbsp;        static AttributeKey valueOf(String value) {
+<b class="nc"><i>588</i>&nbsp;            return new AttributeKey(value);</b>
+<i>589</i>&nbsp;        }
+<i>590</i>&nbsp;    }
+<i>591</i>&nbsp;
+<i>592</i>&nbsp;    static class AttributeValue extends TypedValue {
+<i>593</i>&nbsp;        AttributeValue(String value) {
+<b class="nc"><i>594</i>&nbsp;            super(value);</b>
+<i>595</i>&nbsp;        }
+<i>596</i>&nbsp;
+<i>597</i>&nbsp;        static AttributeValue valueOf(String value) {
+<b class="nc"><i>598</i>&nbsp;            return new AttributeValue(value);</b>
+<i>599</i>&nbsp;        }
+<i>600</i>&nbsp;    }
+<i>601</i>&nbsp;
+<i>602</i>&nbsp;    static class Protocol extends TypedValue {
+<i>603</i>&nbsp;        Protocol(String value) {
+<b class="nc"><i>604</i>&nbsp;            super(value);</b>
+<i>605</i>&nbsp;        }
+<i>606</i>&nbsp;
+<i>607</i>&nbsp;        static Protocol valueOf(String value) {
+<b class="nc"><i>608</i>&nbsp;            return new Protocol(value);</b>
+<i>609</i>&nbsp;        }
+<i>610</i>&nbsp;    }
+<i>611</i>&nbsp;
+<i>612</i>&nbsp;    abstract static class TypedValue {
+<i>613</i>&nbsp;        private String value;
+<i>614</i>&nbsp;
+<b class="nc"><i>615</i>&nbsp;        TypedValue(String value) {</b>
+<b class="nc"><i>616</i>&nbsp;            Validate.notNull(value);</b>
+<b class="nc"><i>617</i>&nbsp;            this.value = value;</b>
+<i>618</i>&nbsp;        }
+<i>619</i>&nbsp;
+<i>620</i>&nbsp;        @Override
+<i>621</i>&nbsp;        public int hashCode() {
+<b class="nc"><i>622</i>&nbsp;            final int prime = 31;</b>
+<b class="nc"><i>623</i>&nbsp;            int result = 1;</b>
+<b class="nc"><i>624</i>&nbsp;            result = prime * result + ((value == null) ? 0 : value.hashCode());</b>
+<b class="nc"><i>625</i>&nbsp;            return result;</b>
+<i>626</i>&nbsp;        }
+<i>627</i>&nbsp;
+<i>628</i>&nbsp;        @Override
+<i>629</i>&nbsp;        public boolean equals(Object obj) {
+<b class="nc"><i>630</i>&nbsp;            if (this == obj) return true;</b>
+<b class="nc"><i>631</i>&nbsp;            if (obj == null) return false;</b>
+<b class="nc"><i>632</i>&nbsp;            if (getClass() != obj.getClass()) return false;</b>
+<b class="nc"><i>633</i>&nbsp;            TypedValue other = (TypedValue) obj;</b>
+<b class="nc"><i>634</i>&nbsp;            if (value == null) {</b>
+<b class="nc"><i>635</i>&nbsp;                if (other.value != null) return false;</b>
+<b class="nc"><i>636</i>&nbsp;            } else if (!value.equals(other.value)) return false;</b>
+<b class="nc"><i>637</i>&nbsp;            return true;</b>
+<i>638</i>&nbsp;        }
+<i>639</i>&nbsp;
+<i>640</i>&nbsp;        @Override
+<i>641</i>&nbsp;        public String toString() {
+<b class="nc"><i>642</i>&nbsp;            return value;</b>
+<i>643</i>&nbsp;        }
+<i>644</i>&nbsp;    }
+<i>645</i>&nbsp;}
+<i>646</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 17:37</div>
+</div>
+</body>
+</html>

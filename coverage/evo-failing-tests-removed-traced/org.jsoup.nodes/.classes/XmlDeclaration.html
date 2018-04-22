@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: XmlDeclaration</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.nodes</a> ]
+</div>
+
+<h1>Coverage Summary for Class: XmlDeclaration (org.jsoup.nodes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XmlDeclaration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.nodes;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.SerializationException;
+<i>4</i>&nbsp;import org.jsoup.helper.Validate;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import java.io.IOException;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;/**
+<i>9</i>&nbsp; * An XML Declaration.
+<i>10</i>&nbsp; */
+<i>11</i>&nbsp;public class XmlDeclaration extends LeafNode {
+<i>12</i>&nbsp;    // todo this impl isn&#39;t really right, the data shouldn&#39;t be attributes, just a run of text after the name
+<i>13</i>&nbsp;    private final boolean isProcessingInstruction; // &lt;! if true, &lt;? if false, declaration (and last data char should be ?)
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;    /**
+<i>16</i>&nbsp;     * Create a new XML declaration
+<i>17</i>&nbsp;     * @param name of declaration
+<i>18</i>&nbsp;     * @param isProcessingInstruction is processing instruction
+<i>19</i>&nbsp;     */
+<b class="nc"><i>20</i>&nbsp;    public XmlDeclaration(String name, boolean isProcessingInstruction) {</b>
+<b class="nc"><i>21</i>&nbsp;        Validate.notNull(name);</b>
+<b class="nc"><i>22</i>&nbsp;        value = name;</b>
+<b class="nc"><i>23</i>&nbsp;        this.isProcessingInstruction = isProcessingInstruction;</b>
+<i>24</i>&nbsp;    }
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    /**
+<i>27</i>&nbsp;     * Create a new XML declaration
+<i>28</i>&nbsp;     * @param name of declaration
+<i>29</i>&nbsp;     * @param baseUri Leaf Nodes don&#39;t have base URIs; they inherit from their Element
+<i>30</i>&nbsp;     * @param isProcessingInstruction is processing instruction
+<i>31</i>&nbsp;     * @see XmlDeclaration#XmlDeclaration(String, boolean)
+<i>32</i>&nbsp;     * @deprecated
+<i>33</i>&nbsp;     */
+<i>34</i>&nbsp;    public XmlDeclaration(String name, String baseUri, boolean isProcessingInstruction) {
+<b class="nc"><i>35</i>&nbsp;        this(name, isProcessingInstruction);</b>
+<i>36</i>&nbsp;    }
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    public String nodeName() {
+<b class="nc"><i>39</i>&nbsp;        return &quot;#declaration&quot;;</b>
+<i>40</i>&nbsp;    }
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    /**
+<i>43</i>&nbsp;     * Get the name of this declaration.
+<i>44</i>&nbsp;     * @return name of this declaration.
+<i>45</i>&nbsp;     */
+<i>46</i>&nbsp;    public String name() {
+<b class="nc"><i>47</i>&nbsp;        return coreValue();</b>
+<i>48</i>&nbsp;    }
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;    /**
+<i>51</i>&nbsp;     * Get the unencoded XML declaration.
+<i>52</i>&nbsp;     * @return XML declaration
+<i>53</i>&nbsp;     */
+<i>54</i>&nbsp;    public String getWholeDeclaration() {
+<b class="nc"><i>55</i>&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<i>56</i>&nbsp;        try {
+<b class="nc"><i>57</i>&nbsp;            getWholeDeclaration(sb, new Document.OutputSettings());</b>
+<b class="nc"><i>58</i>&nbsp;        } catch (IOException e) {</b>
+<b class="nc"><i>59</i>&nbsp;            throw new SerializationException(e);</b>
+<b class="nc"><i>60</i>&nbsp;        }</b>
+<b class="nc"><i>61</i>&nbsp;        return sb.toString().trim();</b>
+<i>62</i>&nbsp;    }
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;    private void getWholeDeclaration(Appendable accum, Document.OutputSettings out) throws IOException {
+<b class="nc"><i>65</i>&nbsp;        for (Attribute attribute : attributes()) {</b>
+<b class="nc"><i>66</i>&nbsp;            if (!attribute.getKey().equals(nodeName())) { // skips coreValue (name)</b>
+<b class="nc"><i>67</i>&nbsp;                accum.append(&#39; &#39;);</b>
+<b class="nc"><i>68</i>&nbsp;                attribute.html(accum, out);</b>
+<i>69</i>&nbsp;            }
+<b class="nc"><i>70</i>&nbsp;        }</b>
+<i>71</i>&nbsp;    }
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+<b class="nc"><i>74</i>&nbsp;        accum</b>
+<b class="nc"><i>75</i>&nbsp;            .append(&quot;&lt;&quot;)</b>
+<b class="nc"><i>76</i>&nbsp;            .append(isProcessingInstruction ? &quot;!&quot; : &quot;?&quot;)</b>
+<b class="nc"><i>77</i>&nbsp;            .append(coreValue());</b>
+<b class="nc"><i>78</i>&nbsp;        getWholeDeclaration(accum, out);</b>
+<b class="nc"><i>79</i>&nbsp;        accum</b>
+<b class="nc"><i>80</i>&nbsp;            .append(isProcessingInstruction ? &quot;!&quot; : &quot;?&quot;)</b>
+<b class="nc"><i>81</i>&nbsp;            .append(&quot;&gt;&quot;);</b>
+<i>82</i>&nbsp;    }
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;    void outerHtmlTail(Appendable accum, int depth, Document.OutputSettings out) {
+<i>85</i>&nbsp;    }
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    @Override
+<i>88</i>&nbsp;    public String toString() {
+<b class="nc"><i>89</i>&nbsp;        return outerHtml();</b>
+<i>90</i>&nbsp;    }
+<i>91</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 17:37</div>
+</div>
+</body>
+</html>
