@@ -1,0 +1,379 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Tokeniser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.parser</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Tokeniser (org.jsoup.parser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Tokeniser</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    18.5%
+  </span>
+  <span class="absValue">
+    (5/ 27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    23.6%
+  </span>
+  <span class="absValue">
+    (37/ 157)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.parser;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.helper.StringUtil;
+<i>4</i>&nbsp;import org.jsoup.helper.Validate;
+<i>5</i>&nbsp;import org.jsoup.nodes.Entities;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import java.util.Arrays;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;/**
+<i>10</i>&nbsp; * Readers the input stream into tokens.
+<i>11</i>&nbsp; */
+<i>12</i>&nbsp;final class Tokeniser {
+<i>13</i>&nbsp;    static final char replacementChar = &#39;\uFFFD&#39;; // replaces null character
+<b class="fc"><i>14</i>&nbsp;    private static final char[] notCharRefCharsSorted = new char[]{&#39;\t&#39;, &#39;\n&#39;, &#39;\r&#39;, &#39;\f&#39;, &#39; &#39;, &#39;&lt;&#39;, &#39;&amp;&#39;};</b>
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;    // Some illegal character escapes are parsed by browsers as windows-1252 instead. See issue #1034
+<i>17</i>&nbsp;    // https://html.spec.whatwg.org/multipage/parsing.html#numeric-character-reference-end-state
+<i>18</i>&nbsp;    static final int win1252ExtensionsStart = 0x80;
+<b class="fc"><i>19</i>&nbsp;    static final int[] win1252Extensions = new int[] {</b>
+<i>20</i>&nbsp;            // we could build this manually, but Windows-1252 is not a standard java charset so that could break on
+<i>21</i>&nbsp;            // some platforms - this table is verified with a test
+<i>22</i>&nbsp;            0x20AC, 0x0081, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021,
+<i>23</i>&nbsp;            0x02C6, 0x2030, 0x0160, 0x2039, 0x0152, 0x008D, 0x017D, 0x008F,
+<i>24</i>&nbsp;            0x0090, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014,
+<i>25</i>&nbsp;            0x02DC, 0x2122, 0x0161, 0x203A, 0x0153, 0x009D, 0x017E, 0x0178,
+<i>26</i>&nbsp;    };
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    static {
+<b class="fc"><i>29</i>&nbsp;        Arrays.sort(notCharRefCharsSorted);</b>
+<b class="fc"><i>30</i>&nbsp;    }</b>
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    private final CharacterReader reader; // html input
+<i>33</i>&nbsp;    private final ParseErrorList errors; // errors found while tokenising
+<i>34</i>&nbsp;
+<b class="fc"><i>35</i>&nbsp;    private TokeniserState state = TokeniserState.Data; // current tokenisation state</b>
+<i>36</i>&nbsp;    private Token emitPending; // the token we are about to emit on next read
+<b class="fc"><i>37</i>&nbsp;    private boolean isEmitPending = false;</b>
+<b class="fc"><i>38</i>&nbsp;    private String charsString = null; // characters pending an emit. Will fall to charsBuilder if more than one</b>
+<b class="fc"><i>39</i>&nbsp;    private StringBuilder charsBuilder = new StringBuilder(1024); // buffers characters to output as one token, if more than one emit per read</b>
+<b class="fc"><i>40</i>&nbsp;    StringBuilder dataBuffer = new StringBuilder(1024); // buffers data looking for &lt;/script&gt;</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    Token.Tag tagPending; // tag we are building up
+<b class="fc"><i>43</i>&nbsp;    Token.StartTag startPending = new Token.StartTag();</b>
+<b class="fc"><i>44</i>&nbsp;    Token.EndTag endPending = new Token.EndTag();</b>
+<b class="fc"><i>45</i>&nbsp;    Token.Character charPending = new Token.Character();</b>
+<b class="fc"><i>46</i>&nbsp;    Token.Doctype doctypePending = new Token.Doctype(); // doctype building up</b>
+<b class="fc"><i>47</i>&nbsp;    Token.Comment commentPending = new Token.Comment(); // comment building up</b>
+<i>48</i>&nbsp;    private String lastStartTag; // the last start tag emitted, to test appropriate end tag
+<i>49</i>&nbsp;
+<b class="fc"><i>50</i>&nbsp;    Tokeniser(CharacterReader reader, ParseErrorList errors) {</b>
+<b class="fc"><i>51</i>&nbsp;        this.reader = reader;</b>
+<b class="fc"><i>52</i>&nbsp;        this.errors = errors;</b>
+<b class="fc"><i>53</i>&nbsp;    }</b>
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    Token read() {
+<b class="fc"><i>56</i>&nbsp;        while (!isEmitPending)</b>
+<b class="fc"><i>57</i>&nbsp;            state.read(this, reader);</b>
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;        // if emit is pending, a non-character token was found: return any chars in buffer, and leave token for next read:
+<b class="fc"><i>60</i>&nbsp;        if (charsBuilder.length() &gt; 0) {</b>
+<b class="nc"><i>61</i>&nbsp;            String str = charsBuilder.toString();</b>
+<b class="nc"><i>62</i>&nbsp;            charsBuilder.delete(0, charsBuilder.length());</b>
+<b class="nc"><i>63</i>&nbsp;            charsString = null;</b>
+<b class="nc"><i>64</i>&nbsp;            return charPending.data(str);</b>
+<b class="fc"><i>65</i>&nbsp;        } else if (charsString != null) {</b>
+<b class="fc"><i>66</i>&nbsp;            Token token = charPending.data(charsString);</b>
+<b class="fc"><i>67</i>&nbsp;            charsString = null;</b>
+<b class="fc"><i>68</i>&nbsp;            return token;</b>
+<i>69</i>&nbsp;        } else {
+<b class="fc"><i>70</i>&nbsp;            isEmitPending = false;</b>
+<b class="fc"><i>71</i>&nbsp;            return emitPending;</b>
+<i>72</i>&nbsp;        }
+<i>73</i>&nbsp;    }
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    void emit(Token token) {
+<b class="fc"><i>76</i>&nbsp;        Validate.isFalse(isEmitPending, &quot;There is an unread token pending!&quot;);</b>
+<i>77</i>&nbsp;
+<b class="fc"><i>78</i>&nbsp;        emitPending = token;</b>
+<b class="fc"><i>79</i>&nbsp;        isEmitPending = true;</b>
+<i>80</i>&nbsp;
+<b class="fc"><i>81</i>&nbsp;        if (token.type == Token.TokenType.StartTag) {</b>
+<b class="nc"><i>82</i>&nbsp;            Token.StartTag startTag = (Token.StartTag) token;</b>
+<b class="nc"><i>83</i>&nbsp;            lastStartTag = startTag.tagName;</b>
+<b class="nc"><i>84</i>&nbsp;        } else if (token.type == Token.TokenType.EndTag) {</b>
+<b class="nc"><i>85</i>&nbsp;            Token.EndTag endTag = (Token.EndTag) token;</b>
+<b class="nc"><i>86</i>&nbsp;            if (endTag.attributes != null)</b>
+<b class="nc"><i>87</i>&nbsp;                error(&quot;Attributes incorrectly present on end tag&quot;);</b>
+<i>88</i>&nbsp;        }
+<b class="fc"><i>89</i>&nbsp;    }</b>
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;    void emit(final String str) {
+<i>92</i>&nbsp;        // buffer strings up until last string token found, to emit only one token for a run of character refs etc.
+<i>93</i>&nbsp;        // does not set isEmitPending; read checks that
+<b class="fc"><i>94</i>&nbsp;        if (charsString == null) {</b>
+<b class="fc"><i>95</i>&nbsp;            charsString = str;</b>
+<i>96</i>&nbsp;        }
+<i>97</i>&nbsp;        else {
+<b class="nc"><i>98</i>&nbsp;            if (charsBuilder.length() == 0) { // switching to string builder as more than one emit before read</b>
+<b class="nc"><i>99</i>&nbsp;                charsBuilder.append(charsString);</b>
+<i>100</i>&nbsp;            }
+<b class="nc"><i>101</i>&nbsp;            charsBuilder.append(str);</b>
+<i>102</i>&nbsp;        }
+<b class="fc"><i>103</i>&nbsp;    }</b>
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;    void emit(char[] chars) {
+<b class="nc"><i>106</i>&nbsp;        emit(String.valueOf(chars));</b>
+<b class="nc"><i>107</i>&nbsp;    }</b>
+<i>108</i>&nbsp;
+<i>109</i>&nbsp;    void emit(int[] codepoints) {
+<b class="nc"><i>110</i>&nbsp;        emit(new String(codepoints, 0, codepoints.length));</b>
+<b class="nc"><i>111</i>&nbsp;    }</b>
+<i>112</i>&nbsp;
+<i>113</i>&nbsp;    void emit(char c) {
+<b class="nc"><i>114</i>&nbsp;        emit(String.valueOf(c));</b>
+<b class="nc"><i>115</i>&nbsp;    }</b>
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;    TokeniserState getState() {
+<b class="nc"><i>118</i>&nbsp;        return state;</b>
+<i>119</i>&nbsp;    }
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;    void transition(TokeniserState state) {
+<b class="nc"><i>122</i>&nbsp;        this.state = state;</b>
+<b class="nc"><i>123</i>&nbsp;    }</b>
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;    void advanceTransition(TokeniserState state) {
+<b class="nc"><i>126</i>&nbsp;        reader.advance();</b>
+<b class="nc"><i>127</i>&nbsp;        this.state = state;</b>
+<b class="nc"><i>128</i>&nbsp;    }</b>
+<i>129</i>&nbsp;
+<b class="fc"><i>130</i>&nbsp;    final private int[] codepointHolder = new int[1]; // holder to not have to keep creating arrays</b>
+<b class="fc"><i>131</i>&nbsp;    final private int[] multipointHolder = new int[2];</b>
+<i>132</i>&nbsp;    int[] consumeCharacterReference(Character additionalAllowedCharacter, boolean inAttribute) {
+<b class="nc"><i>133</i>&nbsp;        if (reader.isEmpty())</b>
+<b class="nc"><i>134</i>&nbsp;            return null;</b>
+<b class="nc"><i>135</i>&nbsp;        if (additionalAllowedCharacter != null &amp;&amp; additionalAllowedCharacter == reader.current())</b>
+<b class="nc"><i>136</i>&nbsp;            return null;</b>
+<b class="nc"><i>137</i>&nbsp;        if (reader.matchesAnySorted(notCharRefCharsSorted))</b>
+<b class="nc"><i>138</i>&nbsp;            return null;</b>
+<i>139</i>&nbsp;
+<b class="nc"><i>140</i>&nbsp;        final int[] codeRef = codepointHolder;</b>
+<b class="nc"><i>141</i>&nbsp;        reader.mark();</b>
+<b class="nc"><i>142</i>&nbsp;        if (reader.matchConsume(&quot;#&quot;)) { // numbered</b>
+<b class="nc"><i>143</i>&nbsp;            boolean isHexMode = reader.matchConsumeIgnoreCase(&quot;X&quot;);</b>
+<b class="nc"><i>144</i>&nbsp;            String numRef = isHexMode ? reader.consumeHexSequence() : reader.consumeDigitSequence();</b>
+<b class="nc"><i>145</i>&nbsp;            if (numRef.length() == 0) { // didn&#39;t match anything</b>
+<b class="nc"><i>146</i>&nbsp;                characterReferenceError(&quot;numeric reference with no numerals&quot;);</b>
+<b class="nc"><i>147</i>&nbsp;                reader.rewindToMark();</b>
+<b class="nc"><i>148</i>&nbsp;                return null;</b>
+<i>149</i>&nbsp;            }
+<b class="nc"><i>150</i>&nbsp;            if (!reader.matchConsume(&quot;;&quot;))</b>
+<b class="nc"><i>151</i>&nbsp;                characterReferenceError(&quot;missing semicolon&quot;); // missing semi</b>
+<b class="nc"><i>152</i>&nbsp;            int charval = -1;</b>
+<i>153</i>&nbsp;            try {
+<b class="nc"><i>154</i>&nbsp;                int base = isHexMode ? 16 : 10;</b>
+<b class="nc"><i>155</i>&nbsp;                charval = Integer.valueOf(numRef, base);</b>
+<b class="nc"><i>156</i>&nbsp;            } catch (NumberFormatException ignored) {</b>
+<b class="nc"><i>157</i>&nbsp;            } // skip</b>
+<b class="nc"><i>158</i>&nbsp;            if (charval == -1 || (charval &gt;= 0xD800 &amp;&amp; charval &lt;= 0xDFFF) || charval &gt; 0x10FFFF) {</b>
+<b class="nc"><i>159</i>&nbsp;                characterReferenceError(&quot;character outside of valid range&quot;);</b>
+<b class="nc"><i>160</i>&nbsp;                codeRef[0] = replacementChar;</b>
+<b class="nc"><i>161</i>&nbsp;                return codeRef;</b>
+<i>162</i>&nbsp;            } else {
+<i>163</i>&nbsp;                // fix illegal unicode characters to match browser behavior
+<b class="nc"><i>164</i>&nbsp;                if (charval &gt;= win1252ExtensionsStart &amp;&amp; charval &lt; win1252ExtensionsStart + win1252Extensions.length) {</b>
+<b class="nc"><i>165</i>&nbsp;                    characterReferenceError(&quot;character is not a valid unicode code point&quot;);</b>
+<b class="nc"><i>166</i>&nbsp;                    charval = win1252Extensions[charval - win1252ExtensionsStart];</b>
+<i>167</i>&nbsp;                }
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;                // todo: implement number replacement table
+<i>170</i>&nbsp;                // todo: check for extra illegal unicode points as parse errors
+<b class="nc"><i>171</i>&nbsp;                codeRef[0] = charval;</b>
+<b class="nc"><i>172</i>&nbsp;                return codeRef;</b>
+<i>173</i>&nbsp;            }
+<i>174</i>&nbsp;        } else { // named
+<i>175</i>&nbsp;            // get as many letters as possible, and look for matching entities.
+<b class="nc"><i>176</i>&nbsp;            String nameRef = reader.consumeLetterThenDigitSequence();</b>
+<b class="nc"><i>177</i>&nbsp;            boolean looksLegit = reader.matches(&#39;;&#39;);</b>
+<i>178</i>&nbsp;            // found if a base named entity without a ;, or an extended entity with the ;.
+<b class="nc"><i>179</i>&nbsp;            boolean found = (Entities.isBaseNamedEntity(nameRef) || (Entities.isNamedEntity(nameRef) &amp;&amp; looksLegit));</b>
+<i>180</i>&nbsp;
+<b class="nc"><i>181</i>&nbsp;            if (!found) {</b>
+<b class="nc"><i>182</i>&nbsp;                reader.rewindToMark();</b>
+<b class="nc"><i>183</i>&nbsp;                if (looksLegit) // named with semicolon</b>
+<b class="nc"><i>184</i>&nbsp;                    characterReferenceError(String.format(&quot;invalid named referenece &#39;%s&#39;&quot;, nameRef));</b>
+<b class="nc"><i>185</i>&nbsp;                return null;</b>
+<i>186</i>&nbsp;            }
+<b class="nc"><i>187</i>&nbsp;            if (inAttribute &amp;&amp; (reader.matchesLetter() || reader.matchesDigit() || reader.matchesAny(&#39;=&#39;, &#39;-&#39;, &#39;_&#39;))) {</b>
+<i>188</i>&nbsp;                // don&#39;t want that to match
+<b class="nc"><i>189</i>&nbsp;                reader.rewindToMark();</b>
+<b class="nc"><i>190</i>&nbsp;                return null;</b>
+<i>191</i>&nbsp;            }
+<b class="nc"><i>192</i>&nbsp;            if (!reader.matchConsume(&quot;;&quot;))</b>
+<b class="nc"><i>193</i>&nbsp;                characterReferenceError(&quot;missing semicolon&quot;); // missing semi</b>
+<b class="nc"><i>194</i>&nbsp;            int numChars = Entities.codepointsForName(nameRef, multipointHolder);</b>
+<b class="nc"><i>195</i>&nbsp;            if (numChars == 1) {</b>
+<b class="nc"><i>196</i>&nbsp;                codeRef[0] = multipointHolder[0];</b>
+<b class="nc"><i>197</i>&nbsp;                return codeRef;</b>
+<b class="nc"><i>198</i>&nbsp;            } else if (numChars ==2) {</b>
+<b class="nc"><i>199</i>&nbsp;                return multipointHolder;</b>
+<i>200</i>&nbsp;            } else {
+<b class="nc"><i>201</i>&nbsp;                Validate.fail(&quot;Unexpected characters returned for &quot; + nameRef);</b>
+<b class="nc"><i>202</i>&nbsp;                return multipointHolder;</b>
+<i>203</i>&nbsp;            }
+<i>204</i>&nbsp;        }
+<i>205</i>&nbsp;    }
+<i>206</i>&nbsp;
+<i>207</i>&nbsp;    Token.Tag createTagPending(boolean start) {
+<b class="nc"><i>208</i>&nbsp;        tagPending = start ? startPending.reset() : endPending.reset();</b>
+<b class="nc"><i>209</i>&nbsp;        return tagPending;</b>
+<i>210</i>&nbsp;    }
+<i>211</i>&nbsp;
+<i>212</i>&nbsp;    void emitTagPending() {
+<b class="nc"><i>213</i>&nbsp;        tagPending.finaliseTag();</b>
+<b class="nc"><i>214</i>&nbsp;        emit(tagPending);</b>
+<b class="nc"><i>215</i>&nbsp;    }</b>
+<i>216</i>&nbsp;
+<i>217</i>&nbsp;    void createCommentPending() {
+<b class="nc"><i>218</i>&nbsp;        commentPending.reset();</b>
+<b class="nc"><i>219</i>&nbsp;    }</b>
+<i>220</i>&nbsp;
+<i>221</i>&nbsp;    void emitCommentPending() {
+<b class="nc"><i>222</i>&nbsp;        emit(commentPending);</b>
+<b class="nc"><i>223</i>&nbsp;    }</b>
+<i>224</i>&nbsp;
+<i>225</i>&nbsp;    void createDoctypePending() {
+<b class="nc"><i>226</i>&nbsp;        doctypePending.reset();</b>
+<b class="nc"><i>227</i>&nbsp;    }</b>
+<i>228</i>&nbsp;
+<i>229</i>&nbsp;    void emitDoctypePending() {
+<b class="nc"><i>230</i>&nbsp;        emit(doctypePending);</b>
+<b class="nc"><i>231</i>&nbsp;    }</b>
+<i>232</i>&nbsp;
+<i>233</i>&nbsp;    void createTempBuffer() {
+<b class="nc"><i>234</i>&nbsp;        Token.reset(dataBuffer);</b>
+<b class="nc"><i>235</i>&nbsp;    }</b>
+<i>236</i>&nbsp;
+<i>237</i>&nbsp;    boolean isAppropriateEndTagToken() {
+<b class="nc"><i>238</i>&nbsp;        return lastStartTag != null &amp;&amp; tagPending.name().equalsIgnoreCase(lastStartTag);</b>
+<i>239</i>&nbsp;    }
+<i>240</i>&nbsp;
+<i>241</i>&nbsp;    String appropriateEndTagName() {
+<b class="nc"><i>242</i>&nbsp;        return lastStartTag; // could be null</b>
+<i>243</i>&nbsp;    }
+<i>244</i>&nbsp;
+<i>245</i>&nbsp;    void error(TokeniserState state) {
+<b class="nc"><i>246</i>&nbsp;        if (errors.canAddError())</b>
+<b class="nc"><i>247</i>&nbsp;            errors.add(new ParseError(reader.pos(), &quot;Unexpected character &#39;%s&#39; in input state [%s]&quot;, reader.current(), state));</b>
+<b class="nc"><i>248</i>&nbsp;    }</b>
+<i>249</i>&nbsp;
+<i>250</i>&nbsp;    void eofError(TokeniserState state) {
+<b class="nc"><i>251</i>&nbsp;        if (errors.canAddError())</b>
+<b class="nc"><i>252</i>&nbsp;            errors.add(new ParseError(reader.pos(), &quot;Unexpectedly reached end of file (EOF) in input state [%s]&quot;, state));</b>
+<b class="nc"><i>253</i>&nbsp;    }</b>
+<i>254</i>&nbsp;
+<i>255</i>&nbsp;    private void characterReferenceError(String message) {
+<b class="nc"><i>256</i>&nbsp;        if (errors.canAddError())</b>
+<b class="nc"><i>257</i>&nbsp;            errors.add(new ParseError(reader.pos(), &quot;Invalid character reference: %s&quot;, message));</b>
+<b class="nc"><i>258</i>&nbsp;    }</b>
+<i>259</i>&nbsp;
+<i>260</i>&nbsp;    void error(String errorMsg) {
+<b class="nc"><i>261</i>&nbsp;        if (errors.canAddError())</b>
+<b class="nc"><i>262</i>&nbsp;            errors.add(new ParseError(reader.pos(), errorMsg));</b>
+<b class="nc"><i>263</i>&nbsp;    }</b>
+<i>264</i>&nbsp;
+<i>265</i>&nbsp;    boolean currentNodeInHtmlNS() {
+<i>266</i>&nbsp;        // todo: implement namespaces correctly
+<b class="nc"><i>267</i>&nbsp;        return true;</b>
+<i>268</i>&nbsp;        // Element currentNode = currentNode();
+<i>269</i>&nbsp;        // return currentNode != null &amp;&amp; currentNode.namespace().equals(&quot;HTML&quot;);
+<i>270</i>&nbsp;    }
+<i>271</i>&nbsp;
+<i>272</i>&nbsp;    /**
+<i>273</i>&nbsp;     * Utility method to consume reader and unescape entities found within.
+<i>274</i>&nbsp;     * @param inAttribute if the text to be unescaped is in an attribute
+<i>275</i>&nbsp;     * @return unescaped string from reader
+<i>276</i>&nbsp;     */
+<i>277</i>&nbsp;    String unescapeEntities(boolean inAttribute) {
+<b class="nc"><i>278</i>&nbsp;        StringBuilder builder = StringUtil.stringBuilder();</b>
+<b class="nc"><i>279</i>&nbsp;        while (!reader.isEmpty()) {</b>
+<b class="nc"><i>280</i>&nbsp;            builder.append(reader.consumeTo(&#39;&amp;&#39;));</b>
+<b class="nc"><i>281</i>&nbsp;            if (reader.matches(&#39;&amp;&#39;)) {</b>
+<b class="nc"><i>282</i>&nbsp;                reader.consume();</b>
+<b class="nc"><i>283</i>&nbsp;                int[] c = consumeCharacterReference(null, inAttribute);</b>
+<b class="nc"><i>284</i>&nbsp;                if (c == null || c.length==0)</b>
+<b class="nc"><i>285</i>&nbsp;                    builder.append(&#39;&amp;&#39;);</b>
+<i>286</i>&nbsp;                else {
+<b class="nc"><i>287</i>&nbsp;                    builder.appendCodePoint(c[0]);</b>
+<b class="nc"><i>288</i>&nbsp;                    if (c.length == 2)</b>
+<b class="nc"><i>289</i>&nbsp;                        builder.appendCodePoint(c[1]);</b>
+<i>290</i>&nbsp;                }
+<i>291</i>&nbsp;
+<b class="nc"><i>292</i>&nbsp;            }</b>
+<i>293</i>&nbsp;        }
+<b class="nc"><i>294</i>&nbsp;        return builder.toString();</b>
+<i>295</i>&nbsp;    }
+<i>296</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 12:10</div>
+</div>
+</body>
+</html>

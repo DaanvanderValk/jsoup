@@ -1,0 +1,173 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TreeBuilder</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.parser</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TreeBuilder (org.jsoup.parser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.1%
+  </span>
+  <span class="absValue">
+    (30/ 37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.parser;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.helper.Validate;
+<i>4</i>&nbsp;import org.jsoup.nodes.Attributes;
+<i>5</i>&nbsp;import org.jsoup.nodes.Document;
+<i>6</i>&nbsp;import org.jsoup.nodes.Element;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import java.io.Reader;
+<i>9</i>&nbsp;import java.util.ArrayList;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;/**
+<i>12</i>&nbsp; * @author Jonathan Hedley
+<i>13</i>&nbsp; */
+<b class="fc"><i>14</i>&nbsp;abstract class TreeBuilder {</b>
+<i>15</i>&nbsp;    CharacterReader reader;
+<i>16</i>&nbsp;    Tokeniser tokeniser;
+<i>17</i>&nbsp;    protected Document doc; // current doc we are building into
+<i>18</i>&nbsp;    protected ArrayList&lt;Element&gt; stack; // the stack of open elements
+<i>19</i>&nbsp;    protected String baseUri; // current base uri, for creating new elements
+<i>20</i>&nbsp;    protected Token currentToken; // currentToken is used only for error tracking.
+<i>21</i>&nbsp;    protected ParseErrorList errors; // null when not tracking errors
+<i>22</i>&nbsp;    protected ParseSettings settings;
+<i>23</i>&nbsp;
+<b class="fc"><i>24</i>&nbsp;    private Token.StartTag start = new Token.StartTag(); // start tag to process</b>
+<b class="fc"><i>25</i>&nbsp;    private Token.EndTag end  = new Token.EndTag();</b>
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    abstract ParseSettings defaultSettings();
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    protected void initialiseParse(Reader input, String baseUri, ParseErrorList errors, ParseSettings settings) {
+<b class="fc"><i>30</i>&nbsp;        Validate.notNull(input, &quot;String input must not be null&quot;);</b>
+<b class="fc"><i>31</i>&nbsp;        Validate.notNull(baseUri, &quot;BaseURI must not be null&quot;);</b>
+<i>32</i>&nbsp;
+<b class="fc"><i>33</i>&nbsp;        doc = new Document(baseUri);</b>
+<b class="fc"><i>34</i>&nbsp;        this.settings = settings;</b>
+<b class="fc"><i>35</i>&nbsp;        reader = new CharacterReader(input);</b>
+<b class="fc"><i>36</i>&nbsp;        this.errors = errors;</b>
+<b class="fc"><i>37</i>&nbsp;        currentToken = null;</b>
+<b class="fc"><i>38</i>&nbsp;        tokeniser = new Tokeniser(reader, errors);</b>
+<b class="fc"><i>39</i>&nbsp;        stack = new ArrayList&lt;&gt;(32);</b>
+<b class="fc"><i>40</i>&nbsp;        this.baseUri = baseUri;</b>
+<b class="fc"><i>41</i>&nbsp;    }</b>
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;    Document parse(Reader input, String baseUri, ParseErrorList errors, ParseSettings settings) {
+<b class="fc"><i>44</i>&nbsp;        initialiseParse(input, baseUri, errors, settings);</b>
+<b class="fc"><i>45</i>&nbsp;        runParser();</b>
+<b class="fc"><i>46</i>&nbsp;        return doc;</b>
+<i>47</i>&nbsp;    }
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    protected void runParser() {
+<i>50</i>&nbsp;        while (true) {
+<b class="fc"><i>51</i>&nbsp;            Token token = tokeniser.read();</b>
+<b class="fc"><i>52</i>&nbsp;            process(token);</b>
+<b class="fc"><i>53</i>&nbsp;            token.reset();</b>
+<i>54</i>&nbsp;
+<b class="fc"><i>55</i>&nbsp;            if (token.type == Token.TokenType.EOF)</b>
+<b class="fc"><i>56</i>&nbsp;                break;</b>
+<b class="fc"><i>57</i>&nbsp;        }</b>
+<b class="fc"><i>58</i>&nbsp;    }</b>
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;    protected abstract boolean process(Token token);
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;    protected boolean processStartTag(String name) {
+<b class="fc"><i>63</i>&nbsp;        if (currentToken == start) { // don&#39;t recycle an in-use token</b>
+<b class="nc"><i>64</i>&nbsp;            return process(new Token.StartTag().name(name));</b>
+<i>65</i>&nbsp;        }
+<b class="fc"><i>66</i>&nbsp;        return process(start.reset().name(name));</b>
+<i>67</i>&nbsp;    }
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    public boolean processStartTag(String name, Attributes attrs) {
+<b class="nc"><i>70</i>&nbsp;        if (currentToken == start) { // don&#39;t recycle an in-use token</b>
+<b class="nc"><i>71</i>&nbsp;            return process(new Token.StartTag().nameAttr(name, attrs));</b>
+<i>72</i>&nbsp;        }
+<b class="nc"><i>73</i>&nbsp;        start.reset();</b>
+<b class="nc"><i>74</i>&nbsp;        start.nameAttr(name, attrs);</b>
+<b class="nc"><i>75</i>&nbsp;        return process(start);</b>
+<i>76</i>&nbsp;    }
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;    protected boolean processEndTag(String name) {
+<b class="fc"><i>79</i>&nbsp;        if (currentToken == end) { // don&#39;t recycle an in-use token</b>
+<b class="nc"><i>80</i>&nbsp;            return process(new Token.EndTag().name(name));</b>
+<i>81</i>&nbsp;        }
+<b class="fc"><i>82</i>&nbsp;        return process(end.reset().name(name));</b>
+<i>83</i>&nbsp;    }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;    protected Element currentElement() {
+<b class="fc"><i>87</i>&nbsp;        int size = stack.size();</b>
+<b class="fc"><i>88</i>&nbsp;        return size &gt; 0 ? stack.get(size-1) : null;</b>
+<i>89</i>&nbsp;    }
+<i>90</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 12:07</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,299 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Parser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.parser</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Parser (org.jsoup.parser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Parser</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.1%
+  </span>
+  <span class="absValue">
+    (4/ 19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    24.4%
+  </span>
+  <span class="absValue">
+    (10/ 41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.parser;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.nodes.Document;
+<i>4</i>&nbsp;import org.jsoup.nodes.Element;
+<i>5</i>&nbsp;import org.jsoup.nodes.Node;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import java.io.Reader;
+<i>8</i>&nbsp;import java.io.StringReader;
+<i>9</i>&nbsp;import java.util.List;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;/**
+<i>12</i>&nbsp; * Parses HTML into a {@link org.jsoup.nodes.Document}. Generally best to use one of the  more convenient parse methods
+<i>13</i>&nbsp; * in {@link org.jsoup.Jsoup}.
+<i>14</i>&nbsp; */
+<i>15</i>&nbsp;public class Parser {
+<i>16</i>&nbsp;    private static final int DEFAULT_MAX_ERRORS = 0; // by default, error tracking is disabled.
+<i>17</i>&nbsp;    
+<i>18</i>&nbsp;    private TreeBuilder treeBuilder;
+<b class="fc"><i>19</i>&nbsp;    private int maxErrors = DEFAULT_MAX_ERRORS;</b>
+<i>20</i>&nbsp;    private ParseErrorList errors;
+<i>21</i>&nbsp;    private ParseSettings settings;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    /**
+<i>24</i>&nbsp;     * Create a new Parser, using the specified TreeBuilder
+<i>25</i>&nbsp;     * @param treeBuilder TreeBuilder to use to parse input into Documents.
+<i>26</i>&nbsp;     */
+<b class="fc"><i>27</i>&nbsp;    public Parser(TreeBuilder treeBuilder) {</b>
+<b class="fc"><i>28</i>&nbsp;        this.treeBuilder = treeBuilder;</b>
+<b class="fc"><i>29</i>&nbsp;        settings = treeBuilder.defaultSettings();</b>
+<b class="fc"><i>30</i>&nbsp;    }</b>
+<i>31</i>&nbsp;    
+<i>32</i>&nbsp;    public Document parseInput(String html, String baseUri) {
+<b class="nc"><i>33</i>&nbsp;        errors = isTrackErrors() ? ParseErrorList.tracking(maxErrors) : ParseErrorList.noTracking();</b>
+<b class="nc"><i>34</i>&nbsp;        return treeBuilder.parse(new StringReader(html), baseUri, errors, settings);</b>
+<i>35</i>&nbsp;    }
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;    public Document parseInput(Reader inputHtml, String baseUri) {
+<b class="nc"><i>38</i>&nbsp;        errors = isTrackErrors() ? ParseErrorList.tracking(maxErrors) : ParseErrorList.noTracking();</b>
+<b class="nc"><i>39</i>&nbsp;        return treeBuilder.parse(inputHtml, baseUri, errors, settings);</b>
+<i>40</i>&nbsp;    }
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    // gets &amp; sets
+<i>43</i>&nbsp;    /**
+<i>44</i>&nbsp;     * Get the TreeBuilder currently in use.
+<i>45</i>&nbsp;     * @return current TreeBuilder.
+<i>46</i>&nbsp;     */
+<i>47</i>&nbsp;    public TreeBuilder getTreeBuilder() {
+<b class="nc"><i>48</i>&nbsp;        return treeBuilder;</b>
+<i>49</i>&nbsp;    }
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    /**
+<i>52</i>&nbsp;     * Update the TreeBuilder used when parsing content.
+<i>53</i>&nbsp;     * @param treeBuilder current TreeBuilder
+<i>54</i>&nbsp;     * @return this, for chaining
+<i>55</i>&nbsp;     */
+<i>56</i>&nbsp;    public Parser setTreeBuilder(TreeBuilder treeBuilder) {
+<b class="nc"><i>57</i>&nbsp;        this.treeBuilder = treeBuilder;</b>
+<b class="nc"><i>58</i>&nbsp;        return this;</b>
+<i>59</i>&nbsp;    }
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;    /**
+<i>62</i>&nbsp;     * Check if parse error tracking is enabled.
+<i>63</i>&nbsp;     * @return current track error state.
+<i>64</i>&nbsp;     */
+<i>65</i>&nbsp;    public boolean isTrackErrors() {
+<b class="nc"><i>66</i>&nbsp;        return maxErrors &gt; 0;</b>
+<i>67</i>&nbsp;    }
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    /**
+<i>70</i>&nbsp;     * Enable or disable parse error tracking for the next parse.
+<i>71</i>&nbsp;     * @param maxErrors the maximum number of errors to track. Set to 0 to disable.
+<i>72</i>&nbsp;     * @return this, for chaining
+<i>73</i>&nbsp;     */
+<i>74</i>&nbsp;    public Parser setTrackErrors(int maxErrors) {
+<b class="nc"><i>75</i>&nbsp;        this.maxErrors = maxErrors;</b>
+<b class="nc"><i>76</i>&nbsp;        return this;</b>
+<i>77</i>&nbsp;    }
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;    /**
+<i>80</i>&nbsp;     * Retrieve the parse errors, if any, from the last parse.
+<i>81</i>&nbsp;     * @return list of parse errors, up to the size of the maximum errors tracked.
+<i>82</i>&nbsp;     */
+<i>83</i>&nbsp;    public List&lt;ParseError&gt; getErrors() {
+<b class="nc"><i>84</i>&nbsp;        return errors;</b>
+<i>85</i>&nbsp;    }
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    public Parser settings(ParseSettings settings) {
+<b class="nc"><i>88</i>&nbsp;        this.settings = settings;</b>
+<b class="nc"><i>89</i>&nbsp;        return this;</b>
+<i>90</i>&nbsp;    }
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;    public ParseSettings settings() {
+<b class="nc"><i>93</i>&nbsp;        return settings;</b>
+<i>94</i>&nbsp;    }
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;    // static parse functions below
+<i>97</i>&nbsp;    /**
+<i>98</i>&nbsp;     * Parse HTML into a Document.
+<i>99</i>&nbsp;     *
+<i>100</i>&nbsp;     * @param html HTML to parse
+<i>101</i>&nbsp;     * @param baseUri base URI of document (i.e. original fetch location), for resolving relative URLs.
+<i>102</i>&nbsp;     *
+<i>103</i>&nbsp;     * @return parsed Document
+<i>104</i>&nbsp;     */
+<i>105</i>&nbsp;    public static Document parse(String html, String baseUri) {
+<b class="nc"><i>106</i>&nbsp;        TreeBuilder treeBuilder = new HtmlTreeBuilder();</b>
+<b class="nc"><i>107</i>&nbsp;        return treeBuilder.parse(new StringReader(html), baseUri, ParseErrorList.noTracking(), treeBuilder.defaultSettings());</b>
+<i>108</i>&nbsp;    }
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;    /**
+<i>111</i>&nbsp;     * Parse a fragment of HTML into a list of nodes. The context element, if supplied, supplies parsing context.
+<i>112</i>&nbsp;     *
+<i>113</i>&nbsp;     * @param fragmentHtml the fragment of HTML to parse
+<i>114</i>&nbsp;     * @param context (optional) the element that this HTML fragment is being parsed for (i.e. for inner HTML). This
+<i>115</i>&nbsp;     * provides stack context (for implicit element creation).
+<i>116</i>&nbsp;     * @param baseUri base URI of document (i.e. original fetch location), for resolving relative URLs.
+<i>117</i>&nbsp;     *
+<i>118</i>&nbsp;     * @return list of nodes parsed from the input HTML. Note that the context element, if supplied, is not modified.
+<i>119</i>&nbsp;     */
+<i>120</i>&nbsp;    public static List&lt;Node&gt; parseFragment(String fragmentHtml, Element context, String baseUri) {
+<b class="fc"><i>121</i>&nbsp;        HtmlTreeBuilder treeBuilder = new HtmlTreeBuilder();</b>
+<b class="fc"><i>122</i>&nbsp;        return treeBuilder.parseFragment(fragmentHtml, context, baseUri, ParseErrorList.noTracking(), treeBuilder.defaultSettings());</b>
+<i>123</i>&nbsp;    }
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;    /**
+<i>126</i>&nbsp;     * Parse a fragment of HTML into a list of nodes. The context element, if supplied, supplies parsing context.
+<i>127</i>&nbsp;     *
+<i>128</i>&nbsp;     * @param fragmentHtml the fragment of HTML to parse
+<i>129</i>&nbsp;     * @param context (optional) the element that this HTML fragment is being parsed for (i.e. for inner HTML). This
+<i>130</i>&nbsp;     * provides stack context (for implicit element creation).
+<i>131</i>&nbsp;     * @param baseUri base URI of document (i.e. original fetch location), for resolving relative URLs.
+<i>132</i>&nbsp;     * @param errorList list to add errors to
+<i>133</i>&nbsp;     *
+<i>134</i>&nbsp;     * @return list of nodes parsed from the input HTML. Note that the context element, if supplied, is not modified.
+<i>135</i>&nbsp;     */
+<i>136</i>&nbsp;    public static List&lt;Node&gt; parseFragment(String fragmentHtml, Element context, String baseUri, ParseErrorList errorList) {
+<b class="nc"><i>137</i>&nbsp;        HtmlTreeBuilder treeBuilder = new HtmlTreeBuilder();</b>
+<b class="nc"><i>138</i>&nbsp;        return treeBuilder.parseFragment(fragmentHtml, context, baseUri, errorList, treeBuilder.defaultSettings());</b>
+<i>139</i>&nbsp;    }
+<i>140</i>&nbsp;
+<i>141</i>&nbsp;    /**
+<i>142</i>&nbsp;     * Parse a fragment of XML into a list of nodes.
+<i>143</i>&nbsp;     *
+<i>144</i>&nbsp;     * @param fragmentXml the fragment of XML to parse
+<i>145</i>&nbsp;     * @param baseUri base URI of document (i.e. original fetch location), for resolving relative URLs.
+<i>146</i>&nbsp;     * @return list of nodes parsed from the input XML.
+<i>147</i>&nbsp;     */
+<i>148</i>&nbsp;    public static List&lt;Node&gt; parseXmlFragment(String fragmentXml, String baseUri) {
+<b class="nc"><i>149</i>&nbsp;        XmlTreeBuilder treeBuilder = new XmlTreeBuilder();</b>
+<b class="nc"><i>150</i>&nbsp;        return treeBuilder.parseFragment(fragmentXml, baseUri, ParseErrorList.noTracking(), treeBuilder.defaultSettings());</b>
+<i>151</i>&nbsp;    }
+<i>152</i>&nbsp;
+<i>153</i>&nbsp;    /**
+<i>154</i>&nbsp;     * Parse a fragment of HTML into the {@code body} of a Document.
+<i>155</i>&nbsp;     *
+<i>156</i>&nbsp;     * @param bodyHtml fragment of HTML
+<i>157</i>&nbsp;     * @param baseUri base URI of document (i.e. original fetch location), for resolving relative URLs.
+<i>158</i>&nbsp;     *
+<i>159</i>&nbsp;     * @return Document, with empty head, and HTML parsed into body
+<i>160</i>&nbsp;     */
+<i>161</i>&nbsp;    public static Document parseBodyFragment(String bodyHtml, String baseUri) {
+<b class="nc"><i>162</i>&nbsp;        Document doc = Document.createShell(baseUri);</b>
+<b class="nc"><i>163</i>&nbsp;        Element body = doc.body();</b>
+<b class="nc"><i>164</i>&nbsp;        List&lt;Node&gt; nodeList = parseFragment(bodyHtml, body, baseUri);</b>
+<b class="nc"><i>165</i>&nbsp;        Node[] nodes = nodeList.toArray(new Node[nodeList.size()]); // the node list gets modified when re-parented</b>
+<b class="nc"><i>166</i>&nbsp;        for (int i = nodes.length - 1; i &gt; 0; i--) {</b>
+<b class="nc"><i>167</i>&nbsp;            nodes[i].remove();</b>
+<i>168</i>&nbsp;        }
+<b class="nc"><i>169</i>&nbsp;        for (Node node : nodes) {</b>
+<b class="nc"><i>170</i>&nbsp;            body.appendChild(node);</b>
+<i>171</i>&nbsp;        }
+<b class="nc"><i>172</i>&nbsp;        return doc;</b>
+<i>173</i>&nbsp;    }
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;    /**
+<i>176</i>&nbsp;     * Utility method to unescape HTML entities from a string
+<i>177</i>&nbsp;     * @param string HTML escaped string
+<i>178</i>&nbsp;     * @param inAttribute if the string is to be escaped in strict mode (as attributes are)
+<i>179</i>&nbsp;     * @return an unescaped string
+<i>180</i>&nbsp;     */
+<i>181</i>&nbsp;    public static String unescapeEntities(String string, boolean inAttribute) {
+<b class="fc"><i>182</i>&nbsp;        Tokeniser tokeniser = new Tokeniser(new CharacterReader(string), ParseErrorList.noTracking());</b>
+<b class="fc"><i>183</i>&nbsp;        return tokeniser.unescapeEntities(inAttribute);</b>
+<i>184</i>&nbsp;    }
+<i>185</i>&nbsp;
+<i>186</i>&nbsp;    /**
+<i>187</i>&nbsp;     * @param bodyHtml HTML to parse
+<i>188</i>&nbsp;     * @param baseUri baseUri base URI of document (i.e. original fetch location), for resolving relative URLs.
+<i>189</i>&nbsp;     *
+<i>190</i>&nbsp;     * @return parsed Document
+<i>191</i>&nbsp;     * @deprecated Use {@link #parseBodyFragment} or {@link #parseFragment} instead.
+<i>192</i>&nbsp;     */
+<i>193</i>&nbsp;    public static Document parseBodyFragmentRelaxed(String bodyHtml, String baseUri) {
+<b class="nc"><i>194</i>&nbsp;        return parse(bodyHtml, baseUri);</b>
+<i>195</i>&nbsp;    }
+<i>196</i>&nbsp;    
+<i>197</i>&nbsp;    // builders
+<i>198</i>&nbsp;
+<i>199</i>&nbsp;    /**
+<i>200</i>&nbsp;     * Create a new HTML parser. This parser treats input as HTML5, and enforces the creation of a normalised document,
+<i>201</i>&nbsp;     * based on a knowledge of the semantics of the incoming tags.
+<i>202</i>&nbsp;     * @return a new HTML parser.
+<i>203</i>&nbsp;     */
+<i>204</i>&nbsp;    public static Parser htmlParser() {
+<b class="fc"><i>205</i>&nbsp;        return new Parser(new HtmlTreeBuilder());</b>
+<i>206</i>&nbsp;    }
+<i>207</i>&nbsp;
+<i>208</i>&nbsp;    /**
+<i>209</i>&nbsp;     * Create a new XML parser. This parser assumes no knowledge of the incoming tags and does not treat it as HTML,
+<i>210</i>&nbsp;     * rather creates a simple tree directly from the input.
+<i>211</i>&nbsp;     * @return a new simple XML parser.
+<i>212</i>&nbsp;     */
+<i>213</i>&nbsp;    public static Parser xmlParser() {
+<b class="nc"><i>214</i>&nbsp;        return new Parser(new XmlTreeBuilder());</b>
+<i>215</i>&nbsp;    }
+<i>216</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-19 14:53</div>
+</div>
+</body>
+</html>

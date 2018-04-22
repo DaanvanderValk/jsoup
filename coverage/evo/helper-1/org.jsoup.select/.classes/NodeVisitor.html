@@ -1,0 +1,78 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: NodeVisitor</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.select</a> ]
+</div>
+
+<h1>Coverage Summary for Class: NodeVisitor (org.jsoup.select)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">NodeVisitor</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.select;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.nodes.Node;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp; * Node visitor interface. Provide an implementing class to {@link NodeTraversor} to iterate through nodes.
+<i>7</i>&nbsp; * &lt;p&gt;
+<i>8</i>&nbsp; * This interface provides two methods, {@code head} and {@code tail}. The head method is called when the node is first
+<i>9</i>&nbsp; * seen, and the tail method when all of the node&#39;s children have been visited. As an example, head can be used to
+<i>10</i>&nbsp; * create a start tag for a node, and tail to create the end tag.
+<i>11</i>&nbsp; * &lt;/p&gt;
+<i>12</i>&nbsp; */
+<i>13</i>&nbsp;public interface NodeVisitor {
+<i>14</i>&nbsp;    /**
+<i>15</i>&nbsp;     * Callback for when a node is first visited.
+<i>16</i>&nbsp;     *
+<i>17</i>&nbsp;     * @param node the node being visited.
+<i>18</i>&nbsp;     * @param depth the depth of the node, relative to the root node. E.g., the root node has depth 0, and a child node
+<i>19</i>&nbsp;     * of that will have depth 1.
+<i>20</i>&nbsp;     */
+<i>21</i>&nbsp;    void head(Node node, int depth);
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    /**
+<i>24</i>&nbsp;     * Callback for when a node is last visited, after all of its descendants have been visited.
+<i>25</i>&nbsp;     *
+<i>26</i>&nbsp;     * @param node the node being visited.
+<i>27</i>&nbsp;     * @param depth the depth of the node, relative to the root node. E.g., the root node has depth 0, and a child node
+<i>28</i>&nbsp;     * of that will have depth 1.
+<i>29</i>&nbsp;     */
+<i>30</i>&nbsp;    void tail(Node node, int depth);
+<i>31</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 12:34</div>
+</div>
+</body>
+</html>

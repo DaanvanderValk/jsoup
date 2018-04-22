@@ -1,0 +1,108 @@
+* Starting client
+* Connecting to master process on port 20272
+* Analyzing classpath: 
+  - C:/Users/Daan/IdeaProjects/jsoup/target/classes
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\charsets.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\deploy.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\access-bridge-64.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\cldrdata.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\dnsns.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jaccess.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\localedata.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\nashorn.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunec.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunjce_provider.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunmscapi.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunpkcs11.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\zipfs.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\javaws.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jce.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jfr.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jfxswt.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jsse.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\management-agent.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\plugin.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\resources.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\rt.jar
+  - C:\Users\Daan\IdeaProjects\jsoup\target\test-classes
+  - C:\Users\Daan\IdeaProjects\jsoup\target\classes
+  - C:\Users\Daan\.m2\repository\junit\junit\4.12\junit-4.12.jar
+  - C:\Users\Daan\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar
+  - C:\Users\Daan\.m2\repository\com\google\code\gson\gson\2.7\gson-2.7.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-server\9.2.22.v20170606\jetty-server-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\javax\servlet\javax.servlet-api\3.1.0\javax.servlet-api-3.1.0.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-http\9.2.22.v20170606\jetty-http-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-util\9.2.22.v20170606\jetty-util-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-io\9.2.22.v20170606\jetty-io-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-servlet\9.2.22.v20170606\jetty-servlet-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-security\9.2.22.v20170606\jetty-security-9.2.22.v20170606.jar
+* Finished analyzing classpath
+* Generating tests for class org.jsoup.helper.ChangeNotifyingArrayList
+* Test criteria:
+  - Line Coverage
+  - Branch Coverage
+  - Exception
+  - Mutation testing (weak)
+  - Method-Output Coverage
+  - Top-Level Method Coverage
+  - No-Exception Top-Level Method Coverage
+  - Context Branch Coverage
+* Setting up search algorithm for whole suite generation
+[MASTER] 12:44:33.643 [pool-2-thread-1] WARN  TestSuiteSerialization - Cannot load tests because file does not exist: C:\Users\Daan\IdeaProjects\jsoup\.evosuite\evosuite-seeds\org.jsoup.helper.ChangeNotifyingArrayList.seed
+* Loaded 0 tests from C:\Users\Daan\IdeaProjects\jsoup\.evosuite\evosuite-seeds\org.jsoup.helper.ChangeNotifyingArrayList.seed
+* Total number of test goals: 
+  - Line 27
+  - Branch 12
+  - Exception 0
+  - MutationFactory 20
+  - Output 16
+  - Method 12
+  - MethodNoException 12
+  - CBranchFitnessFactory 12
+* Using seed 1524134664546
+* Starting evolution
+[MASTER] 12:44:34.211 [pool-2-thread-1] WARN  TimeController - Phase INITIALIZATION lasted too long, 4 seconds more than allowed.
+* Search finished after 38s and 0 generations, 0 statements, best individual has fitness: 0.0
+* Writing sequences to pool
+[MASTER] 12:45:11.724 [pool-2-thread-1] WARN  TimeController - Phase SEARCH lasted too long, 7 seconds more than allowed.
+* Minimizing test suite
+* Going to analyze the coverage criteria
+* Coverage analysis for criterion LINE
+* Coverage of criterion LINE: 0%
+* Total number of goals: 27
+* Number of covered goals: 0
+* Coverage analysis for criterion BRANCH
+* Coverage of criterion BRANCH: 0%
+* Total number of goals: 12
+* Number of covered goals: 0
+* Coverage analysis for criterion EXCEPTION
+* Coverage of criterion EXCEPTION: 100% (no goals)
+* Coverage analysis for criterion WEAKMUTATION
+* Coverage of criterion WEAKMUTATION: 0%
+* Total number of goals: 20
+* Number of covered goals: 0
+* Coverage analysis for criterion OUTPUT
+* Coverage of criterion OUTPUT: 0%
+* Total number of goals: 16
+* Number of covered goals: 0
+* Coverage analysis for criterion METHOD
+* Coverage of criterion METHOD: 0%
+* Total number of goals: 12
+* Number of covered goals: 0
+* Coverage analysis for criterion METHODNOEXCEPTION
+* Coverage of criterion METHODNOEXCEPTION: 0%
+* Total number of goals: 12
+* Number of covered goals: 0
+* Coverage analysis for criterion CBRANCH
+* Coverage of criterion CBRANCH: 0%
+* Total number of goals: 12
+* Number of covered goals: 0
+* Generated 0 tests with total length 0
+* Resulting test suite's coverage: 0% (average coverage for all fitness functions)
+* Generating assertions
+* Resulting test suite's mutation score: 0%
+* Compiling and checking tests
+* Writing JUnit test case 'ChangeNotifyingArrayList_ESTest' to C:\Users\Daan\IdeaProjects\jsoup\.evosuite\tmp_2018_04_19_12_13_31\tests
+* Done!
+

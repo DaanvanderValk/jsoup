@@ -1,0 +1,4 @@
+[MASTER] 12:25:54.791 [pool-2-thread-1] ERROR TestCluster - Failed to check cache for java.util.Comparator<T> : Type points to itself
+[MASTER] 12:25:55.827 [pool-2-thread-1] ERROR TestCluster - Failed to check cache for java.util.function.Function<T, R> : Type points to itself
+[MASTER] 12:26:06.470 [pool-2-thread-1] ERROR TestCluster - Failed to check cache for java.util.function.Predicate<T> : Type points to itself
+[MASTER] 12:29:35.052 [pool-2-thread-1] ERROR JUnitAnalyzer - Ran out of time while checking tests

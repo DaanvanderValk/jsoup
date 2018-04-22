@@ -1,0 +1,928 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Connection</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Connection (org.jsoup)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">Connection$Base</td>
+  </tr>
+  <tr>
+    <td class="name">Connection$KeyVal</td>
+  </tr>
+  <tr>
+    <td class="name">Connection$Method</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/ 6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Connection$Request</td>
+  </tr>
+  <tr>
+    <td class="name">Connection$Response</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/ 6)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.nodes.Document;
+<i>4</i>&nbsp;import org.jsoup.parser.Parser;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import javax.net.ssl.SSLSocketFactory;
+<i>7</i>&nbsp;import java.io.BufferedInputStream;
+<i>8</i>&nbsp;import java.io.IOException;
+<i>9</i>&nbsp;import java.io.InputStream;
+<i>10</i>&nbsp;import java.net.Proxy;
+<i>11</i>&nbsp;import java.net.URL;
+<i>12</i>&nbsp;import java.util.Collection;
+<i>13</i>&nbsp;import java.util.List;
+<i>14</i>&nbsp;import java.util.Map;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;/**
+<i>17</i>&nbsp; * A Connection provides a convenient interface to fetch content from the web, and parse them into Documents.
+<i>18</i>&nbsp; * &lt;p&gt;
+<i>19</i>&nbsp; * To get a new Connection, use {@link org.jsoup.Jsoup#connect(String)}. Connections contain {@link Connection.Request}
+<i>20</i>&nbsp; * and {@link Connection.Response} objects. The request objects are reusable as prototype requests.
+<i>21</i>&nbsp; * &lt;/p&gt;
+<i>22</i>&nbsp; * &lt;p&gt;
+<i>23</i>&nbsp; * Request configuration can be made using either the shortcut methods in Connection (e.g. {@link #userAgent(String)}),
+<i>24</i>&nbsp; * or by methods in the Connection.Request object directly. All request configuration must be made before the request is
+<i>25</i>&nbsp; * executed.
+<i>26</i>&nbsp; * &lt;/p&gt;
+<i>27</i>&nbsp; */
+<i>28</i>&nbsp;public interface Connection {
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    /**
+<i>31</i>&nbsp;     * GET and POST http methods.
+<i>32</i>&nbsp;     */
+<b class="fc"><i>33</i>&nbsp;    enum Method {</b>
+<b class="fc"><i>34</i>&nbsp;        GET(false), POST(true), PUT(true), DELETE(false), PATCH(true), HEAD(false), OPTIONS(false), TRACE(false);</b>
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;        private final boolean hasBody;
+<i>37</i>&nbsp;
+<b class="fc"><i>38</i>&nbsp;        Method(boolean hasBody) {</b>
+<b class="fc"><i>39</i>&nbsp;            this.hasBody = hasBody;</b>
+<b class="fc"><i>40</i>&nbsp;        }</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;        /**
+<i>43</i>&nbsp;         * Check if this HTTP method has/needs a request body
+<i>44</i>&nbsp;         * @return if body needed
+<i>45</i>&nbsp;         */
+<i>46</i>&nbsp;        public final boolean hasBody() {
+<b class="nc"><i>47</i>&nbsp;            return hasBody;</b>
+<i>48</i>&nbsp;        }
+<i>49</i>&nbsp;    }
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    /**
+<i>52</i>&nbsp;     * Set the request URL to fetch. The protocol must be HTTP or HTTPS.
+<i>53</i>&nbsp;     * @param url URL to connect to
+<i>54</i>&nbsp;     * @return this Connection, for chaining
+<i>55</i>&nbsp;     */
+<i>56</i>&nbsp;    Connection url(URL url);
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;    /**
+<i>59</i>&nbsp;     * Set the request URL to fetch. The protocol must be HTTP or HTTPS.
+<i>60</i>&nbsp;     * @param url URL to connect to
+<i>61</i>&nbsp;     * @return this Connection, for chaining
+<i>62</i>&nbsp;     */
+<i>63</i>&nbsp;    Connection url(String url);
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;    /**
+<i>66</i>&nbsp;     * Set the proxy to use for this request. Set to &lt;code&gt;null&lt;/code&gt; to disable.
+<i>67</i>&nbsp;     * @param proxy proxy to use
+<i>68</i>&nbsp;     * @return this Connection, for chaining
+<i>69</i>&nbsp;     */
+<i>70</i>&nbsp;    Connection proxy(Proxy proxy);
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    /**
+<i>73</i>&nbsp;     * Set the HTTP proxy to use for this request.
+<i>74</i>&nbsp;     * @param host the proxy hostname
+<i>75</i>&nbsp;     * @param port the proxy port
+<i>76</i>&nbsp;     * @return this Connection, for chaining
+<i>77</i>&nbsp;     */
+<i>78</i>&nbsp;    Connection proxy(String host, int port);
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;    /**
+<i>81</i>&nbsp;     * Set the request user-agent header.
+<i>82</i>&nbsp;     * @param userAgent user-agent to use
+<i>83</i>&nbsp;     * @return this Connection, for chaining
+<i>84</i>&nbsp;     * @see org.jsoup.helper.HttpConnection#DEFAULT_UA
+<i>85</i>&nbsp;     */
+<i>86</i>&nbsp;    Connection userAgent(String userAgent);
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;    /**
+<i>89</i>&nbsp;     * Set the total request timeout duration. If a timeout occurs, an {@link java.net.SocketTimeoutException} will be thrown.
+<i>90</i>&nbsp;     * &lt;p&gt;The default timeout is &lt;b&gt;30 seconds&lt;/b&gt; (30,000 millis). A timeout of zero is treated as an infinite timeout.
+<i>91</i>&nbsp;     * &lt;p&gt;Note that this timeout specifies the combined maximum duration of the connection time and the time to read
+<i>92</i>&nbsp;     * the full response.
+<i>93</i>&nbsp;     * @param millis number of milliseconds (thousandths of a second) before timing out connects or reads.
+<i>94</i>&nbsp;     * @return this Connection, for chaining
+<i>95</i>&nbsp;     * @see #maxBodySize(int)
+<i>96</i>&nbsp;     */
+<i>97</i>&nbsp;    Connection timeout(int millis);
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;    /**
+<i>100</i>&nbsp;     * Set the maximum bytes to read from the (uncompressed) connection into the body, before the connection is closed,
+<i>101</i>&nbsp;     * and the input truncated. The default maximum is 1MB. A max size of zero is treated as an infinite amount (bounded
+<i>102</i>&nbsp;     * only by your patience and the memory available on your machine).
+<i>103</i>&nbsp;     * @param bytes number of bytes to read from the input before truncating
+<i>104</i>&nbsp;     * @return this Connection, for chaining
+<i>105</i>&nbsp;     */
+<i>106</i>&nbsp;    Connection maxBodySize(int bytes);
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;    /**
+<i>109</i>&nbsp;     * Set the request referrer (aka &quot;referer&quot;) header.
+<i>110</i>&nbsp;     * @param referrer referrer to use
+<i>111</i>&nbsp;     * @return this Connection, for chaining
+<i>112</i>&nbsp;     */
+<i>113</i>&nbsp;    Connection referrer(String referrer);
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;    /**
+<i>116</i>&nbsp;     * Configures the connection to (not) follow server redirects. By default this is &lt;b&gt;true&lt;/b&gt;.
+<i>117</i>&nbsp;     * @param followRedirects true if server redirects should be followed.
+<i>118</i>&nbsp;     * @return this Connection, for chaining
+<i>119</i>&nbsp;     */
+<i>120</i>&nbsp;    Connection followRedirects(boolean followRedirects);
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;    /**
+<i>123</i>&nbsp;     * Set the request method to use, GET or POST. Default is GET.
+<i>124</i>&nbsp;     * @param method HTTP request method
+<i>125</i>&nbsp;     * @return this Connection, for chaining
+<i>126</i>&nbsp;     */
+<i>127</i>&nbsp;    Connection method(Method method);
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;    /**
+<i>130</i>&nbsp;     * Configures the connection to not throw exceptions when a HTTP error occurs. (4xx - 5xx, e.g. 404 or 500). By
+<i>131</i>&nbsp;     * default this is &lt;b&gt;false&lt;/b&gt;; an IOException is thrown if an error is encountered. If set to &lt;b&gt;true&lt;/b&gt;, the
+<i>132</i>&nbsp;     * response is populated with the error body, and the status message will reflect the error.
+<i>133</i>&nbsp;     * @param ignoreHttpErrors - false (default) if HTTP errors should be ignored.
+<i>134</i>&nbsp;     * @return this Connection, for chaining
+<i>135</i>&nbsp;     */
+<i>136</i>&nbsp;    Connection ignoreHttpErrors(boolean ignoreHttpErrors);
+<i>137</i>&nbsp;
+<i>138</i>&nbsp;    /**
+<i>139</i>&nbsp;     * Ignore the document&#39;s Content-Type when parsing the response. By default this is &lt;b&gt;false&lt;/b&gt;, an unrecognised
+<i>140</i>&nbsp;     * content-type will cause an IOException to be thrown. (This is to prevent producing garbage by attempting to parse
+<i>141</i>&nbsp;     * a JPEG binary image, for example.) Set to true to force a parse attempt regardless of content type.
+<i>142</i>&nbsp;     * @param ignoreContentType set to true if you would like the content type ignored on parsing the response into a
+<i>143</i>&nbsp;     * Document.
+<i>144</i>&nbsp;     * @return this Connection, for chaining
+<i>145</i>&nbsp;     */
+<i>146</i>&nbsp;    Connection ignoreContentType(boolean ignoreContentType);
+<i>147</i>&nbsp;
+<i>148</i>&nbsp;    /**
+<i>149</i>&nbsp;     * Disable/enable TLS certificates validation for HTTPS requests.
+<i>150</i>&nbsp;     * &lt;p&gt;
+<i>151</i>&nbsp;     * By default this is &lt;b&gt;true&lt;/b&gt;; all
+<i>152</i>&nbsp;     * connections over HTTPS perform normal validation of certificates, and will abort requests if the provided
+<i>153</i>&nbsp;     * certificate does not validate.
+<i>154</i>&nbsp;     * &lt;/p&gt;
+<i>155</i>&nbsp;     * &lt;p&gt;
+<i>156</i>&nbsp;     * Some servers use expired, self-generated certificates; or your JDK may not
+<i>157</i>&nbsp;     * support SNI hosts. In which case, you may want to enable this setting.
+<i>158</i>&nbsp;     * &lt;/p&gt;
+<i>159</i>&nbsp;     * &lt;p&gt;
+<i>160</i>&nbsp;     * &lt;b&gt;Be careful&lt;/b&gt; and understand why you need to disable these validations.
+<i>161</i>&nbsp;     * &lt;/p&gt;
+<i>162</i>&nbsp;     * @param value if should validate TLS (SSL) certificates. &lt;b&gt;true&lt;/b&gt; by default.
+<i>163</i>&nbsp;     * @return this Connection, for chaining
+<i>164</i>&nbsp;     * @deprecated as distributions (specifically Google Play) are starting to show warnings if these checks are
+<i>165</i>&nbsp;     * disabled.
+<i>166</i>&nbsp;     */
+<i>167</i>&nbsp;    Connection validateTLSCertificates(boolean value);
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;    /**
+<i>170</i>&nbsp;     * Set custom SSL socket factory
+<i>171</i>&nbsp;     * @param sslSocketFactory custom SSL socket factory
+<i>172</i>&nbsp;     * @return this Connection, for chaining
+<i>173</i>&nbsp;     */
+<i>174</i>&nbsp;    Connection sslSocketFactory(SSLSocketFactory sslSocketFactory);
+<i>175</i>&nbsp;
+<i>176</i>&nbsp;    /**
+<i>177</i>&nbsp;     * Add a request data parameter. Request parameters are sent in the request query string for GETs, and in the
+<i>178</i>&nbsp;     * request body for POSTs. A request may have multiple values of the same name.
+<i>179</i>&nbsp;     * @param key data key
+<i>180</i>&nbsp;     * @param value data value
+<i>181</i>&nbsp;     * @return this Connection, for chaining
+<i>182</i>&nbsp;     */
+<i>183</i>&nbsp;    Connection data(String key, String value);
+<i>184</i>&nbsp;
+<i>185</i>&nbsp;    /**
+<i>186</i>&nbsp;     * Add an input stream as a request data parameter. For GETs, has no effect, but for POSTS this will upload the
+<i>187</i>&nbsp;     * input stream.
+<i>188</i>&nbsp;     * @param key data key (form item name)
+<i>189</i>&nbsp;     * @param filename the name of the file to present to the remove server. Typically just the name, not path,
+<i>190</i>&nbsp;     * component.
+<i>191</i>&nbsp;     * @param inputStream the input stream to upload, that you probably obtained from a {@link java.io.FileInputStream}.
+<i>192</i>&nbsp;     * You must close the InputStream in a {@code finally} block.
+<i>193</i>&nbsp;     * @return this Connections, for chaining
+<i>194</i>&nbsp;     * @see #data(String, String, InputStream, String) if you want to set the uploaded file&#39;s mimetype.
+<i>195</i>&nbsp;     */
+<i>196</i>&nbsp;    Connection data(String key, String filename, InputStream inputStream);
+<i>197</i>&nbsp;
+<i>198</i>&nbsp;    /**
+<i>199</i>&nbsp;     * Add an input stream as a request data parameter. For GETs, has no effect, but for POSTS this will upload the
+<i>200</i>&nbsp;     * input stream.
+<i>201</i>&nbsp;     * @param key data key (form item name)
+<i>202</i>&nbsp;     * @param filename the name of the file to present to the remove server. Typically just the name, not path,
+<i>203</i>&nbsp;     * component.
+<i>204</i>&nbsp;     * @param inputStream the input stream to upload, that you probably obtained from a {@link java.io.FileInputStream}.
+<i>205</i>&nbsp;     * @param contentType the Content Type (aka mimetype) to specify for this file.
+<i>206</i>&nbsp;     * You must close the InputStream in a {@code finally} block.
+<i>207</i>&nbsp;     * @return this Connections, for chaining
+<i>208</i>&nbsp;     */
+<i>209</i>&nbsp;    Connection data(String key, String filename, InputStream inputStream, String contentType);
+<i>210</i>&nbsp;
+<i>211</i>&nbsp;    /**
+<i>212</i>&nbsp;     * Adds all of the supplied data to the request data parameters
+<i>213</i>&nbsp;     * @param data collection of data parameters
+<i>214</i>&nbsp;     * @return this Connection, for chaining
+<i>215</i>&nbsp;     */
+<i>216</i>&nbsp;    Connection data(Collection&lt;KeyVal&gt; data);
+<i>217</i>&nbsp;
+<i>218</i>&nbsp;    /**
+<i>219</i>&nbsp;     * Adds all of the supplied data to the request data parameters
+<i>220</i>&nbsp;     * @param data map of data parameters
+<i>221</i>&nbsp;     * @return this Connection, for chaining
+<i>222</i>&nbsp;     */
+<i>223</i>&nbsp;    Connection data(Map&lt;String, String&gt; data);
+<i>224</i>&nbsp;
+<i>225</i>&nbsp;    /**
+<i>226</i>&nbsp;     * Add a number of request data parameters. Multiple parameters may be set at once, e.g.: &lt;code&gt;.data(&quot;name&quot;,
+<i>227</i>&nbsp;     * &quot;jsoup&quot;, &quot;language&quot;, &quot;Java&quot;, &quot;language&quot;, &quot;English&quot;);&lt;/code&gt; creates a query string like:
+<i>228</i>&nbsp;     * &lt;code&gt;{@literal ?name=jsoup&amp;language=Java&amp;language=English}&lt;/code&gt;
+<i>229</i>&nbsp;     * @param keyvals a set of key value pairs.
+<i>230</i>&nbsp;     * @return this Connection, for chaining
+<i>231</i>&nbsp;     */
+<i>232</i>&nbsp;    Connection data(String... keyvals);
+<i>233</i>&nbsp;
+<i>234</i>&nbsp;    /**
+<i>235</i>&nbsp;     * Get the data KeyVal for this key, if any
+<i>236</i>&nbsp;     * @param key the data key
+<i>237</i>&nbsp;     * @return null if not set
+<i>238</i>&nbsp;     */
+<i>239</i>&nbsp;    KeyVal data(String key);
+<i>240</i>&nbsp;
+<i>241</i>&nbsp;    /**
+<i>242</i>&nbsp;     * Set a POST (or PUT) request body. Useful when a server expects a plain request body, not a set for URL
+<i>243</i>&nbsp;     * encoded form key/value pairs. E.g.:
+<i>244</i>&nbsp;     * &lt;code&gt;&lt;pre&gt;Jsoup.connect(url)
+<i>245</i>&nbsp;     * .requestBody(json)
+<i>246</i>&nbsp;     * .header(&quot;Content-Type&quot;, &quot;application/json&quot;)
+<i>247</i>&nbsp;     * .post();&lt;/pre&gt;&lt;/code&gt;
+<i>248</i>&nbsp;     * If any data key/vals are supplied, they will be sent as URL query params.
+<i>249</i>&nbsp;     * @return this Request, for chaining
+<i>250</i>&nbsp;     */
+<i>251</i>&nbsp;    Connection requestBody(String body);
+<i>252</i>&nbsp;
+<i>253</i>&nbsp;    /**
+<i>254</i>&nbsp;     * Set a request header.
+<i>255</i>&nbsp;     * @param name header name
+<i>256</i>&nbsp;     * @param value header value
+<i>257</i>&nbsp;     * @return this Connection, for chaining
+<i>258</i>&nbsp;     * @see org.jsoup.Connection.Request#headers()
+<i>259</i>&nbsp;     */
+<i>260</i>&nbsp;    Connection header(String name, String value);
+<i>261</i>&nbsp;
+<i>262</i>&nbsp;    /**
+<i>263</i>&nbsp;     * Adds each of the supplied headers to the request.
+<i>264</i>&nbsp;     * @param headers map of headers name {@literal -&gt;} value pairs
+<i>265</i>&nbsp;     * @return this Connection, for chaining
+<i>266</i>&nbsp;     * @see org.jsoup.Connection.Request#headers()
+<i>267</i>&nbsp;     */
+<i>268</i>&nbsp;    Connection headers(Map&lt;String,String&gt; headers);
+<i>269</i>&nbsp;
+<i>270</i>&nbsp;    /**
+<i>271</i>&nbsp;     * Set a cookie to be sent in the request.
+<i>272</i>&nbsp;     * @param name name of cookie
+<i>273</i>&nbsp;     * @param value value of cookie
+<i>274</i>&nbsp;     * @return this Connection, for chaining
+<i>275</i>&nbsp;     */
+<i>276</i>&nbsp;    Connection cookie(String name, String value);
+<i>277</i>&nbsp;
+<i>278</i>&nbsp;    /**
+<i>279</i>&nbsp;     * Adds each of the supplied cookies to the request.
+<i>280</i>&nbsp;     * @param cookies map of cookie name {@literal -&gt;} value pairs
+<i>281</i>&nbsp;     * @return this Connection, for chaining
+<i>282</i>&nbsp;     */
+<i>283</i>&nbsp;    Connection cookies(Map&lt;String, String&gt; cookies);
+<i>284</i>&nbsp;
+<i>285</i>&nbsp;    /**
+<i>286</i>&nbsp;     * Provide an alternate parser to use when parsing the response to a Document. If not set, defaults to the HTML
+<i>287</i>&nbsp;     * parser, unless the response content-type is XML, in which case the XML parser is used.
+<i>288</i>&nbsp;     * @param parser alternate parser
+<i>289</i>&nbsp;     * @return this Connection, for chaining
+<i>290</i>&nbsp;     */
+<i>291</i>&nbsp;    Connection parser(Parser parser);
+<i>292</i>&nbsp;
+<i>293</i>&nbsp;    /**
+<i>294</i>&nbsp;     * Sets the default post data character set for x-www-form-urlencoded post data
+<i>295</i>&nbsp;     * @param charset character set to encode post data
+<i>296</i>&nbsp;     * @return this Connection, for chaining
+<i>297</i>&nbsp;     */
+<i>298</i>&nbsp;    Connection postDataCharset(String charset);
+<i>299</i>&nbsp;
+<i>300</i>&nbsp;    /**
+<i>301</i>&nbsp;     * Execute the request as a GET, and parse the result.
+<i>302</i>&nbsp;     * @return parsed Document
+<i>303</i>&nbsp;     * @throws java.net.MalformedURLException if the request URL is not a HTTP or HTTPS URL, or is otherwise malformed
+<i>304</i>&nbsp;     * @throws HttpStatusException if the response is not OK and HTTP response errors are not ignored
+<i>305</i>&nbsp;     * @throws UnsupportedMimeTypeException if the response mime type is not supported and those errors are not ignored
+<i>306</i>&nbsp;     * @throws java.net.SocketTimeoutException if the connection times out
+<i>307</i>&nbsp;     * @throws IOException on error
+<i>308</i>&nbsp;     */
+<i>309</i>&nbsp;    Document get() throws IOException;
+<i>310</i>&nbsp;
+<i>311</i>&nbsp;    /**
+<i>312</i>&nbsp;     * Execute the request as a POST, and parse the result.
+<i>313</i>&nbsp;     * @return parsed Document
+<i>314</i>&nbsp;     * @throws java.net.MalformedURLException if the request URL is not a HTTP or HTTPS URL, or is otherwise malformed
+<i>315</i>&nbsp;     * @throws HttpStatusException if the response is not OK and HTTP response errors are not ignored
+<i>316</i>&nbsp;     * @throws UnsupportedMimeTypeException if the response mime type is not supported and those errors are not ignored
+<i>317</i>&nbsp;     * @throws java.net.SocketTimeoutException if the connection times out
+<i>318</i>&nbsp;     * @throws IOException on error
+<i>319</i>&nbsp;     */
+<i>320</i>&nbsp;    Document post() throws IOException;
+<i>321</i>&nbsp;
+<i>322</i>&nbsp;    /**
+<i>323</i>&nbsp;     * Execute the request.
+<i>324</i>&nbsp;     * @return a response object
+<i>325</i>&nbsp;     * @throws java.net.MalformedURLException if the request URL is not a HTTP or HTTPS URL, or is otherwise malformed
+<i>326</i>&nbsp;     * @throws HttpStatusException if the response is not OK and HTTP response errors are not ignored
+<i>327</i>&nbsp;     * @throws UnsupportedMimeTypeException if the response mime type is not supported and those errors are not ignored
+<i>328</i>&nbsp;     * @throws java.net.SocketTimeoutException if the connection times out
+<i>329</i>&nbsp;     * @throws IOException on error
+<i>330</i>&nbsp;     */
+<i>331</i>&nbsp;    Response execute() throws IOException;
+<i>332</i>&nbsp;
+<i>333</i>&nbsp;    /**
+<i>334</i>&nbsp;     * Get the request object associated with this connection
+<i>335</i>&nbsp;     * @return request
+<i>336</i>&nbsp;     */
+<i>337</i>&nbsp;    Request request();
+<i>338</i>&nbsp;
+<i>339</i>&nbsp;    /**
+<i>340</i>&nbsp;     * Set the connection&#39;s request
+<i>341</i>&nbsp;     * @param request new request object
+<i>342</i>&nbsp;     * @return this Connection, for chaining
+<i>343</i>&nbsp;     */
+<i>344</i>&nbsp;    Connection request(Request request);
+<i>345</i>&nbsp;
+<i>346</i>&nbsp;    /**
+<i>347</i>&nbsp;     * Get the response, once the request has been executed
+<i>348</i>&nbsp;     * @return response
+<i>349</i>&nbsp;     */
+<i>350</i>&nbsp;    Response response();
+<i>351</i>&nbsp;
+<i>352</i>&nbsp;    /**
+<i>353</i>&nbsp;     * Set the connection&#39;s response
+<i>354</i>&nbsp;     * @param response new response
+<i>355</i>&nbsp;     * @return this Connection, for chaining
+<i>356</i>&nbsp;     */
+<i>357</i>&nbsp;    Connection response(Response response);
+<i>358</i>&nbsp;
+<i>359</i>&nbsp;    /**
+<i>360</i>&nbsp;     * Common methods for Requests and Responses
+<i>361</i>&nbsp;     * @param &lt;T&gt; Type of Base, either Request or Response
+<i>362</i>&nbsp;     */
+<i>363</i>&nbsp;    interface Base&lt;T extends Base&gt; {
+<i>364</i>&nbsp;
+<i>365</i>&nbsp;        /**
+<i>366</i>&nbsp;         * Get the URL
+<i>367</i>&nbsp;         * @return URL
+<i>368</i>&nbsp;         */
+<i>369</i>&nbsp;        URL url();
+<i>370</i>&nbsp;
+<i>371</i>&nbsp;        /**
+<i>372</i>&nbsp;         * Set the URL
+<i>373</i>&nbsp;         * @param url new URL
+<i>374</i>&nbsp;         * @return this, for chaining
+<i>375</i>&nbsp;         */
+<i>376</i>&nbsp;        T url(URL url);
+<i>377</i>&nbsp;
+<i>378</i>&nbsp;        /**
+<i>379</i>&nbsp;         * Get the request method
+<i>380</i>&nbsp;         * @return method
+<i>381</i>&nbsp;         */
+<i>382</i>&nbsp;        Method method();
+<i>383</i>&nbsp;
+<i>384</i>&nbsp;        /**
+<i>385</i>&nbsp;         * Set the request method
+<i>386</i>&nbsp;         * @param method new method
+<i>387</i>&nbsp;         * @return this, for chaining
+<i>388</i>&nbsp;         */
+<i>389</i>&nbsp;        T method(Method method);
+<i>390</i>&nbsp;
+<i>391</i>&nbsp;        /**
+<i>392</i>&nbsp;         * Get the value of a header. If there is more than one header value with the same name, the headers are returned
+<i>393</i>&nbsp;         * comma seperated, per &lt;a href=&quot;https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2&quot;&gt;rfc2616-sec4&lt;/a&gt;.
+<i>394</i>&nbsp;         * &lt;p&gt;
+<i>395</i>&nbsp;         * Header names are case insensitive.
+<i>396</i>&nbsp;         * &lt;/p&gt;
+<i>397</i>&nbsp;         * @param name name of header (case insensitive)
+<i>398</i>&nbsp;         * @return value of header, or null if not set.
+<i>399</i>&nbsp;         * @see #hasHeader(String)
+<i>400</i>&nbsp;         * @see #cookie(String)
+<i>401</i>&nbsp;         */
+<i>402</i>&nbsp;        String header(String name);
+<i>403</i>&nbsp;
+<i>404</i>&nbsp;        /**
+<i>405</i>&nbsp;         * Get the values of a header.
+<i>406</i>&nbsp;         * @param name header name, case insensitive.
+<i>407</i>&nbsp;         * @return a list of values for this header, or an empty list if not set.
+<i>408</i>&nbsp;         */
+<i>409</i>&nbsp;        List&lt;String&gt; headers(String name);
+<i>410</i>&nbsp;
+<i>411</i>&nbsp;        /**
+<i>412</i>&nbsp;         * Set a header. This method will overwrite any existing header with the same case insensitive name. (If there
+<i>413</i>&nbsp;         * is more than one value for this header, this method will update the first matching header.
+<i>414</i>&nbsp;         * @param name Name of header
+<i>415</i>&nbsp;         * @param value Value of header
+<i>416</i>&nbsp;         * @return this, for chaining
+<i>417</i>&nbsp;         * @see #addHeader(String, String)
+<i>418</i>&nbsp;         */
+<i>419</i>&nbsp;        T header(String name, String value);
+<i>420</i>&nbsp;
+<i>421</i>&nbsp;        /**
+<i>422</i>&nbsp;         * Add a header. The header will be added regardless of whether a header with the same name already exists.
+<i>423</i>&nbsp;         * @param name Name of new header
+<i>424</i>&nbsp;         * @param value Value of new header
+<i>425</i>&nbsp;         * @return this, for chaining
+<i>426</i>&nbsp;         */
+<i>427</i>&nbsp;        T addHeader(String name, String value);
+<i>428</i>&nbsp;
+<i>429</i>&nbsp;        /**
+<i>430</i>&nbsp;         * Check if a header is present
+<i>431</i>&nbsp;         * @param name name of header (case insensitive)
+<i>432</i>&nbsp;         * @return if the header is present in this request/response
+<i>433</i>&nbsp;         */
+<i>434</i>&nbsp;        boolean hasHeader(String name);
+<i>435</i>&nbsp;
+<i>436</i>&nbsp;        /**
+<i>437</i>&nbsp;         * Check if a header is present, with the given value
+<i>438</i>&nbsp;         * @param name header name (case insensitive)
+<i>439</i>&nbsp;         * @param value value (case insensitive)
+<i>440</i>&nbsp;         * @return if the header and value pair are set in this req/res
+<i>441</i>&nbsp;         */
+<i>442</i>&nbsp;        boolean hasHeaderWithValue(String name, String value);
+<i>443</i>&nbsp;
+<i>444</i>&nbsp;        /**
+<i>445</i>&nbsp;         * Remove headers by name. If there is more than one header with this name, they will all be removed.
+<i>446</i>&nbsp;         * @param name name of header to remove (case insensitive)
+<i>447</i>&nbsp;         * @return this, for chaining
+<i>448</i>&nbsp;         */
+<i>449</i>&nbsp;        T removeHeader(String name);
+<i>450</i>&nbsp;
+<i>451</i>&nbsp;        /**
+<i>452</i>&nbsp;         * Retrieve all of the request/response header names and corresponding values as a map. For headers with multiple
+<i>453</i>&nbsp;         * values, only the first header is returned.
+<i>454</i>&nbsp;         * &lt;p&gt;Note that this is a view of the headers only, and changes made to this map will not be reflected in the
+<i>455</i>&nbsp;         * request/response object.&lt;/p&gt;
+<i>456</i>&nbsp;         * @return headers
+<i>457</i>&nbsp;         * @see #multiHeaders()
+<i>458</i>&nbsp;
+<i>459</i>&nbsp;         */
+<i>460</i>&nbsp;        Map&lt;String, String&gt; headers();
+<i>461</i>&nbsp;
+<i>462</i>&nbsp;        /**
+<i>463</i>&nbsp;         * Retreive all of the headers, keyed by the header name, and with a list of values per header.
+<i>464</i>&nbsp;         * @return a list of multiple values per header.
+<i>465</i>&nbsp;         */
+<i>466</i>&nbsp;        Map&lt;String, List&lt;String&gt;&gt; multiHeaders();
+<i>467</i>&nbsp;
+<i>468</i>&nbsp;        /**
+<i>469</i>&nbsp;         * Get a cookie value by name from this request/response.
+<i>470</i>&nbsp;         * &lt;p&gt;
+<i>471</i>&nbsp;         * Response objects have a simplified cookie model. Each cookie set in the response is added to the response
+<i>472</i>&nbsp;         * object&#39;s cookie key=value map. The cookie&#39;s path, domain, and expiry date are ignored.
+<i>473</i>&nbsp;         * &lt;/p&gt;
+<i>474</i>&nbsp;         * @param name name of cookie to retrieve.
+<i>475</i>&nbsp;         * @return value of cookie, or null if not set
+<i>476</i>&nbsp;         */
+<i>477</i>&nbsp;        String cookie(String name);
+<i>478</i>&nbsp;
+<i>479</i>&nbsp;        /**
+<i>480</i>&nbsp;         * Set a cookie in this request/response.
+<i>481</i>&nbsp;         * @param name name of cookie
+<i>482</i>&nbsp;         * @param value value of cookie
+<i>483</i>&nbsp;         * @return this, for chaining
+<i>484</i>&nbsp;         */
+<i>485</i>&nbsp;        T cookie(String name, String value);
+<i>486</i>&nbsp;
+<i>487</i>&nbsp;        /**
+<i>488</i>&nbsp;         * Check if a cookie is present
+<i>489</i>&nbsp;         * @param name name of cookie
+<i>490</i>&nbsp;         * @return if the cookie is present in this request/response
+<i>491</i>&nbsp;         */
+<i>492</i>&nbsp;        boolean hasCookie(String name);
+<i>493</i>&nbsp;
+<i>494</i>&nbsp;        /**
+<i>495</i>&nbsp;         * Remove a cookie by name
+<i>496</i>&nbsp;         * @param name name of cookie to remove
+<i>497</i>&nbsp;         * @return this, for chaining
+<i>498</i>&nbsp;         */
+<i>499</i>&nbsp;        T removeCookie(String name);
+<i>500</i>&nbsp;
+<i>501</i>&nbsp;        /**
+<i>502</i>&nbsp;         * Retrieve all of the request/response cookies as a map
+<i>503</i>&nbsp;         * @return cookies
+<i>504</i>&nbsp;         */
+<i>505</i>&nbsp;        Map&lt;String, String&gt; cookies();
+<i>506</i>&nbsp;    }
+<i>507</i>&nbsp;
+<i>508</i>&nbsp;    /**
+<i>509</i>&nbsp;     * Represents a HTTP request.
+<i>510</i>&nbsp;     */
+<i>511</i>&nbsp;    interface Request extends Base&lt;Request&gt; {
+<i>512</i>&nbsp;        /**
+<i>513</i>&nbsp;         * Get the proxy used for this request.
+<i>514</i>&nbsp;         * @return the proxy; &lt;code&gt;null&lt;/code&gt; if not enabled.
+<i>515</i>&nbsp;         */
+<i>516</i>&nbsp;        Proxy proxy();
+<i>517</i>&nbsp;
+<i>518</i>&nbsp;        /**
+<i>519</i>&nbsp;         * Update the proxy for this request.
+<i>520</i>&nbsp;         * @param proxy the proxy ot use; &lt;code&gt;null&lt;/code&gt; to disable.
+<i>521</i>&nbsp;         * @return this Request, for chaining
+<i>522</i>&nbsp;         */
+<i>523</i>&nbsp;        Request proxy(Proxy proxy);
+<i>524</i>&nbsp;
+<i>525</i>&nbsp;        /**
+<i>526</i>&nbsp;         * Set the HTTP proxy to use for this request.
+<i>527</i>&nbsp;         * @param host the proxy hostname
+<i>528</i>&nbsp;         * @param port the proxy port
+<i>529</i>&nbsp;         * @return this Connection, for chaining
+<i>530</i>&nbsp;         */
+<i>531</i>&nbsp;        Request proxy(String host, int port);
+<i>532</i>&nbsp;
+<i>533</i>&nbsp;        /**
+<i>534</i>&nbsp;         * Get the request timeout, in milliseconds.
+<i>535</i>&nbsp;         * @return the timeout in milliseconds.
+<i>536</i>&nbsp;         */
+<i>537</i>&nbsp;        int timeout();
+<i>538</i>&nbsp;
+<i>539</i>&nbsp;        /**
+<i>540</i>&nbsp;         * Update the request timeout.
+<i>541</i>&nbsp;         * @param millis timeout, in milliseconds
+<i>542</i>&nbsp;         * @return this Request, for chaining
+<i>543</i>&nbsp;         */
+<i>544</i>&nbsp;        Request timeout(int millis);
+<i>545</i>&nbsp;
+<i>546</i>&nbsp;        /**
+<i>547</i>&nbsp;         * Get the maximum body size, in bytes.
+<i>548</i>&nbsp;         * @return the maximum body size, in bytes.
+<i>549</i>&nbsp;         */
+<i>550</i>&nbsp;        int maxBodySize();
+<i>551</i>&nbsp;
+<i>552</i>&nbsp;        /**
+<i>553</i>&nbsp;         * Update the maximum body size, in bytes.
+<i>554</i>&nbsp;         * @param bytes maximum body size, in bytes.
+<i>555</i>&nbsp;         * @return this Request, for chaining
+<i>556</i>&nbsp;         */
+<i>557</i>&nbsp;        Request maxBodySize(int bytes);
+<i>558</i>&nbsp;
+<i>559</i>&nbsp;        /**
+<i>560</i>&nbsp;         * Get the current followRedirects configuration.
+<i>561</i>&nbsp;         * @return true if followRedirects is enabled.
+<i>562</i>&nbsp;         */
+<i>563</i>&nbsp;        boolean followRedirects();
+<i>564</i>&nbsp;
+<i>565</i>&nbsp;        /**
+<i>566</i>&nbsp;         * Configures the request to (not) follow server redirects. By default this is &lt;b&gt;true&lt;/b&gt;.
+<i>567</i>&nbsp;         * @param followRedirects true if server redirects should be followed.
+<i>568</i>&nbsp;         * @return this Request, for chaining
+<i>569</i>&nbsp;         */
+<i>570</i>&nbsp;        Request followRedirects(boolean followRedirects);
+<i>571</i>&nbsp;
+<i>572</i>&nbsp;        /**
+<i>573</i>&nbsp;         * Get the current ignoreHttpErrors configuration.
+<i>574</i>&nbsp;         * @return true if errors will be ignored; false (default) if HTTP errors will cause an IOException to be
+<i>575</i>&nbsp;         * thrown.
+<i>576</i>&nbsp;         */
+<i>577</i>&nbsp;        boolean ignoreHttpErrors();
+<i>578</i>&nbsp;
+<i>579</i>&nbsp;        /**
+<i>580</i>&nbsp;         * Configures the request to ignore HTTP errors in the response.
+<i>581</i>&nbsp;         * @param ignoreHttpErrors set to true to ignore HTTP errors.
+<i>582</i>&nbsp;         * @return this Request, for chaining
+<i>583</i>&nbsp;         */
+<i>584</i>&nbsp;        Request ignoreHttpErrors(boolean ignoreHttpErrors);
+<i>585</i>&nbsp;
+<i>586</i>&nbsp;        /**
+<i>587</i>&nbsp;         * Get the current ignoreContentType configuration.
+<i>588</i>&nbsp;         * @return true if invalid content-types will be ignored; false (default) if they will cause an IOException to
+<i>589</i>&nbsp;         * be thrown.
+<i>590</i>&nbsp;         */
+<i>591</i>&nbsp;        boolean ignoreContentType();
+<i>592</i>&nbsp;
+<i>593</i>&nbsp;        /**
+<i>594</i>&nbsp;         * Configures the request to ignore the Content-Type of the response.
+<i>595</i>&nbsp;         * @param ignoreContentType set to true to ignore the content type.
+<i>596</i>&nbsp;         * @return this Request, for chaining
+<i>597</i>&nbsp;         */
+<i>598</i>&nbsp;        Request ignoreContentType(boolean ignoreContentType);
+<i>599</i>&nbsp;
+<i>600</i>&nbsp;        /**
+<i>601</i>&nbsp;         * Get the current state of TLS (SSL) certificate validation.
+<i>602</i>&nbsp;         * @return true if TLS cert validation enabled
+<i>603</i>&nbsp;         * @deprecated
+<i>604</i>&nbsp;         */
+<i>605</i>&nbsp;        boolean validateTLSCertificates();
+<i>606</i>&nbsp;
+<i>607</i>&nbsp;        /**
+<i>608</i>&nbsp;         * Set TLS certificate validation. &lt;b&gt;True&lt;/b&gt; by default.
+<i>609</i>&nbsp;         * @param value set false to ignore TLS (SSL) certificates
+<i>610</i>&nbsp;         * @deprecated as distributions (specifically Google Play) are starting to show warnings if these checks are
+<i>611</i>&nbsp;         * disabled. This method will be removed in the next release.
+<i>612</i>&nbsp;         * @see #sslSocketFactory(SSLSocketFactory)
+<i>613</i>&nbsp;         */
+<i>614</i>&nbsp;        void validateTLSCertificates(boolean value);
+<i>615</i>&nbsp;
+<i>616</i>&nbsp;        /**
+<i>617</i>&nbsp;         * Get the current custom SSL socket factory, if any.
+<i>618</i>&nbsp;         * @return custom SSL socket factory if set, null otherwise
+<i>619</i>&nbsp;         */
+<i>620</i>&nbsp;        SSLSocketFactory sslSocketFactory();
+<i>621</i>&nbsp;
+<i>622</i>&nbsp;        /**
+<i>623</i>&nbsp;         * Set a custom SSL socket factory.
+<i>624</i>&nbsp;         * @param sslSocketFactory SSL socket factory
+<i>625</i>&nbsp;         */
+<i>626</i>&nbsp;        void sslSocketFactory(SSLSocketFactory sslSocketFactory);
+<i>627</i>&nbsp;
+<i>628</i>&nbsp;        /**
+<i>629</i>&nbsp;         * Add a data parameter to the request
+<i>630</i>&nbsp;         * @param keyval data to add.
+<i>631</i>&nbsp;         * @return this Request, for chaining
+<i>632</i>&nbsp;         */
+<i>633</i>&nbsp;        Request data(KeyVal keyval);
+<i>634</i>&nbsp;
+<i>635</i>&nbsp;        /**
+<i>636</i>&nbsp;         * Get all of the request&#39;s data parameters
+<i>637</i>&nbsp;         * @return collection of keyvals
+<i>638</i>&nbsp;         */
+<i>639</i>&nbsp;        Collection&lt;KeyVal&gt; data();
+<i>640</i>&nbsp;
+<i>641</i>&nbsp;        /**
+<i>642</i>&nbsp;         * Set a POST (or PUT) request body. Useful when a server expects a plain request body, not a set for URL
+<i>643</i>&nbsp;         * encoded form key/value pairs. E.g.:
+<i>644</i>&nbsp;         * &lt;code&gt;&lt;pre&gt;Jsoup.connect(url)
+<i>645</i>&nbsp;         * .requestBody(json)
+<i>646</i>&nbsp;         * .header(&quot;Content-Type&quot;, &quot;application/json&quot;)
+<i>647</i>&nbsp;         * .post();&lt;/pre&gt;&lt;/code&gt;
+<i>648</i>&nbsp;         * If any data key/vals are supplied, they will be sent as URL query params.
+<i>649</i>&nbsp;         * @return this Request, for chaining
+<i>650</i>&nbsp;         */
+<i>651</i>&nbsp;        Request requestBody(String body);
+<i>652</i>&nbsp;
+<i>653</i>&nbsp;        /**
+<i>654</i>&nbsp;         * Get the current request body.
+<i>655</i>&nbsp;         * @return null if not set.
+<i>656</i>&nbsp;         */
+<i>657</i>&nbsp;        String requestBody();
+<i>658</i>&nbsp;
+<i>659</i>&nbsp;        /**
+<i>660</i>&nbsp;         * Specify the parser to use when parsing the document.
+<i>661</i>&nbsp;         * @param parser parser to use.
+<i>662</i>&nbsp;         * @return this Request, for chaining
+<i>663</i>&nbsp;         */
+<i>664</i>&nbsp;        Request parser(Parser parser);
+<i>665</i>&nbsp;
+<i>666</i>&nbsp;        /**
+<i>667</i>&nbsp;         * Get the current parser to use when parsing the document.
+<i>668</i>&nbsp;         * @return current Parser
+<i>669</i>&nbsp;         */
+<i>670</i>&nbsp;        Parser parser();
+<i>671</i>&nbsp;
+<i>672</i>&nbsp;        /**
+<i>673</i>&nbsp;         * Sets the post data character set for x-www-form-urlencoded post data
+<i>674</i>&nbsp;         * @param charset character set to encode post data
+<i>675</i>&nbsp;         * @return this Request, for chaining
+<i>676</i>&nbsp;         */
+<i>677</i>&nbsp;        Request postDataCharset(String charset);
+<i>678</i>&nbsp;
+<i>679</i>&nbsp;        /**
+<i>680</i>&nbsp;         * Gets the post data character set for x-www-form-urlencoded post data
+<i>681</i>&nbsp;         * @return character set to encode post data
+<i>682</i>&nbsp;         */
+<i>683</i>&nbsp;        String postDataCharset();
+<i>684</i>&nbsp;
+<i>685</i>&nbsp;    }
+<i>686</i>&nbsp;
+<i>687</i>&nbsp;    /**
+<i>688</i>&nbsp;     * Represents a HTTP response.
+<i>689</i>&nbsp;     */
+<i>690</i>&nbsp;    interface Response extends Base&lt;Response&gt; {
+<i>691</i>&nbsp;
+<i>692</i>&nbsp;        /**
+<i>693</i>&nbsp;         * Get the status code of the response.
+<i>694</i>&nbsp;         * @return status code
+<i>695</i>&nbsp;         */
+<i>696</i>&nbsp;        int statusCode();
+<i>697</i>&nbsp;
+<i>698</i>&nbsp;        /**
+<i>699</i>&nbsp;         * Get the status message of the response.
+<i>700</i>&nbsp;         * @return status message
+<i>701</i>&nbsp;         */
+<i>702</i>&nbsp;        String statusMessage();
+<i>703</i>&nbsp;
+<i>704</i>&nbsp;        /**
+<i>705</i>&nbsp;         * Get the character set name of the response, derived from the content-type header.
+<i>706</i>&nbsp;         * @return character set name
+<i>707</i>&nbsp;         */
+<i>708</i>&nbsp;        String charset();
+<i>709</i>&nbsp;
+<i>710</i>&nbsp;        /**
+<i>711</i>&nbsp;         * Set / override the response character set. When the document body is parsed it will be with this charset.
+<i>712</i>&nbsp;         * @param charset to decode body as
+<i>713</i>&nbsp;         * @return this Response, for chaining
+<i>714</i>&nbsp;         */
+<i>715</i>&nbsp;        Response charset(String charset);
+<i>716</i>&nbsp;
+<i>717</i>&nbsp;        /**
+<i>718</i>&nbsp;         * Get the response content type (e.g. &quot;text/html&quot;);
+<i>719</i>&nbsp;         * @return the response content type
+<i>720</i>&nbsp;         */
+<i>721</i>&nbsp;        String contentType();
+<i>722</i>&nbsp;
+<i>723</i>&nbsp;        /**
+<i>724</i>&nbsp;         * Read and parse the body of the response as a Document. If you intend to parse the same response multiple
+<i>725</i>&nbsp;         * times, you should {@link #bufferUp()} first.
+<i>726</i>&nbsp;         * @return a parsed Document
+<i>727</i>&nbsp;         * @throws IOException on error
+<i>728</i>&nbsp;         */
+<i>729</i>&nbsp;        Document parse() throws IOException;
+<i>730</i>&nbsp;
+<i>731</i>&nbsp;        /**
+<i>732</i>&nbsp;         * Get the body of the response as a plain string.
+<i>733</i>&nbsp;         * @return body
+<i>734</i>&nbsp;         */
+<i>735</i>&nbsp;        String body();
+<i>736</i>&nbsp;
+<i>737</i>&nbsp;        /**
+<i>738</i>&nbsp;         * Get the body of the response as an array of bytes.
+<i>739</i>&nbsp;         * @return body bytes
+<i>740</i>&nbsp;         */
+<i>741</i>&nbsp;        byte[] bodyAsBytes();
+<i>742</i>&nbsp;
+<i>743</i>&nbsp;        /**
+<i>744</i>&nbsp;         * Read the body of the response into a local buffer, so that {@link #parse()} may be called repeatedly on the
+<i>745</i>&nbsp;         * same connection response (otherwise, once the response is read, its InputStream will have been drained and
+<i>746</i>&nbsp;         * may not be re-read). Calling {@link #body() } or {@link #bodyAsBytes()} has the same effect.
+<i>747</i>&nbsp;         * @return this response, for chaining
+<i>748</i>&nbsp;         * @throws UncheckedIOException if an IO exception occurs during buffering.
+<i>749</i>&nbsp;         */
+<i>750</i>&nbsp;        Response bufferUp();
+<i>751</i>&nbsp;
+<i>752</i>&nbsp;        /**
+<i>753</i>&nbsp;         * Get the body of the response as a (buffered) InputStream. You should close the input stream when you&#39;re done with it.
+<i>754</i>&nbsp;         * Other body methods (like bufferUp, body, parse, etc) will not work in conjunction with this method.
+<i>755</i>&nbsp;         * &lt;p&gt;This method is useful for writing large responses to disk, without buffering them completely into memory first.&lt;/p&gt;
+<i>756</i>&nbsp;         * @return the response body input stream
+<i>757</i>&nbsp;         */
+<i>758</i>&nbsp;        BufferedInputStream bodyStream();
+<i>759</i>&nbsp;    }
+<i>760</i>&nbsp;
+<i>761</i>&nbsp;    /**
+<i>762</i>&nbsp;     * A Key:Value tuple(+), used for form data.
+<i>763</i>&nbsp;     */
+<i>764</i>&nbsp;    interface KeyVal {
+<i>765</i>&nbsp;
+<i>766</i>&nbsp;        /**
+<i>767</i>&nbsp;         * Update the key of a keyval
+<i>768</i>&nbsp;         * @param key new key
+<i>769</i>&nbsp;         * @return this KeyVal, for chaining
+<i>770</i>&nbsp;         */
+<i>771</i>&nbsp;        KeyVal key(String key);
+<i>772</i>&nbsp;
+<i>773</i>&nbsp;        /**
+<i>774</i>&nbsp;         * Get the key of a keyval
+<i>775</i>&nbsp;         * @return the key
+<i>776</i>&nbsp;         */
+<i>777</i>&nbsp;        String key();
+<i>778</i>&nbsp;
+<i>779</i>&nbsp;        /**
+<i>780</i>&nbsp;         * Update the value of a keyval
+<i>781</i>&nbsp;         * @param value the new value
+<i>782</i>&nbsp;         * @return this KeyVal, for chaining
+<i>783</i>&nbsp;         */
+<i>784</i>&nbsp;        KeyVal value(String value);
+<i>785</i>&nbsp;
+<i>786</i>&nbsp;        /**
+<i>787</i>&nbsp;         * Get the value of a keyval
+<i>788</i>&nbsp;         * @return the value
+<i>789</i>&nbsp;         */
+<i>790</i>&nbsp;        String value();
+<i>791</i>&nbsp;
+<i>792</i>&nbsp;        /**
+<i>793</i>&nbsp;         * Add or update an input stream to this keyVal
+<i>794</i>&nbsp;         * @param inputStream new input stream
+<i>795</i>&nbsp;         * @return this KeyVal, for chaining
+<i>796</i>&nbsp;         */
+<i>797</i>&nbsp;        KeyVal inputStream(InputStream inputStream);
+<i>798</i>&nbsp;
+<i>799</i>&nbsp;        /**
+<i>800</i>&nbsp;         * Get the input stream associated with this keyval, if any
+<i>801</i>&nbsp;         * @return input stream if set, or null
+<i>802</i>&nbsp;         */
+<i>803</i>&nbsp;        InputStream inputStream();
+<i>804</i>&nbsp;
+<i>805</i>&nbsp;        /**
+<i>806</i>&nbsp;         * Does this keyval have an input stream?
+<i>807</i>&nbsp;         * @return true if this keyval does indeed have an input stream
+<i>808</i>&nbsp;         */
+<i>809</i>&nbsp;        boolean hasInputStream();
+<i>810</i>&nbsp;
+<i>811</i>&nbsp;        /**
+<i>812</i>&nbsp;         * Set the Content Type header used in the MIME body (aka mimetype) when uploading files.
+<i>813</i>&nbsp;         * Only useful if {@link #inputStream(InputStream)} is set.
+<i>814</i>&nbsp;         * &lt;p&gt;Will default to {@code application/octet-stream}.&lt;/p&gt;
+<i>815</i>&nbsp;         * @param contentType the new content type
+<i>816</i>&nbsp;         * @return this KeyVal
+<i>817</i>&nbsp;         */
+<i>818</i>&nbsp;        KeyVal contentType(String contentType);
+<i>819</i>&nbsp;
+<i>820</i>&nbsp;        /**
+<i>821</i>&nbsp;         * Get the current Content Type, or {@code null} if not set.
+<i>822</i>&nbsp;         * @return the current Content Type.
+<i>823</i>&nbsp;         */
+<i>824</i>&nbsp;        String contentType();
+<i>825</i>&nbsp;    }
+<i>826</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-19 14:53</div>
+</div>
+</body>
+</html>

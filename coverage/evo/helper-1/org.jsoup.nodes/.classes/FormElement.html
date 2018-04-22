@@ -1,0 +1,196 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: FormElement</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.nodes</a> ]
+</div>
+
+<h1>Coverage Summary for Class: FormElement (org.jsoup.nodes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FormElement</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.nodes;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.Connection;
+<i>4</i>&nbsp;import org.jsoup.Jsoup;
+<i>5</i>&nbsp;import org.jsoup.helper.HttpConnection;
+<i>6</i>&nbsp;import org.jsoup.helper.Validate;
+<i>7</i>&nbsp;import org.jsoup.parser.Tag;
+<i>8</i>&nbsp;import org.jsoup.select.Elements;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import java.util.ArrayList;
+<i>11</i>&nbsp;import java.util.List;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;/**
+<i>14</i>&nbsp; * A HTML Form Element provides ready access to the form fields/controls that are associated with it. It also allows a
+<i>15</i>&nbsp; * form to easily be submitted.
+<i>16</i>&nbsp; */
+<i>17</i>&nbsp;public class FormElement extends Element {
+<b class="nc"><i>18</i>&nbsp;    private final Elements elements = new Elements();</b>
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    /**
+<i>21</i>&nbsp;     * Create a new, standalone form element.
+<i>22</i>&nbsp;     *
+<i>23</i>&nbsp;     * @param tag        tag of this element
+<i>24</i>&nbsp;     * @param baseUri    the base URI
+<i>25</i>&nbsp;     * @param attributes initial attributes
+<i>26</i>&nbsp;     */
+<i>27</i>&nbsp;    public FormElement(Tag tag, String baseUri, Attributes attributes) {
+<b class="nc"><i>28</i>&nbsp;        super(tag, baseUri, attributes);</b>
+<b class="nc"><i>29</i>&nbsp;    }</b>
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    /**
+<i>32</i>&nbsp;     * Get the list of form control elements associated with this form.
+<i>33</i>&nbsp;     * @return form controls associated with this element.
+<i>34</i>&nbsp;     */
+<i>35</i>&nbsp;    public Elements elements() {
+<b class="nc"><i>36</i>&nbsp;        return elements;</b>
+<i>37</i>&nbsp;    }
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;    /**
+<i>40</i>&nbsp;     * Add a form control element to this form.
+<i>41</i>&nbsp;     * @param element form control to add
+<i>42</i>&nbsp;     * @return this form element, for chaining
+<i>43</i>&nbsp;     */
+<i>44</i>&nbsp;    public FormElement addElement(Element element) {
+<b class="nc"><i>45</i>&nbsp;        elements.add(element);</b>
+<b class="nc"><i>46</i>&nbsp;        return this;</b>
+<i>47</i>&nbsp;    }
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    @Override
+<i>50</i>&nbsp;    protected void removeChild(Node out) {
+<b class="nc"><i>51</i>&nbsp;        super.removeChild(out);</b>
+<b class="nc"><i>52</i>&nbsp;        elements.remove(out);</b>
+<b class="nc"><i>53</i>&nbsp;    }</b>
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;    /**
+<i>56</i>&nbsp;     * Prepare to submit this form. A Connection object is created with the request set up from the form values. You
+<i>57</i>&nbsp;     * can then set up other options (like user-agent, timeout, cookies), then execute it.
+<i>58</i>&nbsp;     * @return a connection prepared from the values of this form.
+<i>59</i>&nbsp;     * @throws IllegalArgumentException if the form&#39;s absolute action URL cannot be determined. Make sure you pass the
+<i>60</i>&nbsp;     * document&#39;s base URI when parsing.
+<i>61</i>&nbsp;     */
+<i>62</i>&nbsp;    public Connection submit() {
+<b class="nc"><i>63</i>&nbsp;        String action = hasAttr(&quot;action&quot;) ? absUrl(&quot;action&quot;) : baseUri();</b>
+<b class="nc"><i>64</i>&nbsp;        Validate.notEmpty(action, &quot;Could not determine a form action URL for submit. Ensure you set a base URI when parsing.&quot;);</b>
+<b class="nc"><i>65</i>&nbsp;        Connection.Method method = attr(&quot;method&quot;).toUpperCase().equals(&quot;POST&quot;) ?</b>
+<i>66</i>&nbsp;                Connection.Method.POST : Connection.Method.GET;
+<i>67</i>&nbsp;
+<b class="nc"><i>68</i>&nbsp;        return Jsoup.connect(action)</b>
+<b class="nc"><i>69</i>&nbsp;                .data(formData())</b>
+<b class="nc"><i>70</i>&nbsp;                .method(method);</b>
+<i>71</i>&nbsp;    }
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    /**
+<i>74</i>&nbsp;     * Get the data that this form submits. The returned list is a copy of the data, and changes to the contents of the
+<i>75</i>&nbsp;     * list will not be reflected in the DOM.
+<i>76</i>&nbsp;     * @return a list of key vals
+<i>77</i>&nbsp;     */
+<i>78</i>&nbsp;    public List&lt;Connection.KeyVal&gt; formData() {
+<b class="nc"><i>79</i>&nbsp;        ArrayList&lt;Connection.KeyVal&gt; data = new ArrayList&lt;&gt;();</b>
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;        // iterate the form control elements and accumulate their values
+<b class="nc"><i>82</i>&nbsp;        for (Element el: elements) {</b>
+<b class="nc"><i>83</i>&nbsp;            if (!el.tag().isFormSubmittable()) continue; // contents are form listable, superset of submitable</b>
+<b class="nc"><i>84</i>&nbsp;            if (el.hasAttr(&quot;disabled&quot;)) continue; // skip disabled form inputs</b>
+<b class="nc"><i>85</i>&nbsp;            String name = el.attr(&quot;name&quot;);</b>
+<b class="nc"><i>86</i>&nbsp;            if (name.length() == 0) continue;</b>
+<b class="nc"><i>87</i>&nbsp;            String type = el.attr(&quot;type&quot;);</b>
+<i>88</i>&nbsp;
+<b class="nc"><i>89</i>&nbsp;            if (&quot;select&quot;.equals(el.tagName())) {</b>
+<b class="nc"><i>90</i>&nbsp;                Elements options = el.select(&quot;option[selected]&quot;);</b>
+<b class="nc"><i>91</i>&nbsp;                boolean set = false;</b>
+<b class="nc"><i>92</i>&nbsp;                for (Element option: options) {</b>
+<b class="nc"><i>93</i>&nbsp;                    data.add(HttpConnection.KeyVal.create(name, option.val()));</b>
+<b class="nc"><i>94</i>&nbsp;                    set = true;</b>
+<b class="nc"><i>95</i>&nbsp;                }</b>
+<b class="nc"><i>96</i>&nbsp;                if (!set) {</b>
+<b class="nc"><i>97</i>&nbsp;                    Element option = el.select(&quot;option&quot;).first();</b>
+<b class="nc"><i>98</i>&nbsp;                    if (option != null)</b>
+<b class="nc"><i>99</i>&nbsp;                        data.add(HttpConnection.KeyVal.create(name, option.val()));</b>
+<i>100</i>&nbsp;                }
+<b class="nc"><i>101</i>&nbsp;            } else if (&quot;checkbox&quot;.equalsIgnoreCase(type) || &quot;radio&quot;.equalsIgnoreCase(type)) {</b>
+<i>102</i>&nbsp;                // only add checkbox or radio if they have the checked attribute
+<b class="nc"><i>103</i>&nbsp;                if (el.hasAttr(&quot;checked&quot;)) {</b>
+<b class="nc"><i>104</i>&nbsp;                    final String val = el.val().length() &gt;  0 ? el.val() : &quot;on&quot;;</b>
+<b class="nc"><i>105</i>&nbsp;                    data.add(HttpConnection.KeyVal.create(name, val));</b>
+<b class="nc"><i>106</i>&nbsp;                }</b>
+<i>107</i>&nbsp;            } else {
+<b class="nc"><i>108</i>&nbsp;                data.add(HttpConnection.KeyVal.create(name, el.val()));</b>
+<i>109</i>&nbsp;            }
+<b class="nc"><i>110</i>&nbsp;        }</b>
+<b class="nc"><i>111</i>&nbsp;        return data;</b>
+<i>112</i>&nbsp;    }
+<i>113</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 12:34</div>
+</div>
+</body>
+</html>

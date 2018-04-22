@@ -1,0 +1,566 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CharacterReader</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.parser</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CharacterReader (org.jsoup.parser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CharacterReader</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    32.5%
+  </span>
+  <span class="absValue">
+    (13/ 40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    32.9%
+  </span>
+  <span class="absValue">
+    (77/ 234)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.parser;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.UncheckedIOException;
+<i>4</i>&nbsp;import org.jsoup.helper.Validate;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import java.io.IOException;
+<i>7</i>&nbsp;import java.io.Reader;
+<i>8</i>&nbsp;import java.io.StringReader;
+<i>9</i>&nbsp;import java.util.Arrays;
+<i>10</i>&nbsp;import java.util.Locale;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;/**
+<i>13</i>&nbsp; CharacterReader consumes tokens off a string. Used internally by jsoup. API subject to changes.
+<i>14</i>&nbsp; */
+<i>15</i>&nbsp;public final class CharacterReader {
+<i>16</i>&nbsp;    static final char EOF = (char) -1;
+<i>17</i>&nbsp;    private static final int maxStringCacheLen = 12;
+<i>18</i>&nbsp;    static final int maxBufferLen = 1024 * 32; // visible for testing
+<i>19</i>&nbsp;    private static final int readAheadLimit = (int) (maxBufferLen * 0.75);
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    private final char[] charBuf;
+<i>22</i>&nbsp;    private final Reader reader;
+<i>23</i>&nbsp;    private int bufLength;
+<i>24</i>&nbsp;    private int bufSplitPoint;
+<i>25</i>&nbsp;    private int bufPos;
+<i>26</i>&nbsp;    private int readerPos;
+<i>27</i>&nbsp;    private int bufMark;
+<b class="fc"><i>28</i>&nbsp;    private final String[] stringCache = new String[512]; // holds reused strings in this doc, to lessen garbage</b>
+<i>29</i>&nbsp;
+<b class="fc"><i>30</i>&nbsp;    public CharacterReader(Reader input, int sz) {</b>
+<b class="fc"><i>31</i>&nbsp;        Validate.notNull(input);</b>
+<b class="fc"><i>32</i>&nbsp;        Validate.isTrue(input.markSupported());</b>
+<b class="fc"><i>33</i>&nbsp;        reader = input;</b>
+<b class="fc"><i>34</i>&nbsp;        charBuf = new char[sz &gt; maxBufferLen ? maxBufferLen : sz];</b>
+<b class="fc"><i>35</i>&nbsp;        bufferUp();</b>
+<b class="fc"><i>36</i>&nbsp;    }</b>
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    public CharacterReader(Reader input) {
+<b class="fc"><i>39</i>&nbsp;        this(input, maxBufferLen);</b>
+<b class="fc"><i>40</i>&nbsp;    }</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;    public CharacterReader(String input) {
+<b class="fc"><i>43</i>&nbsp;        this(new StringReader(input), input.length());</b>
+<b class="fc"><i>44</i>&nbsp;    }</b>
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    private void bufferUp() {
+<b class="fc"><i>47</i>&nbsp;        if (bufPos &lt; bufSplitPoint)</b>
+<b class="fc"><i>48</i>&nbsp;            return;</b>
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;        try {
+<b class="fc"><i>51</i>&nbsp;            reader.skip(bufPos);</b>
+<b class="fc"><i>52</i>&nbsp;            reader.mark(maxBufferLen);</b>
+<b class="fc"><i>53</i>&nbsp;            final int read = reader.read(charBuf);</b>
+<b class="fc"><i>54</i>&nbsp;            reader.reset();</b>
+<b class="fc"><i>55</i>&nbsp;            if (read != -1) {</b>
+<b class="fc"><i>56</i>&nbsp;                bufLength = read;</b>
+<b class="fc"><i>57</i>&nbsp;                readerPos += bufPos;</b>
+<b class="fc"><i>58</i>&nbsp;                bufPos = 0;</b>
+<b class="fc"><i>59</i>&nbsp;                bufMark = 0;</b>
+<b class="fc"><i>60</i>&nbsp;                bufSplitPoint = bufLength &gt; readAheadLimit ? readAheadLimit : bufLength;</b>
+<i>61</i>&nbsp;            }
+<b class="nc"><i>62</i>&nbsp;        } catch (IOException e) {</b>
+<b class="nc"><i>63</i>&nbsp;            throw new UncheckedIOException(e);</b>
+<b class="fc"><i>64</i>&nbsp;        }</b>
+<b class="fc"><i>65</i>&nbsp;    }</b>
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;    /**
+<i>68</i>&nbsp;     * Gets the current cursor position in the content.
+<i>69</i>&nbsp;     * @return current position
+<i>70</i>&nbsp;     */
+<i>71</i>&nbsp;    public int pos() {
+<b class="nc"><i>72</i>&nbsp;        return readerPos + bufPos;</b>
+<i>73</i>&nbsp;    }
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    /**
+<i>76</i>&nbsp;     * Tests if all the content has been read.
+<i>77</i>&nbsp;     * @return true if nothing left to read.
+<i>78</i>&nbsp;     */
+<i>79</i>&nbsp;    public boolean isEmpty() {
+<b class="fc"><i>80</i>&nbsp;        bufferUp();</b>
+<b class="fc"><i>81</i>&nbsp;        return bufPos &gt;= bufLength;</b>
+<i>82</i>&nbsp;    }
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;    private boolean isEmptyNoBufferUp() {
+<b class="fc"><i>85</i>&nbsp;        return bufPos &gt;= bufLength;</b>
+<i>86</i>&nbsp;    }
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;    /**
+<i>89</i>&nbsp;     * Get the char at the current position.
+<i>90</i>&nbsp;     * @return char
+<i>91</i>&nbsp;     */
+<i>92</i>&nbsp;    public char current() {
+<b class="fc"><i>93</i>&nbsp;        bufferUp();</b>
+<b class="fc"><i>94</i>&nbsp;        return isEmptyNoBufferUp() ? EOF : charBuf[bufPos];</b>
+<i>95</i>&nbsp;    }
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;    char consume() {
+<b class="nc"><i>98</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>99</i>&nbsp;        char val = isEmptyNoBufferUp() ? EOF : charBuf[bufPos];</b>
+<b class="nc"><i>100</i>&nbsp;        bufPos++;</b>
+<b class="nc"><i>101</i>&nbsp;        return val;</b>
+<i>102</i>&nbsp;    }
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;    void unconsume() {
+<b class="nc"><i>105</i>&nbsp;        bufPos--;</b>
+<b class="nc"><i>106</i>&nbsp;    }</b>
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;    /**
+<i>109</i>&nbsp;     * Moves the current position by one.
+<i>110</i>&nbsp;     */
+<i>111</i>&nbsp;    public void advance() {
+<b class="fc"><i>112</i>&nbsp;        bufPos++;</b>
+<b class="fc"><i>113</i>&nbsp;    }</b>
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;    void mark() {
+<b class="nc"><i>116</i>&nbsp;        bufMark = bufPos;</b>
+<b class="nc"><i>117</i>&nbsp;    }</b>
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;    void rewindToMark() {
+<b class="nc"><i>120</i>&nbsp;        bufPos = bufMark;</b>
+<b class="nc"><i>121</i>&nbsp;    }</b>
+<i>122</i>&nbsp;
+<i>123</i>&nbsp;    /**
+<i>124</i>&nbsp;     * Returns the number of characters between the current position and the next instance of the input char
+<i>125</i>&nbsp;     * @param c scan target
+<i>126</i>&nbsp;     * @return offset between current position and next instance of target. -1 if not found.
+<i>127</i>&nbsp;     */
+<i>128</i>&nbsp;    int nextIndexOf(char c) {
+<i>129</i>&nbsp;        // doesn&#39;t handle scanning for surrogates
+<b class="fc"><i>130</i>&nbsp;        bufferUp();</b>
+<b class="fc"><i>131</i>&nbsp;        for (int i = bufPos; i &lt; bufLength; i++) {</b>
+<b class="fc"><i>132</i>&nbsp;            if (c == charBuf[i])</b>
+<b class="fc"><i>133</i>&nbsp;                return i - bufPos;</b>
+<i>134</i>&nbsp;        }
+<b class="nc"><i>135</i>&nbsp;        return -1;</b>
+<i>136</i>&nbsp;    }
+<i>137</i>&nbsp;
+<i>138</i>&nbsp;    /**
+<i>139</i>&nbsp;     * Returns the number of characters between the current position and the next instance of the input sequence
+<i>140</i>&nbsp;     *
+<i>141</i>&nbsp;     * @param seq scan target
+<i>142</i>&nbsp;     * @return offset between current position and next instance of target. -1 if not found.
+<i>143</i>&nbsp;     */
+<i>144</i>&nbsp;    int nextIndexOf(CharSequence seq) {
+<b class="nc"><i>145</i>&nbsp;        bufferUp();</b>
+<i>146</i>&nbsp;        // doesn&#39;t handle scanning for surrogates
+<b class="nc"><i>147</i>&nbsp;        char startChar = seq.charAt(0);</b>
+<b class="nc"><i>148</i>&nbsp;        for (int offset = bufPos; offset &lt; bufLength; offset++) {</b>
+<i>149</i>&nbsp;            // scan to first instance of startchar:
+<b class="nc"><i>150</i>&nbsp;            if (startChar != charBuf[offset])</b>
+<b class="nc"><i>151</i>&nbsp;                while(++offset &lt; bufLength &amp;&amp; startChar != charBuf[offset]) { /* empty */ }</b>
+<b class="nc"><i>152</i>&nbsp;            int i = offset + 1;</b>
+<b class="nc"><i>153</i>&nbsp;            int last = i + seq.length()-1;</b>
+<b class="nc"><i>154</i>&nbsp;            if (offset &lt; bufLength &amp;&amp; last &lt;= bufLength) {</b>
+<b class="nc"><i>155</i>&nbsp;                for (int j = 1; i &lt; last &amp;&amp; seq.charAt(j) == charBuf[i]; i++, j++) { /* empty */ }</b>
+<b class="nc"><i>156</i>&nbsp;                if (i == last) // found full sequence</b>
+<b class="nc"><i>157</i>&nbsp;                    return offset - bufPos;</b>
+<i>158</i>&nbsp;            }
+<i>159</i>&nbsp;        }
+<b class="nc"><i>160</i>&nbsp;        return -1;</b>
+<i>161</i>&nbsp;    }
+<i>162</i>&nbsp;
+<i>163</i>&nbsp;    /**
+<i>164</i>&nbsp;     * Reads characters up to the specific char.
+<i>165</i>&nbsp;     * @param c the delimiter
+<i>166</i>&nbsp;     * @return the chars read
+<i>167</i>&nbsp;     */
+<i>168</i>&nbsp;    public String consumeTo(char c) {
+<b class="fc"><i>169</i>&nbsp;        int offset = nextIndexOf(c);</b>
+<b class="fc"><i>170</i>&nbsp;        if (offset != -1) {</b>
+<b class="fc"><i>171</i>&nbsp;            String consumed = cacheString(charBuf, stringCache, bufPos, offset);</b>
+<b class="fc"><i>172</i>&nbsp;            bufPos += offset;</b>
+<b class="fc"><i>173</i>&nbsp;            return consumed;</b>
+<i>174</i>&nbsp;        } else {
+<b class="nc"><i>175</i>&nbsp;            return consumeToEnd();</b>
+<i>176</i>&nbsp;        }
+<i>177</i>&nbsp;    }
+<i>178</i>&nbsp;
+<i>179</i>&nbsp;    String consumeTo(String seq) {
+<b class="nc"><i>180</i>&nbsp;        int offset = nextIndexOf(seq);</b>
+<b class="nc"><i>181</i>&nbsp;        if (offset != -1) {</b>
+<b class="nc"><i>182</i>&nbsp;            String consumed = cacheString(charBuf, stringCache, bufPos, offset);</b>
+<b class="nc"><i>183</i>&nbsp;            bufPos += offset;</b>
+<b class="nc"><i>184</i>&nbsp;            return consumed;</b>
+<i>185</i>&nbsp;        } else {
+<b class="nc"><i>186</i>&nbsp;            return consumeToEnd();</b>
+<i>187</i>&nbsp;        }
+<i>188</i>&nbsp;    }
+<i>189</i>&nbsp;
+<i>190</i>&nbsp;    /**
+<i>191</i>&nbsp;     * Read characters until the first of any delimiters is found.
+<i>192</i>&nbsp;     * @param chars delimiters to scan for
+<i>193</i>&nbsp;     * @return characters read up to the matched delimiter.
+<i>194</i>&nbsp;     */
+<i>195</i>&nbsp;    public String consumeToAny(final char... chars) {
+<b class="fc"><i>196</i>&nbsp;        bufferUp();</b>
+<b class="fc"><i>197</i>&nbsp;        final int start = bufPos;</b>
+<b class="fc"><i>198</i>&nbsp;        final int remaining = bufLength;</b>
+<b class="fc"><i>199</i>&nbsp;        final char[] val = charBuf;</b>
+<i>200</i>&nbsp;
+<b class="fc"><i>201</i>&nbsp;        OUTER: while (bufPos &lt; remaining) {</b>
+<b class="fc"><i>202</i>&nbsp;            for (char c : chars) {</b>
+<b class="fc"><i>203</i>&nbsp;                if (val[bufPos] == c)</b>
+<b class="fc"><i>204</i>&nbsp;                    break OUTER;</b>
+<i>205</i>&nbsp;            }
+<b class="fc"><i>206</i>&nbsp;            bufPos++;</b>
+<i>207</i>&nbsp;        }
+<i>208</i>&nbsp;
+<b class="fc"><i>209</i>&nbsp;        return bufPos &gt; start ? cacheString(charBuf, stringCache, start, bufPos -start) : &quot;&quot;;</b>
+<i>210</i>&nbsp;    }
+<i>211</i>&nbsp;
+<i>212</i>&nbsp;    String consumeToAnySorted(final char... chars) {
+<b class="nc"><i>213</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>214</i>&nbsp;        final int start = bufPos;</b>
+<b class="nc"><i>215</i>&nbsp;        final int remaining = bufLength;</b>
+<b class="nc"><i>216</i>&nbsp;        final char[] val = charBuf;</b>
+<i>217</i>&nbsp;
+<b class="nc"><i>218</i>&nbsp;        while (bufPos &lt; remaining) {</b>
+<b class="nc"><i>219</i>&nbsp;            if (Arrays.binarySearch(chars, val[bufPos]) &gt;= 0)</b>
+<b class="nc"><i>220</i>&nbsp;                break;</b>
+<b class="nc"><i>221</i>&nbsp;            bufPos++;</b>
+<i>222</i>&nbsp;        }
+<i>223</i>&nbsp;
+<b class="nc"><i>224</i>&nbsp;        return bufPos &gt; start ? cacheString(charBuf, stringCache, start, bufPos -start) : &quot;&quot;;</b>
+<i>225</i>&nbsp;    }
+<i>226</i>&nbsp;
+<i>227</i>&nbsp;    String consumeData() {
+<i>228</i>&nbsp;        // &amp;, &lt;, null
+<b class="nc"><i>229</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>230</i>&nbsp;        final int start = bufPos;</b>
+<b class="nc"><i>231</i>&nbsp;        final int remaining = bufLength;</b>
+<b class="nc"><i>232</i>&nbsp;        final char[] val = charBuf;</b>
+<i>233</i>&nbsp;
+<b class="nc"><i>234</i>&nbsp;        while (bufPos &lt; remaining) {</b>
+<b class="nc"><i>235</i>&nbsp;            final char c = val[bufPos];</b>
+<b class="nc"><i>236</i>&nbsp;            if (c == &#39;&amp;&#39;|| c ==  &#39;&lt;&#39; || c ==  TokeniserState.nullChar)</b>
+<b class="nc"><i>237</i>&nbsp;                break;</b>
+<b class="nc"><i>238</i>&nbsp;            bufPos++;</b>
+<b class="nc"><i>239</i>&nbsp;        }</b>
+<i>240</i>&nbsp;
+<b class="nc"><i>241</i>&nbsp;        return bufPos &gt; start ? cacheString(charBuf, stringCache, start, bufPos -start) : &quot;&quot;;</b>
+<i>242</i>&nbsp;    }
+<i>243</i>&nbsp;
+<i>244</i>&nbsp;    String consumeTagName() {
+<i>245</i>&nbsp;        // &#39;\t&#39;, &#39;\n&#39;, &#39;\r&#39;, &#39;\f&#39;, &#39; &#39;, &#39;/&#39;, &#39;&gt;&#39;, nullChar
+<b class="nc"><i>246</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>247</i>&nbsp;        final int start = bufPos;</b>
+<b class="nc"><i>248</i>&nbsp;        final int remaining = bufLength;</b>
+<b class="nc"><i>249</i>&nbsp;        final char[] val = charBuf;</b>
+<i>250</i>&nbsp;
+<b class="nc"><i>251</i>&nbsp;        while (bufPos &lt; remaining) {</b>
+<b class="nc"><i>252</i>&nbsp;            final char c = val[bufPos];</b>
+<b class="nc"><i>253</i>&nbsp;            if (c == &#39;\t&#39;|| c ==  &#39;\n&#39;|| c ==  &#39;\r&#39;|| c ==  &#39;\f&#39;|| c ==  &#39; &#39;|| c ==  &#39;/&#39;|| c ==  &#39;&gt;&#39;|| c ==  TokeniserState.nullChar)</b>
+<b class="nc"><i>254</i>&nbsp;                break;</b>
+<b class="nc"><i>255</i>&nbsp;            bufPos++;</b>
+<b class="nc"><i>256</i>&nbsp;        }</b>
+<i>257</i>&nbsp;
+<b class="nc"><i>258</i>&nbsp;        return bufPos &gt; start ? cacheString(charBuf, stringCache, start, bufPos -start) : &quot;&quot;;</b>
+<i>259</i>&nbsp;    }
+<i>260</i>&nbsp;
+<i>261</i>&nbsp;    String consumeToEnd() {
+<b class="nc"><i>262</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>263</i>&nbsp;        String data = cacheString(charBuf, stringCache, bufPos, bufLength - bufPos);</b>
+<b class="nc"><i>264</i>&nbsp;        bufPos = bufLength;</b>
+<b class="nc"><i>265</i>&nbsp;        return data;</b>
+<i>266</i>&nbsp;    }
+<i>267</i>&nbsp;
+<i>268</i>&nbsp;    String consumeLetterSequence() {
+<b class="nc"><i>269</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>270</i>&nbsp;        int start = bufPos;</b>
+<b class="nc"><i>271</i>&nbsp;        while (bufPos &lt; bufLength) {</b>
+<b class="nc"><i>272</i>&nbsp;            char c = charBuf[bufPos];</b>
+<b class="nc"><i>273</i>&nbsp;            if ((c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;Z&#39;) || (c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;z&#39;) || Character.isLetter(c))</b>
+<b class="nc"><i>274</i>&nbsp;                bufPos++;</b>
+<i>275</i>&nbsp;            else
+<i>276</i>&nbsp;                break;
+<b class="nc"><i>277</i>&nbsp;        }</b>
+<i>278</i>&nbsp;
+<b class="nc"><i>279</i>&nbsp;        return cacheString(charBuf, stringCache, start, bufPos - start);</b>
+<i>280</i>&nbsp;    }
+<i>281</i>&nbsp;
+<i>282</i>&nbsp;    String consumeLetterThenDigitSequence() {
+<b class="nc"><i>283</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>284</i>&nbsp;        int start = bufPos;</b>
+<b class="nc"><i>285</i>&nbsp;        while (bufPos &lt; bufLength) {</b>
+<b class="nc"><i>286</i>&nbsp;            char c = charBuf[bufPos];</b>
+<b class="nc"><i>287</i>&nbsp;            if ((c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;Z&#39;) || (c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;z&#39;) || Character.isLetter(c))</b>
+<b class="nc"><i>288</i>&nbsp;                bufPos++;</b>
+<i>289</i>&nbsp;            else
+<i>290</i>&nbsp;                break;
+<b class="nc"><i>291</i>&nbsp;        }</b>
+<b class="nc"><i>292</i>&nbsp;        while (!isEmptyNoBufferUp()) {</b>
+<b class="nc"><i>293</i>&nbsp;            char c = charBuf[bufPos];</b>
+<b class="nc"><i>294</i>&nbsp;            if (c &gt;= &#39;0&#39; &amp;&amp; c &lt;= &#39;9&#39;)</b>
+<b class="nc"><i>295</i>&nbsp;                bufPos++;</b>
+<i>296</i>&nbsp;            else
+<i>297</i>&nbsp;                break;
+<b class="nc"><i>298</i>&nbsp;        }</b>
+<i>299</i>&nbsp;
+<b class="nc"><i>300</i>&nbsp;        return cacheString(charBuf, stringCache, start, bufPos - start);</b>
+<i>301</i>&nbsp;    }
+<i>302</i>&nbsp;
+<i>303</i>&nbsp;    String consumeHexSequence() {
+<b class="nc"><i>304</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>305</i>&nbsp;        int start = bufPos;</b>
+<b class="nc"><i>306</i>&nbsp;        while (bufPos &lt; bufLength) {</b>
+<b class="nc"><i>307</i>&nbsp;            char c = charBuf[bufPos];</b>
+<b class="nc"><i>308</i>&nbsp;            if ((c &gt;= &#39;0&#39; &amp;&amp; c &lt;= &#39;9&#39;) || (c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;F&#39;) || (c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;f&#39;))</b>
+<b class="nc"><i>309</i>&nbsp;                bufPos++;</b>
+<i>310</i>&nbsp;            else
+<i>311</i>&nbsp;                break;
+<b class="nc"><i>312</i>&nbsp;        }</b>
+<b class="nc"><i>313</i>&nbsp;        return cacheString(charBuf, stringCache, start, bufPos - start);</b>
+<i>314</i>&nbsp;    }
+<i>315</i>&nbsp;
+<i>316</i>&nbsp;    String consumeDigitSequence() {
+<b class="nc"><i>317</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>318</i>&nbsp;        int start = bufPos;</b>
+<b class="nc"><i>319</i>&nbsp;        while (bufPos &lt; bufLength) {</b>
+<b class="nc"><i>320</i>&nbsp;            char c = charBuf[bufPos];</b>
+<b class="nc"><i>321</i>&nbsp;            if (c &gt;= &#39;0&#39; &amp;&amp; c &lt;= &#39;9&#39;)</b>
+<b class="nc"><i>322</i>&nbsp;                bufPos++;</b>
+<i>323</i>&nbsp;            else
+<i>324</i>&nbsp;                break;
+<b class="nc"><i>325</i>&nbsp;        }</b>
+<b class="nc"><i>326</i>&nbsp;        return cacheString(charBuf, stringCache, start, bufPos - start);</b>
+<i>327</i>&nbsp;    }
+<i>328</i>&nbsp;
+<i>329</i>&nbsp;    boolean matches(char c) {
+<b class="nc"><i>330</i>&nbsp;        return !isEmpty() &amp;&amp; charBuf[bufPos] == c;</b>
+<i>331</i>&nbsp;
+<i>332</i>&nbsp;    }
+<i>333</i>&nbsp;
+<i>334</i>&nbsp;    boolean matches(String seq) {
+<b class="nc"><i>335</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>336</i>&nbsp;        int scanLength = seq.length();</b>
+<b class="nc"><i>337</i>&nbsp;        if (scanLength &gt; bufLength - bufPos)</b>
+<b class="nc"><i>338</i>&nbsp;            return false;</b>
+<i>339</i>&nbsp;
+<b class="nc"><i>340</i>&nbsp;        for (int offset = 0; offset &lt; scanLength; offset++)</b>
+<b class="nc"><i>341</i>&nbsp;            if (seq.charAt(offset) != charBuf[bufPos +offset])</b>
+<b class="nc"><i>342</i>&nbsp;                return false;</b>
+<b class="nc"><i>343</i>&nbsp;        return true;</b>
+<i>344</i>&nbsp;    }
+<i>345</i>&nbsp;
+<i>346</i>&nbsp;    boolean matchesIgnoreCase(String seq) {
+<b class="nc"><i>347</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>348</i>&nbsp;        int scanLength = seq.length();</b>
+<b class="nc"><i>349</i>&nbsp;        if (scanLength &gt; bufLength - bufPos)</b>
+<b class="nc"><i>350</i>&nbsp;            return false;</b>
+<i>351</i>&nbsp;
+<b class="nc"><i>352</i>&nbsp;        for (int offset = 0; offset &lt; scanLength; offset++) {</b>
+<b class="nc"><i>353</i>&nbsp;            char upScan = Character.toUpperCase(seq.charAt(offset));</b>
+<b class="nc"><i>354</i>&nbsp;            char upTarget = Character.toUpperCase(charBuf[bufPos + offset]);</b>
+<b class="nc"><i>355</i>&nbsp;            if (upScan != upTarget)</b>
+<b class="nc"><i>356</i>&nbsp;                return false;</b>
+<i>357</i>&nbsp;        }
+<b class="nc"><i>358</i>&nbsp;        return true;</b>
+<i>359</i>&nbsp;    }
+<i>360</i>&nbsp;
+<i>361</i>&nbsp;    boolean matchesAny(char... seq) {
+<b class="nc"><i>362</i>&nbsp;        if (isEmpty())</b>
+<b class="nc"><i>363</i>&nbsp;            return false;</b>
+<i>364</i>&nbsp;
+<b class="nc"><i>365</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>366</i>&nbsp;        char c = charBuf[bufPos];</b>
+<b class="nc"><i>367</i>&nbsp;        for (char seek : seq) {</b>
+<b class="nc"><i>368</i>&nbsp;            if (seek == c)</b>
+<b class="nc"><i>369</i>&nbsp;                return true;</b>
+<i>370</i>&nbsp;        }
+<b class="nc"><i>371</i>&nbsp;        return false;</b>
+<i>372</i>&nbsp;    }
+<i>373</i>&nbsp;
+<i>374</i>&nbsp;    boolean matchesAnySorted(char[] seq) {
+<b class="nc"><i>375</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>376</i>&nbsp;        return !isEmpty() &amp;&amp; Arrays.binarySearch(seq, charBuf[bufPos]) &gt;= 0;</b>
+<i>377</i>&nbsp;    }
+<i>378</i>&nbsp;
+<i>379</i>&nbsp;    boolean matchesLetter() {
+<b class="nc"><i>380</i>&nbsp;        if (isEmpty())</b>
+<b class="nc"><i>381</i>&nbsp;            return false;</b>
+<b class="nc"><i>382</i>&nbsp;        char c = charBuf[bufPos];</b>
+<b class="nc"><i>383</i>&nbsp;        return (c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;Z&#39;) || (c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;z&#39;) || Character.isLetter(c);</b>
+<i>384</i>&nbsp;    }
+<i>385</i>&nbsp;
+<i>386</i>&nbsp;    boolean matchesDigit() {
+<b class="nc"><i>387</i>&nbsp;        if (isEmpty())</b>
+<b class="nc"><i>388</i>&nbsp;            return false;</b>
+<b class="nc"><i>389</i>&nbsp;        char c = charBuf[bufPos];</b>
+<b class="nc"><i>390</i>&nbsp;        return (c &gt;= &#39;0&#39; &amp;&amp; c &lt;= &#39;9&#39;);</b>
+<i>391</i>&nbsp;    }
+<i>392</i>&nbsp;
+<i>393</i>&nbsp;    boolean matchConsume(String seq) {
+<b class="nc"><i>394</i>&nbsp;        bufferUp();</b>
+<b class="nc"><i>395</i>&nbsp;        if (matches(seq)) {</b>
+<b class="nc"><i>396</i>&nbsp;            bufPos += seq.length();</b>
+<b class="nc"><i>397</i>&nbsp;            return true;</b>
+<i>398</i>&nbsp;        } else {
+<b class="nc"><i>399</i>&nbsp;            return false;</b>
+<i>400</i>&nbsp;        }
+<i>401</i>&nbsp;    }
+<i>402</i>&nbsp;
+<i>403</i>&nbsp;    boolean matchConsumeIgnoreCase(String seq) {
+<b class="nc"><i>404</i>&nbsp;        if (matchesIgnoreCase(seq)) {</b>
+<b class="nc"><i>405</i>&nbsp;            bufPos += seq.length();</b>
+<b class="nc"><i>406</i>&nbsp;            return true;</b>
+<i>407</i>&nbsp;        } else {
+<b class="nc"><i>408</i>&nbsp;            return false;</b>
+<i>409</i>&nbsp;        }
+<i>410</i>&nbsp;    }
+<i>411</i>&nbsp;
+<i>412</i>&nbsp;    boolean containsIgnoreCase(String seq) {
+<i>413</i>&nbsp;        // used to check presence of &lt;/title&gt;, &lt;/style&gt;. only finds consistent case.
+<b class="nc"><i>414</i>&nbsp;        String loScan = seq.toLowerCase(Locale.ENGLISH);</b>
+<b class="nc"><i>415</i>&nbsp;        String hiScan = seq.toUpperCase(Locale.ENGLISH);</b>
+<b class="nc"><i>416</i>&nbsp;        return (nextIndexOf(loScan) &gt; -1) || (nextIndexOf(hiScan) &gt; -1);</b>
+<i>417</i>&nbsp;    }
+<i>418</i>&nbsp;
+<i>419</i>&nbsp;    @Override
+<i>420</i>&nbsp;    public String toString() {
+<b class="nc"><i>421</i>&nbsp;        return new String(charBuf, bufPos, bufLength - bufPos);</b>
+<i>422</i>&nbsp;    }
+<i>423</i>&nbsp;
+<i>424</i>&nbsp;    /**
+<i>425</i>&nbsp;     * Caches short strings, as a flywheel pattern, to reduce GC load. Just for this doc, to prevent leaks.
+<i>426</i>&nbsp;     * &lt;p /&gt;
+<i>427</i>&nbsp;     * Simplistic, and on hash collisions just falls back to creating a new string, vs a full HashMap with Entry list.
+<i>428</i>&nbsp;     * That saves both having to create objects as hash keys, and running through the entry list, at the expense of
+<i>429</i>&nbsp;     * some more duplicates.
+<i>430</i>&nbsp;     */
+<i>431</i>&nbsp;    private static String cacheString(final char[] charBuf, final String[] stringCache, final int start, final int count) {
+<i>432</i>&nbsp;        // limit (no cache):
+<b class="fc"><i>433</i>&nbsp;        if (count &gt; maxStringCacheLen)</b>
+<b class="fc"><i>434</i>&nbsp;            return new String(charBuf, start, count);</b>
+<b class="fc"><i>435</i>&nbsp;        if (count &lt; 1)</b>
+<b class="nc"><i>436</i>&nbsp;            return &quot;&quot;;</b>
+<i>437</i>&nbsp;
+<i>438</i>&nbsp;        // calculate hash:
+<b class="fc"><i>439</i>&nbsp;        int hash = 0;</b>
+<b class="fc"><i>440</i>&nbsp;        int offset = start;</b>
+<b class="fc"><i>441</i>&nbsp;        for (int i = 0; i &lt; count; i++) {</b>
+<b class="fc"><i>442</i>&nbsp;            hash = 31 * hash + charBuf[offset++];</b>
+<i>443</i>&nbsp;        }
+<i>444</i>&nbsp;
+<i>445</i>&nbsp;        // get from cache
+<b class="fc"><i>446</i>&nbsp;        final int index = hash &amp; stringCache.length - 1;</b>
+<b class="fc"><i>447</i>&nbsp;        String cached = stringCache[index];</b>
+<i>448</i>&nbsp;
+<b class="fc"><i>449</i>&nbsp;        if (cached == null) { // miss, add</b>
+<b class="fc"><i>450</i>&nbsp;            cached = new String(charBuf, start, count);</b>
+<b class="fc"><i>451</i>&nbsp;            stringCache[index] = cached;</b>
+<i>452</i>&nbsp;        } else { // hashcode hit, check equality
+<b class="fc"><i>453</i>&nbsp;            if (rangeEquals(charBuf, start, count, cached)) { // hit</b>
+<b class="fc"><i>454</i>&nbsp;                return cached;</b>
+<i>455</i>&nbsp;            } else { // hashcode conflict
+<b class="fc"><i>456</i>&nbsp;                cached = new String(charBuf, start, count);</b>
+<b class="fc"><i>457</i>&nbsp;                stringCache[index] = cached; // update the cache, as recently used strings are more likely to show up again</b>
+<i>458</i>&nbsp;            }
+<i>459</i>&nbsp;        }
+<b class="fc"><i>460</i>&nbsp;        return cached;</b>
+<i>461</i>&nbsp;    }
+<i>462</i>&nbsp;
+<i>463</i>&nbsp;    /**
+<i>464</i>&nbsp;     * Check if the value of the provided range equals the string.
+<i>465</i>&nbsp;     */
+<i>466</i>&nbsp;    static boolean rangeEquals(final char[] charBuf, final int start, int count, final String cached) {
+<b class="fc"><i>467</i>&nbsp;        if (count == cached.length()) {</b>
+<b class="fc"><i>468</i>&nbsp;            int i = start;</b>
+<b class="fc"><i>469</i>&nbsp;            int j = 0;</b>
+<b class="fc"><i>470</i>&nbsp;            while (count-- != 0) {</b>
+<b class="fc"><i>471</i>&nbsp;                if (charBuf[i++] != cached.charAt(j++))</b>
+<b class="fc"><i>472</i>&nbsp;                    return false;</b>
+<i>473</i>&nbsp;            }
+<b class="fc"><i>474</i>&nbsp;            return true;</b>
+<i>475</i>&nbsp;        }
+<b class="fc"><i>476</i>&nbsp;        return false;</b>
+<i>477</i>&nbsp;    }
+<i>478</i>&nbsp;
+<i>479</i>&nbsp;    // just used for testing
+<i>480</i>&nbsp;    boolean rangeEquals(final int start, final int count, final String cached) {
+<b class="nc"><i>481</i>&nbsp;        return rangeEquals(charBuf, start, count, cached);</b>
+<i>482</i>&nbsp;    }
+<i>483</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 12:34</div>
+</div>
+</body>
+</html>

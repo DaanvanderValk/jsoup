@@ -1,0 +1,491 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TokenQueue</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.parser</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TokenQueue (org.jsoup.parser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TokenQueue</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.8%
+  </span>
+  <span class="absValue">
+    (14/ 32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.1%
+  </span>
+  <span class="absValue">
+    (58/ 141)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.parser;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.helper.StringUtil;
+<i>4</i>&nbsp;import org.jsoup.helper.Validate;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;/**
+<i>7</i>&nbsp; * A character queue with parsing helpers.
+<i>8</i>&nbsp; *
+<i>9</i>&nbsp; * @author Jonathan Hedley
+<i>10</i>&nbsp; */
+<i>11</i>&nbsp;public class TokenQueue {
+<i>12</i>&nbsp;    private String queue;
+<b class="fc"><i>13</i>&nbsp;    private int pos = 0;</b>
+<i>14</i>&nbsp;    
+<i>15</i>&nbsp;    private static final char ESC = &#39;\\&#39;; // escape char for chomp balanced.
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;    /**
+<i>18</i>&nbsp;     Create a new TokenQueue.
+<i>19</i>&nbsp;     @param data string of data to back queue.
+<i>20</i>&nbsp;     */
+<b class="fc"><i>21</i>&nbsp;    public TokenQueue(String data) {</b>
+<b class="fc"><i>22</i>&nbsp;        Validate.notNull(data);</b>
+<b class="fc"><i>23</i>&nbsp;        queue = data;</b>
+<b class="fc"><i>24</i>&nbsp;    }</b>
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    /**
+<i>27</i>&nbsp;     * Is the queue empty?
+<i>28</i>&nbsp;     * @return true if no data left in queue.
+<i>29</i>&nbsp;     */
+<i>30</i>&nbsp;    public boolean isEmpty() {
+<b class="fc"><i>31</i>&nbsp;        return remainingLength() == 0;</b>
+<i>32</i>&nbsp;    }
+<i>33</i>&nbsp;    
+<i>34</i>&nbsp;    private int remainingLength() {
+<b class="fc"><i>35</i>&nbsp;        return queue.length() - pos;</b>
+<i>36</i>&nbsp;    }
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    /**
+<i>39</i>&nbsp;     * Retrieves but does not remove the first character from the queue.
+<i>40</i>&nbsp;     * @return First character, or 0 if empty.
+<i>41</i>&nbsp;     */
+<i>42</i>&nbsp;    public char peek() {
+<b class="nc"><i>43</i>&nbsp;        return isEmpty() ? 0 : queue.charAt(pos);</b>
+<i>44</i>&nbsp;    }
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    /**
+<i>47</i>&nbsp;     Add a character to the start of the queue (will be the next character retrieved).
+<i>48</i>&nbsp;     @param c character to add
+<i>49</i>&nbsp;     */
+<i>50</i>&nbsp;    public void addFirst(Character c) {
+<b class="nc"><i>51</i>&nbsp;        addFirst(c.toString());</b>
+<b class="nc"><i>52</i>&nbsp;    }</b>
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;    /**
+<i>55</i>&nbsp;     Add a string to the start of the queue.
+<i>56</i>&nbsp;     @param seq string to add.
+<i>57</i>&nbsp;     */
+<i>58</i>&nbsp;    public void addFirst(String seq) {
+<i>59</i>&nbsp;        // not very performant, but an edge case
+<b class="nc"><i>60</i>&nbsp;        queue = seq + queue.substring(pos);</b>
+<b class="nc"><i>61</i>&nbsp;        pos = 0;</b>
+<b class="nc"><i>62</i>&nbsp;    }</b>
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;    /**
+<i>65</i>&nbsp;     * Tests if the next characters on the queue match the sequence. Case insensitive.
+<i>66</i>&nbsp;     * @param seq String to check queue for.
+<i>67</i>&nbsp;     * @return true if the next characters match.
+<i>68</i>&nbsp;     */
+<i>69</i>&nbsp;    public boolean matches(String seq) {
+<b class="fc"><i>70</i>&nbsp;        return queue.regionMatches(true, pos, seq, 0, seq.length());</b>
+<i>71</i>&nbsp;    }
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    /**
+<i>74</i>&nbsp;     * Case sensitive match test.
+<i>75</i>&nbsp;     * @param seq string to case sensitively check for
+<i>76</i>&nbsp;     * @return true if matched, false if not
+<i>77</i>&nbsp;     */
+<i>78</i>&nbsp;    public boolean matchesCS(String seq) {
+<b class="nc"><i>79</i>&nbsp;        return queue.startsWith(seq, pos);</b>
+<i>80</i>&nbsp;    }
+<i>81</i>&nbsp;    
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;    /**
+<i>84</i>&nbsp;     Tests if the next characters match any of the sequences. Case insensitive.
+<i>85</i>&nbsp;     @param seq list of strings to case insensitively check for
+<i>86</i>&nbsp;     @return true of any matched, false if none did
+<i>87</i>&nbsp;     */
+<i>88</i>&nbsp;    public boolean matchesAny(String... seq) {
+<b class="fc"><i>89</i>&nbsp;        for (String s : seq) {</b>
+<b class="fc"><i>90</i>&nbsp;            if (matches(s))</b>
+<b class="fc"><i>91</i>&nbsp;                return true;</b>
+<i>92</i>&nbsp;        }
+<b class="fc"><i>93</i>&nbsp;        return false;</b>
+<i>94</i>&nbsp;    }
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;    public boolean matchesAny(char... seq) {
+<b class="nc"><i>97</i>&nbsp;        if (isEmpty())</b>
+<b class="nc"><i>98</i>&nbsp;            return false;</b>
+<i>99</i>&nbsp;
+<b class="nc"><i>100</i>&nbsp;        for (char c: seq) {</b>
+<b class="nc"><i>101</i>&nbsp;            if (queue.charAt(pos) == c)</b>
+<b class="nc"><i>102</i>&nbsp;                return true;</b>
+<i>103</i>&nbsp;        }
+<b class="nc"><i>104</i>&nbsp;        return false;</b>
+<i>105</i>&nbsp;    }
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;    public boolean matchesStartTag() {
+<i>108</i>&nbsp;        // micro opt for matching &quot;&lt;x&quot;
+<b class="nc"><i>109</i>&nbsp;        return (remainingLength() &gt;= 2 &amp;&amp; queue.charAt(pos) == &#39;&lt;&#39; &amp;&amp; Character.isLetter(queue.charAt(pos+1)));</b>
+<i>110</i>&nbsp;    }
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;    /**
+<i>113</i>&nbsp;     * Tests if the queue matches the sequence (as with match), and if they do, removes the matched string from the
+<i>114</i>&nbsp;     * queue.
+<i>115</i>&nbsp;     * @param seq String to search for, and if found, remove from queue.
+<i>116</i>&nbsp;     * @return true if found and removed, false if not found.
+<i>117</i>&nbsp;     */
+<i>118</i>&nbsp;    public boolean matchChomp(String seq) {
+<b class="fc"><i>119</i>&nbsp;        if (matches(seq)) {</b>
+<b class="fc"><i>120</i>&nbsp;            pos += seq.length();</b>
+<b class="fc"><i>121</i>&nbsp;            return true;</b>
+<i>122</i>&nbsp;        } else {
+<b class="fc"><i>123</i>&nbsp;            return false;</b>
+<i>124</i>&nbsp;        }
+<i>125</i>&nbsp;    }
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;    /**
+<i>128</i>&nbsp;     Tests if queue starts with a whitespace character.
+<i>129</i>&nbsp;     @return if starts with whitespace
+<i>130</i>&nbsp;     */
+<i>131</i>&nbsp;    public boolean matchesWhitespace() {
+<b class="fc"><i>132</i>&nbsp;        return !isEmpty() &amp;&amp; StringUtil.isWhitespace(queue.charAt(pos));</b>
+<i>133</i>&nbsp;    }
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;    /**
+<i>136</i>&nbsp;     Test if the queue matches a word character (letter or digit).
+<i>137</i>&nbsp;     @return if matches a word character
+<i>138</i>&nbsp;     */
+<i>139</i>&nbsp;    public boolean matchesWord() {
+<b class="fc"><i>140</i>&nbsp;        return !isEmpty() &amp;&amp; Character.isLetterOrDigit(queue.charAt(pos));</b>
+<i>141</i>&nbsp;    }
+<i>142</i>&nbsp;
+<i>143</i>&nbsp;    /**
+<i>144</i>&nbsp;     * Drops the next character off the queue.
+<i>145</i>&nbsp;     */
+<i>146</i>&nbsp;    public void advance() {
+<b class="nc"><i>147</i>&nbsp;        if (!isEmpty()) pos++;</b>
+<b class="nc"><i>148</i>&nbsp;    }</b>
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;    /**
+<i>151</i>&nbsp;     * Consume one character off queue.
+<i>152</i>&nbsp;     * @return first character on queue.
+<i>153</i>&nbsp;     */
+<i>154</i>&nbsp;    public char consume() {
+<b class="fc"><i>155</i>&nbsp;        return queue.charAt(pos++);</b>
+<i>156</i>&nbsp;    }
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;    /**
+<i>159</i>&nbsp;     * Consumes the supplied sequence of the queue. If the queue does not start with the supplied sequence, will
+<i>160</i>&nbsp;     * throw an illegal state exception -- but you should be running match() against that condition.
+<i>161</i>&nbsp;     &lt;p&gt;
+<i>162</i>&nbsp;     Case insensitive.
+<i>163</i>&nbsp;     * @param seq sequence to remove from head of queue.
+<i>164</i>&nbsp;     */
+<i>165</i>&nbsp;    public void consume(String seq) {
+<b class="nc"><i>166</i>&nbsp;        if (!matches(seq))</b>
+<b class="nc"><i>167</i>&nbsp;            throw new IllegalStateException(&quot;Queue did not match expected sequence&quot;);</b>
+<b class="nc"><i>168</i>&nbsp;        int len = seq.length();</b>
+<b class="nc"><i>169</i>&nbsp;        if (len &gt; remainingLength())</b>
+<b class="nc"><i>170</i>&nbsp;            throw new IllegalStateException(&quot;Queue not long enough to consume sequence&quot;);</b>
+<i>171</i>&nbsp;        
+<b class="nc"><i>172</i>&nbsp;        pos += len;</b>
+<b class="nc"><i>173</i>&nbsp;    }</b>
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;    /**
+<i>176</i>&nbsp;     * Pulls a string off the queue, up to but exclusive of the match sequence, or to the queue running out.
+<i>177</i>&nbsp;     * @param seq String to end on (and not include in return, but leave on queue). &lt;b&gt;Case sensitive.&lt;/b&gt;
+<i>178</i>&nbsp;     * @return The matched data consumed from queue.
+<i>179</i>&nbsp;     */
+<i>180</i>&nbsp;    public String consumeTo(String seq) {
+<b class="nc"><i>181</i>&nbsp;        int offset = queue.indexOf(seq, pos);</b>
+<b class="nc"><i>182</i>&nbsp;        if (offset != -1) {</b>
+<b class="nc"><i>183</i>&nbsp;            String consumed = queue.substring(pos, offset);</b>
+<b class="nc"><i>184</i>&nbsp;            pos += consumed.length();</b>
+<b class="nc"><i>185</i>&nbsp;            return consumed;</b>
+<i>186</i>&nbsp;        } else {
+<b class="nc"><i>187</i>&nbsp;            return remainder();</b>
+<i>188</i>&nbsp;        }
+<i>189</i>&nbsp;    }
+<i>190</i>&nbsp;    
+<i>191</i>&nbsp;    public String consumeToIgnoreCase(String seq) {
+<b class="nc"><i>192</i>&nbsp;        int start = pos;</b>
+<b class="nc"><i>193</i>&nbsp;        String first = seq.substring(0, 1);</b>
+<b class="nc"><i>194</i>&nbsp;        boolean canScan = first.toLowerCase().equals(first.toUpperCase()); // if first is not cased, use index of</b>
+<b class="nc"><i>195</i>&nbsp;        while (!isEmpty()) {</b>
+<b class="nc"><i>196</i>&nbsp;            if (matches(seq))</b>
+<b class="nc"><i>197</i>&nbsp;                break;</b>
+<i>198</i>&nbsp;            
+<b class="nc"><i>199</i>&nbsp;            if (canScan) {</b>
+<b class="nc"><i>200</i>&nbsp;                int skip = queue.indexOf(first, pos) - pos;</b>
+<b class="nc"><i>201</i>&nbsp;                if (skip == 0) // this char is the skip char, but not match, so force advance of pos</b>
+<b class="nc"><i>202</i>&nbsp;                    pos++;</b>
+<b class="nc"><i>203</i>&nbsp;                else if (skip &lt; 0) // no chance of finding, grab to end</b>
+<b class="nc"><i>204</i>&nbsp;                    pos = queue.length();</b>
+<i>205</i>&nbsp;                else
+<b class="nc"><i>206</i>&nbsp;                    pos += skip;</b>
+<b class="nc"><i>207</i>&nbsp;            }</b>
+<i>208</i>&nbsp;            else
+<b class="nc"><i>209</i>&nbsp;                pos++;</b>
+<i>210</i>&nbsp;        }
+<i>211</i>&nbsp;
+<b class="nc"><i>212</i>&nbsp;        return queue.substring(start, pos);</b>
+<i>213</i>&nbsp;    }
+<i>214</i>&nbsp;
+<i>215</i>&nbsp;    /**
+<i>216</i>&nbsp;     Consumes to the first sequence provided, or to the end of the queue. Leaves the terminator on the queue.
+<i>217</i>&nbsp;     @param seq any number of terminators to consume to. &lt;b&gt;Case insensitive.&lt;/b&gt;
+<i>218</i>&nbsp;     @return consumed string   
+<i>219</i>&nbsp;     */
+<i>220</i>&nbsp;    // todo: method name. not good that consumeTo cares for case, and consume to any doesn&#39;t. And the only use for this
+<i>221</i>&nbsp;    // is is a case sensitive time...
+<i>222</i>&nbsp;    public String consumeToAny(String... seq) {
+<b class="fc"><i>223</i>&nbsp;        int start = pos;</b>
+<b class="fc"><i>224</i>&nbsp;        while (!isEmpty() &amp;&amp; !matchesAny(seq)) {</b>
+<b class="fc"><i>225</i>&nbsp;            pos++;</b>
+<i>226</i>&nbsp;        }
+<i>227</i>&nbsp;
+<b class="fc"><i>228</i>&nbsp;        return queue.substring(start, pos);</b>
+<i>229</i>&nbsp;    }
+<i>230</i>&nbsp;
+<i>231</i>&nbsp;    /**
+<i>232</i>&nbsp;     * Pulls a string off the queue (like consumeTo), and then pulls off the matched string (but does not return it).
+<i>233</i>&nbsp;     * &lt;p&gt;
+<i>234</i>&nbsp;     * If the queue runs out of characters before finding the seq, will return as much as it can (and queue will go
+<i>235</i>&nbsp;     * isEmpty() == true).
+<i>236</i>&nbsp;     * @param seq String to match up to, and not include in return, and to pull off queue. &lt;b&gt;Case sensitive.&lt;/b&gt;
+<i>237</i>&nbsp;     * @return Data matched from queue.
+<i>238</i>&nbsp;     */
+<i>239</i>&nbsp;    public String chompTo(String seq) {
+<b class="nc"><i>240</i>&nbsp;        String data = consumeTo(seq);</b>
+<b class="nc"><i>241</i>&nbsp;        matchChomp(seq);</b>
+<b class="nc"><i>242</i>&nbsp;        return data;</b>
+<i>243</i>&nbsp;    }
+<i>244</i>&nbsp;    
+<i>245</i>&nbsp;    public String chompToIgnoreCase(String seq) {
+<b class="nc"><i>246</i>&nbsp;        String data = consumeToIgnoreCase(seq); // case insensitive scan</b>
+<b class="nc"><i>247</i>&nbsp;        matchChomp(seq);</b>
+<b class="nc"><i>248</i>&nbsp;        return data;</b>
+<i>249</i>&nbsp;    }
+<i>250</i>&nbsp;
+<i>251</i>&nbsp;    /**
+<i>252</i>&nbsp;     * Pulls a balanced string off the queue. E.g. if queue is &quot;(one (two) three) four&quot;, (,) will return &quot;one (two) three&quot;,
+<i>253</i>&nbsp;     * and leave &quot; four&quot; on the queue. Unbalanced openers and closers can be quoted (with &#39; or &quot;) or escaped (with \). Those escapes will be left
+<i>254</i>&nbsp;     * in the returned string, which is suitable for regexes (where we need to preserve the escape), but unsuitable for
+<i>255</i>&nbsp;     * contains text strings; use unescape for that.
+<i>256</i>&nbsp;     * @param open opener
+<i>257</i>&nbsp;     * @param close closer
+<i>258</i>&nbsp;     * @return data matched from the queue
+<i>259</i>&nbsp;     */
+<i>260</i>&nbsp;    public String chompBalanced(char open, char close) {
+<b class="fc"><i>261</i>&nbsp;        int start = -1;</b>
+<b class="fc"><i>262</i>&nbsp;        int end = -1;</b>
+<b class="fc"><i>263</i>&nbsp;        int depth = 0;</b>
+<b class="fc"><i>264</i>&nbsp;        char last = 0;</b>
+<b class="fc"><i>265</i>&nbsp;        boolean inSingleQuote = false;</b>
+<b class="fc"><i>266</i>&nbsp;        boolean inDoubleQuote = false;</b>
+<i>267</i>&nbsp;
+<i>268</i>&nbsp;        do {
+<b class="fc"><i>269</i>&nbsp;            if (isEmpty()) break;</b>
+<b class="fc"><i>270</i>&nbsp;            Character c = consume();</b>
+<b class="fc"><i>271</i>&nbsp;            if (last == 0 || last != ESC) {</b>
+<b class="fc"><i>272</i>&nbsp;                if (c.equals(&#39;\&#39;&#39;) &amp;&amp; c != open &amp;&amp; !inDoubleQuote)</b>
+<b class="nc"><i>273</i>&nbsp;                    inSingleQuote = !inSingleQuote;</b>
+<b class="fc"><i>274</i>&nbsp;                else if (c.equals(&#39;&quot;&#39;) &amp;&amp; c != open &amp;&amp; !inSingleQuote)</b>
+<b class="nc"><i>275</i>&nbsp;                    inDoubleQuote = !inDoubleQuote;</b>
+<b class="fc"><i>276</i>&nbsp;                if (inSingleQuote || inDoubleQuote)</b>
+<b class="nc"><i>277</i>&nbsp;                    continue;</b>
+<i>278</i>&nbsp;
+<b class="fc"><i>279</i>&nbsp;                if (c.equals(open)) {</b>
+<b class="fc"><i>280</i>&nbsp;                    depth++;</b>
+<b class="fc"><i>281</i>&nbsp;                    if (start == -1)</b>
+<b class="fc"><i>282</i>&nbsp;                        start = pos;</b>
+<i>283</i>&nbsp;                }
+<b class="fc"><i>284</i>&nbsp;                else if (c.equals(close))</b>
+<b class="fc"><i>285</i>&nbsp;                    depth--;</b>
+<i>286</i>&nbsp;            }
+<i>287</i>&nbsp;
+<b class="fc"><i>288</i>&nbsp;            if (depth &gt; 0 &amp;&amp; last != 0)</b>
+<b class="fc"><i>289</i>&nbsp;                end = pos; // don&#39;t include the outer match pair in the return</b>
+<b class="fc"><i>290</i>&nbsp;            last = c;</b>
+<b class="fc"><i>291</i>&nbsp;        } while (depth &gt; 0);</b>
+<b class="fc"><i>292</i>&nbsp;        final String out = (end &gt;= 0) ? queue.substring(start, end) : &quot;&quot;;</b>
+<b class="fc"><i>293</i>&nbsp;        if (depth &gt; 0) {// ran out of queue before seeing enough )</b>
+<b class="nc"><i>294</i>&nbsp;            Validate.fail(&quot;Did not find balanced marker at &#39;&quot; + out + &quot;&#39;&quot;);</b>
+<i>295</i>&nbsp;        }
+<b class="fc"><i>296</i>&nbsp;        return out;</b>
+<i>297</i>&nbsp;    }
+<i>298</i>&nbsp;    
+<i>299</i>&nbsp;    /**
+<i>300</i>&nbsp;     * Unescape a \ escaped string.
+<i>301</i>&nbsp;     * @param in backslash escaped string
+<i>302</i>&nbsp;     * @return unescaped string
+<i>303</i>&nbsp;     */
+<i>304</i>&nbsp;    public static String unescape(String in) {
+<b class="nc"><i>305</i>&nbsp;        StringBuilder out = StringUtil.stringBuilder();</b>
+<b class="nc"><i>306</i>&nbsp;        char last = 0;</b>
+<b class="nc"><i>307</i>&nbsp;        for (char c : in.toCharArray()) {</b>
+<b class="nc"><i>308</i>&nbsp;            if (c == ESC) {</b>
+<b class="nc"><i>309</i>&nbsp;                if (last != 0 &amp;&amp; last == ESC)</b>
+<b class="nc"><i>310</i>&nbsp;                    out.append(c);</b>
+<i>311</i>&nbsp;            }
+<i>312</i>&nbsp;            else 
+<b class="nc"><i>313</i>&nbsp;                out.append(c);</b>
+<b class="nc"><i>314</i>&nbsp;            last = c;</b>
+<i>315</i>&nbsp;        }
+<b class="nc"><i>316</i>&nbsp;        return out.toString();</b>
+<i>317</i>&nbsp;    }
+<i>318</i>&nbsp;
+<i>319</i>&nbsp;    /**
+<i>320</i>&nbsp;     * Pulls the next run of whitespace characters of the queue.
+<i>321</i>&nbsp;     * @return Whether consuming whitespace or not
+<i>322</i>&nbsp;     */
+<i>323</i>&nbsp;    public boolean consumeWhitespace() {
+<b class="fc"><i>324</i>&nbsp;        boolean seen = false;</b>
+<b class="fc"><i>325</i>&nbsp;        while (matchesWhitespace()) {</b>
+<b class="nc"><i>326</i>&nbsp;            pos++;</b>
+<b class="nc"><i>327</i>&nbsp;            seen = true;</b>
+<i>328</i>&nbsp;        }
+<b class="fc"><i>329</i>&nbsp;        return seen;</b>
+<i>330</i>&nbsp;    }
+<i>331</i>&nbsp;
+<i>332</i>&nbsp;    /**
+<i>333</i>&nbsp;     * Retrieves the next run of word type (letter or digit) off the queue.
+<i>334</i>&nbsp;     * @return String of word characters from queue, or empty string if none.
+<i>335</i>&nbsp;     */
+<i>336</i>&nbsp;    public String consumeWord() {
+<b class="nc"><i>337</i>&nbsp;        int start = pos;</b>
+<b class="nc"><i>338</i>&nbsp;        while (matchesWord())</b>
+<b class="nc"><i>339</i>&nbsp;            pos++;</b>
+<b class="nc"><i>340</i>&nbsp;        return queue.substring(start, pos);</b>
+<i>341</i>&nbsp;    }
+<i>342</i>&nbsp;    
+<i>343</i>&nbsp;    /**
+<i>344</i>&nbsp;     * Consume an tag name off the queue (word or :, _, -)
+<i>345</i>&nbsp;     * 
+<i>346</i>&nbsp;     * @return tag name
+<i>347</i>&nbsp;     */
+<i>348</i>&nbsp;    public String consumeTagName() {
+<b class="nc"><i>349</i>&nbsp;        int start = pos;</b>
+<b class="nc"><i>350</i>&nbsp;        while (!isEmpty() &amp;&amp; (matchesWord() || matchesAny(&#39;:&#39;, &#39;_&#39;, &#39;-&#39;)))</b>
+<b class="nc"><i>351</i>&nbsp;            pos++;</b>
+<i>352</i>&nbsp;        
+<b class="nc"><i>353</i>&nbsp;        return queue.substring(start, pos);</b>
+<i>354</i>&nbsp;    }
+<i>355</i>&nbsp;    
+<i>356</i>&nbsp;    /**
+<i>357</i>&nbsp;     * Consume a CSS element selector (tag name, but | instead of : for namespaces (or *| for wildcard namespace), to not conflict with :pseudo selects).
+<i>358</i>&nbsp;     * 
+<i>359</i>&nbsp;     * @return tag name
+<i>360</i>&nbsp;     */
+<i>361</i>&nbsp;    public String consumeElementSelector() {
+<b class="fc"><i>362</i>&nbsp;        int start = pos;</b>
+<b class="fc"><i>363</i>&nbsp;        while (!isEmpty() &amp;&amp; (matchesWord() || matchesAny(&quot;*|&quot;,&quot;|&quot;, &quot;_&quot;, &quot;-&quot;)))</b>
+<b class="fc"><i>364</i>&nbsp;            pos++;</b>
+<i>365</i>&nbsp;        
+<b class="fc"><i>366</i>&nbsp;        return queue.substring(start, pos);</b>
+<i>367</i>&nbsp;    }
+<i>368</i>&nbsp;
+<i>369</i>&nbsp;    /**
+<i>370</i>&nbsp;     Consume a CSS identifier (ID or class) off the queue (letter, digit, -, _)
+<i>371</i>&nbsp;     http://www.w3.org/TR/CSS2/syndata.html#value-def-identifier
+<i>372</i>&nbsp;     @return identifier
+<i>373</i>&nbsp;     */
+<i>374</i>&nbsp;    public String consumeCssIdentifier() {
+<b class="nc"><i>375</i>&nbsp;        int start = pos;</b>
+<b class="nc"><i>376</i>&nbsp;        while (!isEmpty() &amp;&amp; (matchesWord() || matchesAny(&#39;-&#39;, &#39;_&#39;)))</b>
+<b class="nc"><i>377</i>&nbsp;            pos++;</b>
+<i>378</i>&nbsp;
+<b class="nc"><i>379</i>&nbsp;        return queue.substring(start, pos);</b>
+<i>380</i>&nbsp;    }
+<i>381</i>&nbsp;
+<i>382</i>&nbsp;    /**
+<i>383</i>&nbsp;     Consume an attribute key off the queue (letter, digit, -, _, :&quot;)
+<i>384</i>&nbsp;     @return attribute key
+<i>385</i>&nbsp;     */
+<i>386</i>&nbsp;    public String consumeAttributeKey() {
+<b class="nc"><i>387</i>&nbsp;        int start = pos;</b>
+<b class="nc"><i>388</i>&nbsp;        while (!isEmpty() &amp;&amp; (matchesWord() || matchesAny(&#39;-&#39;, &#39;_&#39;, &#39;:&#39;)))</b>
+<b class="nc"><i>389</i>&nbsp;            pos++;</b>
+<i>390</i>&nbsp;        
+<b class="nc"><i>391</i>&nbsp;        return queue.substring(start, pos);</b>
+<i>392</i>&nbsp;    }
+<i>393</i>&nbsp;
+<i>394</i>&nbsp;    /**
+<i>395</i>&nbsp;     Consume and return whatever is left on the queue.
+<i>396</i>&nbsp;     @return remained of queue.
+<i>397</i>&nbsp;     */
+<i>398</i>&nbsp;    public String remainder() {
+<b class="fc"><i>399</i>&nbsp;        final String remainder = queue.substring(pos, queue.length());</b>
+<b class="fc"><i>400</i>&nbsp;        pos = queue.length();</b>
+<b class="fc"><i>401</i>&nbsp;        return remainder;</b>
+<i>402</i>&nbsp;    }
+<i>403</i>&nbsp;    
+<i>404</i>&nbsp;    @Override
+<i>405</i>&nbsp;    public String toString() {
+<b class="nc"><i>406</i>&nbsp;        return queue.substring(pos);</b>
+<i>407</i>&nbsp;    }
+<i>408</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-19 14:53</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,336 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Jsoup</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Jsoup (org.jsoup)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Jsoup</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (15/ 16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96%
+  </span>
+  <span class="absValue">
+    (24/ 25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.nodes.Document;
+<i>4</i>&nbsp;import org.jsoup.parser.Parser;
+<i>5</i>&nbsp;import org.jsoup.safety.Cleaner;
+<i>6</i>&nbsp;import org.jsoup.safety.Whitelist;
+<i>7</i>&nbsp;import org.jsoup.helper.DataUtil;
+<i>8</i>&nbsp;import org.jsoup.helper.HttpConnection;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import java.io.File;
+<i>11</i>&nbsp;import java.io.IOException;
+<i>12</i>&nbsp;import java.io.InputStream;
+<i>13</i>&nbsp;import java.net.URL;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;/**
+<i>16</i>&nbsp; The core public access point to the jsoup functionality.
+<i>17</i>&nbsp;
+<i>18</i>&nbsp; @author Jonathan Hedley */
+<i>19</i>&nbsp;public class Jsoup {
+<b class="nc"><i>20</i>&nbsp;    private Jsoup() {}</b>
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    /**
+<i>23</i>&nbsp;     Parse HTML into a Document. The parser will make a sensible, balanced document tree out of any HTML.
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;     @param html    HTML to parse
+<i>26</i>&nbsp;     @param baseUri The URL where the HTML was retrieved from. Used to resolve relative URLs to absolute URLs, that occur
+<i>27</i>&nbsp;     before the HTML declares a {@code &lt;base href&gt;} tag.
+<i>28</i>&nbsp;     @return sane HTML
+<i>29</i>&nbsp;     */
+<i>30</i>&nbsp;    public static Document parse(String html, String baseUri) {
+<b class="fc"><i>31</i>&nbsp;        return Parser.parse(html, baseUri);</b>
+<i>32</i>&nbsp;    }
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;    /**
+<i>35</i>&nbsp;     Parse HTML into a Document, using the provided Parser. You can provide an alternate parser, such as a simple XML
+<i>36</i>&nbsp;     (non-HTML) parser.
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;     @param html    HTML to parse
+<i>39</i>&nbsp;     @param baseUri The URL where the HTML was retrieved from. Used to resolve relative URLs to absolute URLs, that occur
+<i>40</i>&nbsp;     before the HTML declares a {@code &lt;base href&gt;} tag.
+<i>41</i>&nbsp;     @param parser alternate {@link Parser#xmlParser() parser} to use.
+<i>42</i>&nbsp;     @return sane HTML
+<i>43</i>&nbsp;     */
+<i>44</i>&nbsp;    public static Document parse(String html, String baseUri, Parser parser) {
+<b class="fc"><i>45</i>&nbsp;        return parser.parseInput(html, baseUri);</b>
+<i>46</i>&nbsp;    }
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;    /**
+<i>49</i>&nbsp;     Parse HTML into a Document. As no base URI is specified, absolute URL detection relies on the HTML including a
+<i>50</i>&nbsp;     {@code &lt;base href&gt;} tag.
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;     @param html HTML to parse
+<i>53</i>&nbsp;     @return sane HTML
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;     @see #parse(String, String)
+<i>56</i>&nbsp;     */
+<i>57</i>&nbsp;    public static Document parse(String html) {
+<b class="fc"><i>58</i>&nbsp;        return Parser.parse(html, &quot;&quot;);</b>
+<i>59</i>&nbsp;    }
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;    /**
+<i>62</i>&nbsp;     * Creates a new {@link Connection} to a URL. Use to fetch and parse a HTML page.
+<i>63</i>&nbsp;     * &lt;p&gt;
+<i>64</i>&nbsp;     * Use examples:
+<i>65</i>&nbsp;     * &lt;ul&gt;
+<i>66</i>&nbsp;     *  &lt;li&gt;&lt;code&gt;Document doc = Jsoup.connect(&quot;http://example.com&quot;).userAgent(&quot;Mozilla&quot;).data(&quot;name&quot;, &quot;jsoup&quot;).get();&lt;/code&gt;&lt;/li&gt;
+<i>67</i>&nbsp;     *  &lt;li&gt;&lt;code&gt;Document doc = Jsoup.connect(&quot;http://example.com&quot;).cookie(&quot;auth&quot;, &quot;token&quot;).post();&lt;/code&gt;&lt;/li&gt;
+<i>68</i>&nbsp;     * &lt;/ul&gt;
+<i>69</i>&nbsp;     * @param url URL to connect to. The protocol must be {@code http} or {@code https}.
+<i>70</i>&nbsp;     * @return the connection. You can add data, cookies, and headers; set the user-agent, referrer, method; and then execute.
+<i>71</i>&nbsp;     */
+<i>72</i>&nbsp;    public static Connection connect(String url) {
+<b class="fc"><i>73</i>&nbsp;        return HttpConnection.connect(url);</b>
+<i>74</i>&nbsp;    }
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;    /**
+<i>77</i>&nbsp;     Parse the contents of a file as HTML.
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;     @param in          file to load HTML from
+<i>80</i>&nbsp;     @param charsetName (optional) character set of file contents. Set to {@code null} to determine from {@code http-equiv} meta tag, if
+<i>81</i>&nbsp;     present, or fall back to {@code UTF-8} (which is often safe to do).
+<i>82</i>&nbsp;     @param baseUri     The URL where the HTML was retrieved from, to resolve relative links against.
+<i>83</i>&nbsp;     @return sane HTML
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;     @throws IOException if the file could not be found, or read, or if the charsetName is invalid.
+<i>86</i>&nbsp;     */
+<i>87</i>&nbsp;    public static Document parse(File in, String charsetName, String baseUri) throws IOException {
+<b class="fc"><i>88</i>&nbsp;        return DataUtil.load(in, charsetName, baseUri);</b>
+<i>89</i>&nbsp;    }
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;    /**
+<i>92</i>&nbsp;     Parse the contents of a file as HTML. The location of the file is used as the base URI to qualify relative URLs.
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;     @param in          file to load HTML from
+<i>95</i>&nbsp;     @param charsetName (optional) character set of file contents. Set to {@code null} to determine from {@code http-equiv} meta tag, if
+<i>96</i>&nbsp;     present, or fall back to {@code UTF-8} (which is often safe to do).
+<i>97</i>&nbsp;     @return sane HTML
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;     @throws IOException if the file could not be found, or read, or if the charsetName is invalid.
+<i>100</i>&nbsp;     @see #parse(File, String, String)
+<i>101</i>&nbsp;     */
+<i>102</i>&nbsp;    public static Document parse(File in, String charsetName) throws IOException {
+<b class="fc"><i>103</i>&nbsp;        return DataUtil.load(in, charsetName, in.getAbsolutePath());</b>
+<i>104</i>&nbsp;    }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;     /**
+<i>107</i>&nbsp;     Read an input stream, and parse it to a Document.
+<i>108</i>&nbsp;
+<i>109</i>&nbsp;     @param in          input stream to read. Make sure to close it after parsing.
+<i>110</i>&nbsp;     @param charsetName (optional) character set of file contents. Set to {@code null} to determine from {@code http-equiv} meta tag, if
+<i>111</i>&nbsp;     present, or fall back to {@code UTF-8} (which is often safe to do).
+<i>112</i>&nbsp;     @param baseUri     The URL where the HTML was retrieved from, to resolve relative links against.
+<i>113</i>&nbsp;     @return sane HTML
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;     @throws IOException if the file could not be found, or read, or if the charsetName is invalid.
+<i>116</i>&nbsp;     */
+<i>117</i>&nbsp;    public static Document parse(InputStream in, String charsetName, String baseUri) throws IOException {
+<b class="fc"><i>118</i>&nbsp;        return DataUtil.load(in, charsetName, baseUri);</b>
+<i>119</i>&nbsp;    }
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;    /**
+<i>122</i>&nbsp;     Read an input stream, and parse it to a Document. You can provide an alternate parser, such as a simple XML
+<i>123</i>&nbsp;     (non-HTML) parser.
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;     @param in          input stream to read. Make sure to close it after parsing.
+<i>126</i>&nbsp;     @param charsetName (optional) character set of file contents. Set to {@code null} to determine from {@code http-equiv} meta tag, if
+<i>127</i>&nbsp;     present, or fall back to {@code UTF-8} (which is often safe to do).
+<i>128</i>&nbsp;     @param baseUri     The URL where the HTML was retrieved from, to resolve relative links against.
+<i>129</i>&nbsp;     @param parser alternate {@link Parser#xmlParser() parser} to use.
+<i>130</i>&nbsp;     @return sane HTML
+<i>131</i>&nbsp;
+<i>132</i>&nbsp;     @throws IOException if the file could not be found, or read, or if the charsetName is invalid.
+<i>133</i>&nbsp;     */
+<i>134</i>&nbsp;    public static Document parse(InputStream in, String charsetName, String baseUri, Parser parser) throws IOException {
+<b class="fc"><i>135</i>&nbsp;        return DataUtil.load(in, charsetName, baseUri, parser);</b>
+<i>136</i>&nbsp;    }
+<i>137</i>&nbsp;
+<i>138</i>&nbsp;    /**
+<i>139</i>&nbsp;     Parse a fragment of HTML, with the assumption that it forms the {@code body} of the HTML.
+<i>140</i>&nbsp;
+<i>141</i>&nbsp;     @param bodyHtml body HTML fragment
+<i>142</i>&nbsp;     @param baseUri  URL to resolve relative URLs against.
+<i>143</i>&nbsp;     @return sane HTML document
+<i>144</i>&nbsp;
+<i>145</i>&nbsp;     @see Document#body()
+<i>146</i>&nbsp;     */
+<i>147</i>&nbsp;    public static Document parseBodyFragment(String bodyHtml, String baseUri) {
+<b class="fc"><i>148</i>&nbsp;        return Parser.parseBodyFragment(bodyHtml, baseUri);</b>
+<i>149</i>&nbsp;    }
+<i>150</i>&nbsp;
+<i>151</i>&nbsp;    /**
+<i>152</i>&nbsp;     Parse a fragment of HTML, with the assumption that it forms the {@code body} of the HTML.
+<i>153</i>&nbsp;
+<i>154</i>&nbsp;     @param bodyHtml body HTML fragment
+<i>155</i>&nbsp;     @return sane HTML document
+<i>156</i>&nbsp;
+<i>157</i>&nbsp;     @see Document#body()
+<i>158</i>&nbsp;     */
+<i>159</i>&nbsp;    public static Document parseBodyFragment(String bodyHtml) {
+<b class="fc"><i>160</i>&nbsp;        return Parser.parseBodyFragment(bodyHtml, &quot;&quot;);</b>
+<i>161</i>&nbsp;    }
+<i>162</i>&nbsp;
+<i>163</i>&nbsp;    /**
+<i>164</i>&nbsp;     Fetch a URL, and parse it as HTML. Provided for compatibility; in most cases use {@link #connect(String)} instead.
+<i>165</i>&nbsp;     &lt;p&gt;
+<i>166</i>&nbsp;     The encoding character set is determined by the content-type header or http-equiv meta tag, or falls back to {@code UTF-8}.
+<i>167</i>&nbsp;
+<i>168</i>&nbsp;     @param url           URL to fetch (with a GET). The protocol must be {@code http} or {@code https}.
+<i>169</i>&nbsp;     @param timeoutMillis Connection and read timeout, in milliseconds. If exceeded, IOException is thrown.
+<i>170</i>&nbsp;     @return The parsed HTML.
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;     @throws java.net.MalformedURLException if the request URL is not a HTTP or HTTPS URL, or is otherwise malformed
+<i>173</i>&nbsp;     @throws HttpStatusException if the response is not OK and HTTP response errors are not ignored
+<i>174</i>&nbsp;     @throws UnsupportedMimeTypeException if the response mime type is not supported and those errors are not ignored
+<i>175</i>&nbsp;     @throws java.net.SocketTimeoutException if the connection times out
+<i>176</i>&nbsp;     @throws IOException if a connection or read error occurs
+<i>177</i>&nbsp;
+<i>178</i>&nbsp;     @see #connect(String)
+<i>179</i>&nbsp;     */
+<i>180</i>&nbsp;    public static Document parse(URL url, int timeoutMillis) throws IOException {
+<b class="fc"><i>181</i>&nbsp;        Connection con = HttpConnection.connect(url);</b>
+<b class="fc"><i>182</i>&nbsp;        con.timeout(timeoutMillis);</b>
+<b class="fc"><i>183</i>&nbsp;        return con.get();</b>
+<i>184</i>&nbsp;    }
+<i>185</i>&nbsp;
+<i>186</i>&nbsp;    /**
+<i>187</i>&nbsp;     Get safe HTML from untrusted input HTML, by parsing input HTML and filtering it through a white-list of permitted
+<i>188</i>&nbsp;     tags and attributes.
+<i>189</i>&nbsp;
+<i>190</i>&nbsp;     @param bodyHtml  input untrusted HTML (body fragment)
+<i>191</i>&nbsp;     @param baseUri   URL to resolve relative URLs against
+<i>192</i>&nbsp;     @param whitelist white-list of permitted HTML elements
+<i>193</i>&nbsp;     @return safe HTML (body fragment)
+<i>194</i>&nbsp;
+<i>195</i>&nbsp;     @see Cleaner#clean(Document)
+<i>196</i>&nbsp;     */
+<i>197</i>&nbsp;    public static String clean(String bodyHtml, String baseUri, Whitelist whitelist) {
+<b class="fc"><i>198</i>&nbsp;        Document dirty = parseBodyFragment(bodyHtml, baseUri);</b>
+<b class="fc"><i>199</i>&nbsp;        Cleaner cleaner = new Cleaner(whitelist);</b>
+<b class="fc"><i>200</i>&nbsp;        Document clean = cleaner.clean(dirty);</b>
+<b class="fc"><i>201</i>&nbsp;        return clean.body().html();</b>
+<i>202</i>&nbsp;    }
+<i>203</i>&nbsp;
+<i>204</i>&nbsp;    /**
+<i>205</i>&nbsp;     Get safe HTML from untrusted input HTML, by parsing input HTML and filtering it through a white-list of permitted
+<i>206</i>&nbsp;     tags and attributes.
+<i>207</i>&nbsp;
+<i>208</i>&nbsp;     @param bodyHtml  input untrusted HTML (body fragment)
+<i>209</i>&nbsp;     @param whitelist white-list of permitted HTML elements
+<i>210</i>&nbsp;     @return safe HTML (body fragment)
+<i>211</i>&nbsp;
+<i>212</i>&nbsp;     @see Cleaner#clean(Document)
+<i>213</i>&nbsp;     */
+<i>214</i>&nbsp;    public static String clean(String bodyHtml, Whitelist whitelist) {
+<b class="fc"><i>215</i>&nbsp;        return clean(bodyHtml, &quot;&quot;, whitelist);</b>
+<i>216</i>&nbsp;    }
+<i>217</i>&nbsp;
+<i>218</i>&nbsp;    /**
+<i>219</i>&nbsp;     * Get safe HTML from untrusted input HTML, by parsing input HTML and filtering it through a white-list of
+<i>220</i>&nbsp;     * permitted tags and attributes.
+<i>221</i>&nbsp;     * &lt;p&gt;The HTML is treated as a body fragment; it&#39;s expected the cleaned HTML will be used within the body of an
+<i>222</i>&nbsp;     * existing document. If you want to clean full documents, use {@link Cleaner#clean(Document)} instead, and add
+<i>223</i>&nbsp;     * structural tags (&lt;code&gt;html, head, body&lt;/code&gt; etc) to the whitelist.
+<i>224</i>&nbsp;     *
+<i>225</i>&nbsp;     * @param bodyHtml input untrusted HTML (body fragment)
+<i>226</i>&nbsp;     * @param baseUri URL to resolve relative URLs against
+<i>227</i>&nbsp;     * @param whitelist white-list of permitted HTML elements
+<i>228</i>&nbsp;     * @param outputSettings document output settings; use to control pretty-printing and entity escape modes
+<i>229</i>&nbsp;     * @return safe HTML (body fragment)
+<i>230</i>&nbsp;     * @see Cleaner#clean(Document)
+<i>231</i>&nbsp;     */
+<i>232</i>&nbsp;    public static String clean(String bodyHtml, String baseUri, Whitelist whitelist, Document.OutputSettings outputSettings) {
+<b class="fc"><i>233</i>&nbsp;        Document dirty = parseBodyFragment(bodyHtml, baseUri);</b>
+<b class="fc"><i>234</i>&nbsp;        Cleaner cleaner = new Cleaner(whitelist);</b>
+<b class="fc"><i>235</i>&nbsp;        Document clean = cleaner.clean(dirty);</b>
+<b class="fc"><i>236</i>&nbsp;        clean.outputSettings(outputSettings);</b>
+<b class="fc"><i>237</i>&nbsp;        return clean.body().html();</b>
+<i>238</i>&nbsp;    }
+<i>239</i>&nbsp;
+<i>240</i>&nbsp;    /**
+<i>241</i>&nbsp;     Test if the input body HTML has only tags and attributes allowed by the Whitelist. Useful for form validation.
+<i>242</i>&nbsp;     &lt;p&gt;The input HTML should still be run through the cleaner to set up enforced attributes, and to tidy the output.
+<i>243</i>&nbsp;     &lt;p&gt;Assumes the HTML is a body fragment (i.e. will be used in an existing HTML document body.)
+<i>244</i>&nbsp;     @param bodyHtml HTML to test
+<i>245</i>&nbsp;     @param whitelist whitelist to test against
+<i>246</i>&nbsp;     @return true if no tags or attributes were removed; false otherwise
+<i>247</i>&nbsp;     @see #clean(String, org.jsoup.safety.Whitelist) 
+<i>248</i>&nbsp;     */
+<i>249</i>&nbsp;    public static boolean isValid(String bodyHtml, Whitelist whitelist) {
+<b class="fc"><i>250</i>&nbsp;        return new Cleaner(whitelist).isValidBodyHtml(bodyHtml);</b>
+<i>251</i>&nbsp;    }
+<i>252</i>&nbsp;    
+<i>253</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-19 13:25</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ConstrainableInputStream</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.internal</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ConstrainableInputStream (org.jsoup.internal)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConstrainableInputStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.8%
+  </span>
+  <span class="absValue">
+    (45/ 49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.internal;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.helper.Validate;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import java.io.BufferedInputStream;
+<i>6</i>&nbsp;import java.io.ByteArrayOutputStream;
+<i>7</i>&nbsp;import java.io.IOException;
+<i>8</i>&nbsp;import java.io.InputStream;
+<i>9</i>&nbsp;import java.net.SocketTimeoutException;
+<i>10</i>&nbsp;import java.nio.ByteBuffer;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;/**
+<i>13</i>&nbsp; * A jsoup internal class (so don&#39;t use it as there is no contract API) that enables constraints on an Input Stream,
+<i>14</i>&nbsp; * namely a maximum read size, and the ability to Thread.interrupt() the read.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;public final class ConstrainableInputStream extends BufferedInputStream {
+<i>17</i>&nbsp;    private static final int DefaultSize = 1024 * 32;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    private final boolean capped;
+<i>20</i>&nbsp;    private final int maxSize;
+<i>21</i>&nbsp;    private long startTime;
+<b class="fc"><i>22</i>&nbsp;    private long timeout = 0; // optional max time of request</b>
+<i>23</i>&nbsp;    private int remaining;
+<i>24</i>&nbsp;    private boolean interrupted;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    private ConstrainableInputStream(InputStream in, int bufferSize, int maxSize) {
+<b class="fc"><i>27</i>&nbsp;        super(in, bufferSize);</b>
+<b class="fc"><i>28</i>&nbsp;        Validate.isTrue(maxSize &gt;= 0);</b>
+<b class="fc"><i>29</i>&nbsp;        this.maxSize = maxSize;</b>
+<b class="fc"><i>30</i>&nbsp;        remaining = maxSize;</b>
+<b class="fc"><i>31</i>&nbsp;        capped = maxSize != 0;</b>
+<b class="fc"><i>32</i>&nbsp;        startTime = System.nanoTime();</b>
+<b class="fc"><i>33</i>&nbsp;    }</b>
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    /**
+<i>36</i>&nbsp;     * If this InputStream is not already a ConstrainableInputStream, let it be one.
+<i>37</i>&nbsp;     * @param in the input stream to (maybe) wrap
+<i>38</i>&nbsp;     * @param bufferSize the buffer size to use when reading
+<i>39</i>&nbsp;     * @param maxSize the maximum size to allow to be read. 0 == infinite.
+<i>40</i>&nbsp;     * @return a constrainable input stream
+<i>41</i>&nbsp;     */
+<i>42</i>&nbsp;    public static ConstrainableInputStream wrap(InputStream in, int bufferSize, int maxSize) {
+<b class="fc"><i>43</i>&nbsp;        return in instanceof ConstrainableInputStream</b>
+<i>44</i>&nbsp;            ? (ConstrainableInputStream) in
+<i>45</i>&nbsp;            : new ConstrainableInputStream(in, bufferSize, maxSize);
+<i>46</i>&nbsp;    }
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;    @Override
+<i>49</i>&nbsp;    public int read(byte[] b, int off, int len) throws IOException {
+<b class="fc"><i>50</i>&nbsp;        if (interrupted || capped &amp;&amp; remaining &lt;= 0)</b>
+<b class="nc"><i>51</i>&nbsp;            return -1;</b>
+<b class="fc"><i>52</i>&nbsp;        if (Thread.interrupted()) {</b>
+<i>53</i>&nbsp;            // interrupted latches, because parse() may call twice (and we still want the thread interupt to clear)
+<b class="nc"><i>54</i>&nbsp;            interrupted = true;</b>
+<b class="nc"><i>55</i>&nbsp;            return -1;</b>
+<i>56</i>&nbsp;        }
+<b class="fc"><i>57</i>&nbsp;        if (expired())</b>
+<b class="fc"><i>58</i>&nbsp;            throw new SocketTimeoutException(&quot;Read timeout&quot;);</b>
+<i>59</i>&nbsp;
+<b class="fc"><i>60</i>&nbsp;        if (capped &amp;&amp; len &gt; remaining)</b>
+<b class="nc"><i>61</i>&nbsp;            len = remaining; // don&#39;t read more than desired, even if available</b>
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;        try {
+<b class="fc"><i>64</i>&nbsp;            final int read = super.read(b, off, len);</b>
+<b class="fc"><i>65</i>&nbsp;            remaining -= read;</b>
+<b class="fc"><i>66</i>&nbsp;            return read;</b>
+<b class="fc"><i>67</i>&nbsp;        } catch (SocketTimeoutException e) {</b>
+<b class="fc"><i>68</i>&nbsp;            return 0;</b>
+<i>69</i>&nbsp;        }
+<i>70</i>&nbsp;    }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    /**
+<i>73</i>&nbsp;     * Reads this inputstream to a ByteBuffer. The supplied max may be less than the inputstream&#39;s max, to support
+<i>74</i>&nbsp;     * reading just the first bytes.
+<i>75</i>&nbsp;     */
+<i>76</i>&nbsp;    public ByteBuffer readToByteBuffer(int max) throws IOException {
+<b class="fc"><i>77</i>&nbsp;        Validate.isTrue(max &gt;= 0, &quot;maxSize must be 0 (unlimited) or larger&quot;);</b>
+<b class="fc"><i>78</i>&nbsp;        final boolean localCapped = max &gt; 0; // still possibly capped in total stream</b>
+<b class="fc"><i>79</i>&nbsp;        final int bufferSize = localCapped &amp;&amp; max &lt; DefaultSize ? max : DefaultSize;</b>
+<b class="fc"><i>80</i>&nbsp;        final byte[] readBuffer = new byte[bufferSize];</b>
+<b class="fc"><i>81</i>&nbsp;        final ByteArrayOutputStream outStream = new ByteArrayOutputStream(bufferSize);</b>
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;        int read;
+<b class="fc"><i>84</i>&nbsp;        int remaining = max;</b>
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;        while (true) {
+<b class="fc"><i>87</i>&nbsp;            read = read(readBuffer);</b>
+<b class="fc"><i>88</i>&nbsp;            if (read == -1) break;</b>
+<b class="fc"><i>89</i>&nbsp;            if (localCapped) { // this local byteBuffer cap may be smaller than the overall maxSize (like when reading first bytes)</b>
+<b class="fc"><i>90</i>&nbsp;                if (read &gt;= remaining) {</b>
+<b class="fc"><i>91</i>&nbsp;                    outStream.write(readBuffer, 0, remaining);</b>
+<b class="fc"><i>92</i>&nbsp;                    break;</b>
+<i>93</i>&nbsp;                }
+<b class="fc"><i>94</i>&nbsp;                remaining -= read;</b>
+<i>95</i>&nbsp;            }
+<b class="fc"><i>96</i>&nbsp;            outStream.write(readBuffer, 0, read);</b>
+<i>97</i>&nbsp;        }
+<b class="fc"><i>98</i>&nbsp;        return ByteBuffer.wrap(outStream.toByteArray());</b>
+<i>99</i>&nbsp;    }
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;    @Override
+<i>102</i>&nbsp;    public void reset() throws IOException {
+<b class="fc"><i>103</i>&nbsp;        super.reset();</b>
+<b class="fc"><i>104</i>&nbsp;        remaining = maxSize - markpos;</b>
+<b class="fc"><i>105</i>&nbsp;    }</b>
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;    public ConstrainableInputStream timeout(long startTimeNanos, long timeoutMillis) {
+<b class="fc"><i>108</i>&nbsp;        this.startTime = startTimeNanos;</b>
+<b class="fc"><i>109</i>&nbsp;        this.timeout = timeoutMillis * 1000000;</b>
+<b class="fc"><i>110</i>&nbsp;        return this;</b>
+<i>111</i>&nbsp;    }
+<i>112</i>&nbsp;
+<i>113</i>&nbsp;    private boolean expired() {
+<b class="fc"><i>114</i>&nbsp;        if (timeout == 0)</b>
+<b class="fc"><i>115</i>&nbsp;            return false;</b>
+<i>116</i>&nbsp;
+<b class="fc"><i>117</i>&nbsp;        final long now = System.nanoTime();</b>
+<b class="fc"><i>118</i>&nbsp;        final long dur = now - startTime;</b>
+<b class="fc"><i>119</i>&nbsp;        return (dur &gt; timeout);</b>
+<i>120</i>&nbsp;    }
+<i>121</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-19 13:25</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1618 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Element</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.nodes</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Element (org.jsoup.nodes)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Element</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.2%
+  </span>
+  <span class="absValue">
+    (95/ 109)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.5%
+  </span>
+  <span class="absValue">
+    (353/ 386)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Element$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/ 16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Element$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Element$NodeList</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    88%
+  </span>
+  <span class="absValue">
+    (103/ 117)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92%
+  </span>
+  <span class="absValue">
+    (380/ 413)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.nodes;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.helper.ChangeNotifyingArrayList;
+<i>4</i>&nbsp;import org.jsoup.helper.StringUtil;
+<i>5</i>&nbsp;import org.jsoup.helper.Validate;
+<i>6</i>&nbsp;import org.jsoup.parser.ParseSettings;
+<i>7</i>&nbsp;import org.jsoup.parser.Parser;
+<i>8</i>&nbsp;import org.jsoup.parser.Tag;
+<i>9</i>&nbsp;import org.jsoup.select.Collector;
+<i>10</i>&nbsp;import org.jsoup.select.Elements;
+<i>11</i>&nbsp;import org.jsoup.select.Evaluator;
+<i>12</i>&nbsp;import org.jsoup.select.NodeTraversor;
+<i>13</i>&nbsp;import org.jsoup.select.NodeVisitor;
+<i>14</i>&nbsp;import org.jsoup.select.QueryParser;
+<i>15</i>&nbsp;import org.jsoup.select.Selector;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;import java.io.IOException;
+<i>18</i>&nbsp;import java.lang.ref.WeakReference;
+<i>19</i>&nbsp;import java.util.ArrayList;
+<i>20</i>&nbsp;import java.util.Arrays;
+<i>21</i>&nbsp;import java.util.Collection;
+<i>22</i>&nbsp;import java.util.Collections;
+<i>23</i>&nbsp;import java.util.LinkedHashSet;
+<i>24</i>&nbsp;import java.util.List;
+<i>25</i>&nbsp;import java.util.Map;
+<i>26</i>&nbsp;import java.util.Set;
+<i>27</i>&nbsp;import java.util.regex.Pattern;
+<i>28</i>&nbsp;import java.util.regex.PatternSyntaxException;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;import static org.jsoup.internal.Normalizer.normalize;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;/**
+<i>33</i>&nbsp; * A HTML element consists of a tag name, attributes, and child nodes (including text nodes and
+<i>34</i>&nbsp; * other elements).
+<i>35</i>&nbsp; * 
+<i>36</i>&nbsp; * From an Element, you can extract data, traverse the node graph, and manipulate the HTML.
+<i>37</i>&nbsp; * 
+<i>38</i>&nbsp; * @author Jonathan Hedley, jonathan@hedley.net
+<i>39</i>&nbsp; */
+<b class="fc"><i>40</i>&nbsp;public class Element extends Node {</b>
+<b class="fc"><i>41</i>&nbsp;    private static final List&lt;Node&gt; EMPTY_NODES = Collections.emptyList();</b>
+<b class="fc"><i>42</i>&nbsp;    private static final Pattern classSplit = Pattern.compile(&quot;\\s+&quot;);</b>
+<i>43</i>&nbsp;    private Tag tag;
+<i>44</i>&nbsp;    private WeakReference&lt;List&lt;Element&gt;&gt; shadowChildrenRef; // points to child elements shadowed from node children
+<i>45</i>&nbsp;    List&lt;Node&gt; childNodes;
+<i>46</i>&nbsp;    private Attributes attributes;
+<i>47</i>&nbsp;    private String baseUri;
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    /**
+<i>50</i>&nbsp;     * Create a new, standalone element.
+<i>51</i>&nbsp;     * @param tag tag name
+<i>52</i>&nbsp;     */
+<i>53</i>&nbsp;    public Element(String tag) {
+<b class="fc"><i>54</i>&nbsp;        this(Tag.valueOf(tag), &quot;&quot;, new Attributes());</b>
+<b class="fc"><i>55</i>&nbsp;    }</b>
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    /**
+<i>58</i>&nbsp;     * Create a new, standalone Element. (Standalone in that is has no parent.)
+<i>59</i>&nbsp;     * 
+<i>60</i>&nbsp;     * @param tag tag of this element
+<i>61</i>&nbsp;     * @param baseUri the base URI
+<i>62</i>&nbsp;     * @param attributes initial attributes
+<i>63</i>&nbsp;     * @see #appendChild(Node)
+<i>64</i>&nbsp;     * @see #appendElement(String)
+<i>65</i>&nbsp;     */
+<b class="fc"><i>66</i>&nbsp;    public Element(Tag tag, String baseUri, Attributes attributes) {</b>
+<b class="fc"><i>67</i>&nbsp;        Validate.notNull(tag);</b>
+<b class="fc"><i>68</i>&nbsp;        Validate.notNull(baseUri);</b>
+<b class="fc"><i>69</i>&nbsp;        childNodes = EMPTY_NODES;</b>
+<b class="fc"><i>70</i>&nbsp;        this.baseUri = baseUri;</b>
+<b class="fc"><i>71</i>&nbsp;        this.attributes = attributes;</b>
+<b class="fc"><i>72</i>&nbsp;        this.tag = tag;</b>
+<b class="fc"><i>73</i>&nbsp;    }</b>
+<i>74</i>&nbsp;    
+<i>75</i>&nbsp;    /**
+<i>76</i>&nbsp;     * Create a new Element from a tag and a base URI.
+<i>77</i>&nbsp;     * 
+<i>78</i>&nbsp;     * @param tag element tag
+<i>79</i>&nbsp;     * @param baseUri the base URI of this element. It is acceptable for the base URI to be an empty
+<i>80</i>&nbsp;     *            string, but not null.
+<i>81</i>&nbsp;     * @see Tag#valueOf(String, ParseSettings)
+<i>82</i>&nbsp;     */
+<i>83</i>&nbsp;    public Element(Tag tag, String baseUri) {
+<b class="fc"><i>84</i>&nbsp;        this(tag, baseUri, null);</b>
+<b class="fc"><i>85</i>&nbsp;    }</b>
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    protected List&lt;Node&gt; ensureChildNodes() {
+<b class="fc"><i>88</i>&nbsp;        if (childNodes == EMPTY_NODES) {</b>
+<b class="fc"><i>89</i>&nbsp;            childNodes = new NodeList(this, 4);</b>
+<i>90</i>&nbsp;        }
+<b class="fc"><i>91</i>&nbsp;        return childNodes;</b>
+<i>92</i>&nbsp;    }
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;    @Override
+<i>95</i>&nbsp;    protected boolean hasAttributes() {
+<b class="fc"><i>96</i>&nbsp;        return attributes != null;</b>
+<i>97</i>&nbsp;    }
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;    @Override
+<i>100</i>&nbsp;    public Attributes attributes() {
+<b class="fc"><i>101</i>&nbsp;        if (!hasAttributes())</b>
+<b class="fc"><i>102</i>&nbsp;            attributes = new Attributes();</b>
+<b class="fc"><i>103</i>&nbsp;        return attributes;</b>
+<i>104</i>&nbsp;    }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    @Override
+<i>107</i>&nbsp;    public String baseUri() {
+<b class="fc"><i>108</i>&nbsp;        return baseUri;</b>
+<i>109</i>&nbsp;    }
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;    @Override
+<i>112</i>&nbsp;    protected void doSetBaseUri(String baseUri) {
+<b class="fc"><i>113</i>&nbsp;        this.baseUri = baseUri;</b>
+<b class="fc"><i>114</i>&nbsp;    }</b>
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;    @Override
+<i>117</i>&nbsp;    public int childNodeSize() {
+<b class="fc"><i>118</i>&nbsp;        return childNodes.size();</b>
+<i>119</i>&nbsp;    }
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;    @Override
+<i>122</i>&nbsp;    public String nodeName() {
+<b class="fc"><i>123</i>&nbsp;        return tag.getName();</b>
+<i>124</i>&nbsp;    }
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;    /**
+<i>127</i>&nbsp;     * Get the name of the tag for this element. E.g. {@code div}
+<i>128</i>&nbsp;     * 
+<i>129</i>&nbsp;     * @return the tag name
+<i>130</i>&nbsp;     */
+<i>131</i>&nbsp;    public String tagName() {
+<b class="fc"><i>132</i>&nbsp;        return tag.getName();</b>
+<i>133</i>&nbsp;    }
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;    /**
+<i>136</i>&nbsp;     * Change the tag of this element. For example, convert a {@code &lt;span&gt;} to a {@code &lt;div&gt;} with
+<i>137</i>&nbsp;     * {@code el.tagName(&quot;div&quot;);}.
+<i>138</i>&nbsp;     *
+<i>139</i>&nbsp;     * @param tagName new tag name for this element
+<i>140</i>&nbsp;     * @return this element, for chaining
+<i>141</i>&nbsp;     */
+<i>142</i>&nbsp;    public Element tagName(String tagName) {
+<b class="fc"><i>143</i>&nbsp;        Validate.notEmpty(tagName, &quot;Tag name must not be empty.&quot;);</b>
+<b class="fc"><i>144</i>&nbsp;        tag = Tag.valueOf(tagName, ParseSettings.preserveCase); // preserve the requested tag case</b>
+<b class="fc"><i>145</i>&nbsp;        return this;</b>
+<i>146</i>&nbsp;    }
+<i>147</i>&nbsp;
+<i>148</i>&nbsp;    /**
+<i>149</i>&nbsp;     * Get the Tag for this element.
+<i>150</i>&nbsp;     * 
+<i>151</i>&nbsp;     * @return the tag object
+<i>152</i>&nbsp;     */
+<i>153</i>&nbsp;    public Tag tag() {
+<b class="fc"><i>154</i>&nbsp;        return tag;</b>
+<i>155</i>&nbsp;    }
+<i>156</i>&nbsp;    
+<i>157</i>&nbsp;    /**
+<i>158</i>&nbsp;     * Test if this element is a block-level element. (E.g. {@code &lt;div&gt; == true} or an inline element
+<i>159</i>&nbsp;     * {@code &lt;p&gt; == false}).
+<i>160</i>&nbsp;     * 
+<i>161</i>&nbsp;     * @return true if block, false if not (and thus inline)
+<i>162</i>&nbsp;     */
+<i>163</i>&nbsp;    public boolean isBlock() {
+<b class="fc"><i>164</i>&nbsp;        return tag.isBlock();</b>
+<i>165</i>&nbsp;    }
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;    /**
+<i>168</i>&nbsp;     * Get the {@code id} attribute of this element.
+<i>169</i>&nbsp;     * 
+<i>170</i>&nbsp;     * @return The id attribute, if present, or an empty string if not.
+<i>171</i>&nbsp;     */
+<i>172</i>&nbsp;    public String id() {
+<b class="fc"><i>173</i>&nbsp;        return attributes().getIgnoreCase(&quot;id&quot;);</b>
+<i>174</i>&nbsp;    }
+<i>175</i>&nbsp;
+<i>176</i>&nbsp;    /**
+<i>177</i>&nbsp;     * Set an attribute value on this element. If this element already has an attribute with the
+<i>178</i>&nbsp;     * key, its value is updated; otherwise, a new attribute is added.
+<i>179</i>&nbsp;     * 
+<i>180</i>&nbsp;     * @return this element
+<i>181</i>&nbsp;     */
+<i>182</i>&nbsp;    public Element attr(String attributeKey, String attributeValue) {
+<b class="fc"><i>183</i>&nbsp;        super.attr(attributeKey, attributeValue);</b>
+<b class="fc"><i>184</i>&nbsp;        return this;</b>
+<i>185</i>&nbsp;    }
+<i>186</i>&nbsp;    
+<i>187</i>&nbsp;    /**
+<i>188</i>&nbsp;     * Set a boolean attribute value on this element. Setting to &lt;code&gt;true&lt;/code&gt; sets the attribute value to &quot;&quot; and
+<i>189</i>&nbsp;     * marks the attribute as boolean so no value is written out. Setting to &lt;code&gt;false&lt;/code&gt; removes the attribute
+<i>190</i>&nbsp;     * with the same key if it exists.
+<i>191</i>&nbsp;     * 
+<i>192</i>&nbsp;     * @param attributeKey the attribute key
+<i>193</i>&nbsp;     * @param attributeValue the attribute value
+<i>194</i>&nbsp;     * 
+<i>195</i>&nbsp;     * @return this element
+<i>196</i>&nbsp;     */
+<i>197</i>&nbsp;    public Element attr(String attributeKey, boolean attributeValue) {
+<b class="fc"><i>198</i>&nbsp;        attributes().put(attributeKey, attributeValue);</b>
+<b class="fc"><i>199</i>&nbsp;        return this;</b>
+<i>200</i>&nbsp;    }
+<i>201</i>&nbsp;
+<i>202</i>&nbsp;    /**
+<i>203</i>&nbsp;     * Get this element&#39;s HTML5 custom data attributes. Each attribute in the element that has a key
+<i>204</i>&nbsp;     * starting with &quot;data-&quot; is included the dataset.
+<i>205</i>&nbsp;     * &lt;p&gt;
+<i>206</i>&nbsp;     * E.g., the element {@code &lt;div data-package=&quot;jsoup&quot; data-language=&quot;Java&quot; class=&quot;group&quot;&gt;...} has the dataset
+<i>207</i>&nbsp;     * {@code package=jsoup, language=java}.
+<i>208</i>&nbsp;     * &lt;p&gt;
+<i>209</i>&nbsp;     * This map is a filtered view of the element&#39;s attribute map. Changes to one map (add, remove, update) are reflected
+<i>210</i>&nbsp;     * in the other map.
+<i>211</i>&nbsp;     * &lt;p&gt;
+<i>212</i>&nbsp;     * You can find elements that have data attributes using the {@code [^data-]} attribute key prefix selector.
+<i>213</i>&nbsp;     * @return a map of {@code key=value} custom data attributes.
+<i>214</i>&nbsp;     */
+<i>215</i>&nbsp;    public Map&lt;String, String&gt; dataset() {
+<b class="fc"><i>216</i>&nbsp;        return attributes().dataset();</b>
+<i>217</i>&nbsp;    }
+<i>218</i>&nbsp;
+<i>219</i>&nbsp;    @Override
+<i>220</i>&nbsp;    public final Element parent() {
+<b class="fc"><i>221</i>&nbsp;        return (Element) parentNode;</b>
+<i>222</i>&nbsp;    }
+<i>223</i>&nbsp;
+<i>224</i>&nbsp;    /**
+<i>225</i>&nbsp;     * Get this element&#39;s parent and ancestors, up to the document root.
+<i>226</i>&nbsp;     * @return this element&#39;s stack of parents, closest first.
+<i>227</i>&nbsp;     */
+<i>228</i>&nbsp;    public Elements parents() {
+<b class="fc"><i>229</i>&nbsp;        Elements parents = new Elements();</b>
+<b class="fc"><i>230</i>&nbsp;        accumulateParents(this, parents);</b>
+<b class="fc"><i>231</i>&nbsp;        return parents;</b>
+<i>232</i>&nbsp;    }
+<i>233</i>&nbsp;
+<i>234</i>&nbsp;    private static void accumulateParents(Element el, Elements parents) {
+<b class="fc"><i>235</i>&nbsp;        Element parent = el.parent();</b>
+<b class="fc"><i>236</i>&nbsp;        if (parent != null &amp;&amp; !parent.tagName().equals(&quot;#root&quot;)) {</b>
+<b class="fc"><i>237</i>&nbsp;            parents.add(parent);</b>
+<b class="fc"><i>238</i>&nbsp;            accumulateParents(parent, parents);</b>
+<i>239</i>&nbsp;        }
+<b class="fc"><i>240</i>&nbsp;    }</b>
+<i>241</i>&nbsp;
+<i>242</i>&nbsp;    /**
+<i>243</i>&nbsp;     * Get a child element of this element, by its 0-based index number.
+<i>244</i>&nbsp;     * &lt;p&gt;
+<i>245</i>&nbsp;     * Note that an element can have both mixed Nodes and Elements as children. This method inspects
+<i>246</i>&nbsp;     * a filtered list of children that are elements, and the index is based on that filtered list.
+<i>247</i>&nbsp;     * &lt;/p&gt;
+<i>248</i>&nbsp;     * 
+<i>249</i>&nbsp;     * @param index the index number of the element to retrieve
+<i>250</i>&nbsp;     * @return the child element, if it exists, otherwise throws an {@code IndexOutOfBoundsException}
+<i>251</i>&nbsp;     * @see #childNode(int)
+<i>252</i>&nbsp;     */
+<i>253</i>&nbsp;    public Element child(int index) {
+<b class="fc"><i>254</i>&nbsp;        return childElementsList().get(index);</b>
+<i>255</i>&nbsp;    }
+<i>256</i>&nbsp;
+<i>257</i>&nbsp;    /**
+<i>258</i>&nbsp;     * Get this element&#39;s child elements.
+<i>259</i>&nbsp;     * &lt;p&gt;
+<i>260</i>&nbsp;     * This is effectively a filter on {@link #childNodes()} to get Element nodes.
+<i>261</i>&nbsp;     * &lt;/p&gt;
+<i>262</i>&nbsp;     * @return child elements. If this element has no children, returns an empty list.
+<i>263</i>&nbsp;     * @see #childNodes()
+<i>264</i>&nbsp;     */
+<i>265</i>&nbsp;    public Elements children() {
+<b class="fc"><i>266</i>&nbsp;        return new Elements(childElementsList());</b>
+<i>267</i>&nbsp;    }
+<i>268</i>&nbsp;
+<i>269</i>&nbsp;    /**
+<i>270</i>&nbsp;     * Maintains a shadow copy of this element&#39;s child elements. If the nodelist is changed, this cache is invalidated.
+<i>271</i>&nbsp;     * TODO - think about pulling this out as a helper as there are other shadow lists (like in Attributes) kept around.
+<i>272</i>&nbsp;     * @return a list of child elements
+<i>273</i>&nbsp;     */
+<i>274</i>&nbsp;    private List&lt;Element&gt; childElementsList() {
+<i>275</i>&nbsp;        List&lt;Element&gt; children;
+<b class="fc"><i>276</i>&nbsp;        if (shadowChildrenRef == null || (children = shadowChildrenRef.get()) == null) {</b>
+<b class="fc"><i>277</i>&nbsp;            final int size = childNodes.size();</b>
+<b class="fc"><i>278</i>&nbsp;            children = new ArrayList&lt;&gt;(size);</b>
+<i>279</i>&nbsp;            //noinspection ForLoopReplaceableByForEach (beacause it allocates an Iterator which is wasteful here)
+<b class="fc"><i>280</i>&nbsp;            for (int i = 0; i &lt; size; i++) {</b>
+<b class="fc"><i>281</i>&nbsp;                final Node node = childNodes.get(i);</b>
+<b class="fc"><i>282</i>&nbsp;                if (node instanceof Element)</b>
+<b class="fc"><i>283</i>&nbsp;                    children.add((Element) node);</b>
+<i>284</i>&nbsp;            }
+<b class="fc"><i>285</i>&nbsp;            shadowChildrenRef = new WeakReference&lt;&gt;(children);</b>
+<i>286</i>&nbsp;        }
+<b class="fc"><i>287</i>&nbsp;        return children;</b>
+<i>288</i>&nbsp;    }
+<i>289</i>&nbsp;
+<i>290</i>&nbsp;    /**
+<i>291</i>&nbsp;     * Clears the cached shadow child elements.
+<i>292</i>&nbsp;     */
+<i>293</i>&nbsp;    @Override
+<i>294</i>&nbsp;    void nodelistChanged() {
+<b class="fc"><i>295</i>&nbsp;        super.nodelistChanged();</b>
+<b class="fc"><i>296</i>&nbsp;        shadowChildrenRef = null;</b>
+<b class="fc"><i>297</i>&nbsp;    }</b>
+<i>298</i>&nbsp;
+<i>299</i>&nbsp;    /**
+<i>300</i>&nbsp;     * Get this element&#39;s child text nodes. The list is unmodifiable but the text nodes may be manipulated.
+<i>301</i>&nbsp;     * &lt;p&gt;
+<i>302</i>&nbsp;     * This is effectively a filter on {@link #childNodes()} to get Text nodes.
+<i>303</i>&nbsp;     * @return child text nodes. If this element has no text nodes, returns an
+<i>304</i>&nbsp;     * empty list.
+<i>305</i>&nbsp;     * &lt;/p&gt;
+<i>306</i>&nbsp;     * For example, with the input HTML: {@code &lt;p&gt;One &lt;span&gt;Two&lt;/span&gt; Three &lt;br&gt; Four&lt;/p&gt;} with the {@code p} element selected:
+<i>307</i>&nbsp;     * &lt;ul&gt;
+<i>308</i>&nbsp;     *     &lt;li&gt;{@code p.text()} = {@code &quot;One Two Three Four&quot;}&lt;/li&gt;
+<i>309</i>&nbsp;     *     &lt;li&gt;{@code p.ownText()} = {@code &quot;One Three Four&quot;}&lt;/li&gt;
+<i>310</i>&nbsp;     *     &lt;li&gt;{@code p.children()} = {@code Elements[&lt;span&gt;, &lt;br&gt;]}&lt;/li&gt;
+<i>311</i>&nbsp;     *     &lt;li&gt;{@code p.childNodes()} = {@code List&lt;Node&gt;[&quot;One &quot;, &lt;span&gt;, &quot; Three &quot;, &lt;br&gt;, &quot; Four&quot;]}&lt;/li&gt;
+<i>312</i>&nbsp;     *     &lt;li&gt;{@code p.textNodes()} = {@code List&lt;TextNode&gt;[&quot;One &quot;, &quot; Three &quot;, &quot; Four&quot;]}&lt;/li&gt;
+<i>313</i>&nbsp;     * &lt;/ul&gt;
+<i>314</i>&nbsp;     */
+<i>315</i>&nbsp;    public List&lt;TextNode&gt; textNodes() {
+<b class="fc"><i>316</i>&nbsp;        List&lt;TextNode&gt; textNodes = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>317</i>&nbsp;        for (Node node : childNodes) {</b>
+<b class="fc"><i>318</i>&nbsp;            if (node instanceof TextNode)</b>
+<b class="fc"><i>319</i>&nbsp;                textNodes.add((TextNode) node);</b>
+<b class="fc"><i>320</i>&nbsp;        }</b>
+<b class="fc"><i>321</i>&nbsp;        return Collections.unmodifiableList(textNodes);</b>
+<i>322</i>&nbsp;    }
+<i>323</i>&nbsp;
+<i>324</i>&nbsp;    /**
+<i>325</i>&nbsp;     * Get this element&#39;s child data nodes. The list is unmodifiable but the data nodes may be manipulated.
+<i>326</i>&nbsp;     * &lt;p&gt;
+<i>327</i>&nbsp;     * This is effectively a filter on {@link #childNodes()} to get Data nodes.
+<i>328</i>&nbsp;     * &lt;/p&gt;
+<i>329</i>&nbsp;     * @return child data nodes. If this element has no data nodes, returns an
+<i>330</i>&nbsp;     * empty list.
+<i>331</i>&nbsp;     * @see #data()
+<i>332</i>&nbsp;     */
+<i>333</i>&nbsp;    public List&lt;DataNode&gt; dataNodes() {
+<b class="fc"><i>334</i>&nbsp;        List&lt;DataNode&gt; dataNodes = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>335</i>&nbsp;        for (Node node : childNodes) {</b>
+<b class="fc"><i>336</i>&nbsp;            if (node instanceof DataNode)</b>
+<b class="fc"><i>337</i>&nbsp;                dataNodes.add((DataNode) node);</b>
+<b class="fc"><i>338</i>&nbsp;        }</b>
+<b class="fc"><i>339</i>&nbsp;        return Collections.unmodifiableList(dataNodes);</b>
+<i>340</i>&nbsp;    }
+<i>341</i>&nbsp;
+<i>342</i>&nbsp;    /**
+<i>343</i>&nbsp;     * Find elements that match the {@link Selector} CSS query, with this element as the starting context. Matched elements
+<i>344</i>&nbsp;     * may include this element, or any of its children.
+<i>345</i>&nbsp;     * &lt;p&gt;
+<i>346</i>&nbsp;     * This method is generally more powerful to use than the DOM-type {@code getElementBy*} methods, because
+<i>347</i>&nbsp;     * multiple filters can be combined, e.g.:
+<i>348</i>&nbsp;     * &lt;/p&gt;
+<i>349</i>&nbsp;     * &lt;ul&gt;
+<i>350</i>&nbsp;     * &lt;li&gt;{@code el.select(&quot;a[href]&quot;)} - finds links ({@code a} tags with {@code href} attributes)
+<i>351</i>&nbsp;     * &lt;li&gt;{@code el.select(&quot;a[href*=example.com]&quot;)} - finds links pointing to example.com (loosely)
+<i>352</i>&nbsp;     * &lt;/ul&gt;
+<i>353</i>&nbsp;     * &lt;p&gt;
+<i>354</i>&nbsp;     * See the query syntax documentation in {@link org.jsoup.select.Selector}.
+<i>355</i>&nbsp;     * &lt;/p&gt;
+<i>356</i>&nbsp;     * 
+<i>357</i>&nbsp;     * @param cssQuery a {@link Selector} CSS-like query
+<i>358</i>&nbsp;     * @return elements that match the query (empty if none match)
+<i>359</i>&nbsp;     * @see org.jsoup.select.Selector
+<i>360</i>&nbsp;     * @throws Selector.SelectorParseException (unchecked) on an invalid CSS query.
+<i>361</i>&nbsp;     */
+<i>362</i>&nbsp;    public Elements select(String cssQuery) {
+<b class="fc"><i>363</i>&nbsp;        return Selector.select(cssQuery, this);</b>
+<i>364</i>&nbsp;    }
+<i>365</i>&nbsp;
+<i>366</i>&nbsp;    /**
+<i>367</i>&nbsp;     * Find the first Element that matches the {@link Selector} CSS query, with this element as the starting context.
+<i>368</i>&nbsp;     * &lt;p&gt;This is effectively the same as calling {@code element.select(query).first()}, but is more efficient as query
+<i>369</i>&nbsp;     * execution stops on the first hit.&lt;/p&gt;
+<i>370</i>&nbsp;     * @param cssQuery cssQuery a {@link Selector} CSS-like query
+<i>371</i>&nbsp;     * @return the first matching element, or &lt;b&gt;{@code null}&lt;/b&gt; if there is no match.
+<i>372</i>&nbsp;     */
+<i>373</i>&nbsp;    public Element selectFirst(String cssQuery) {
+<b class="fc"><i>374</i>&nbsp;        return Selector.selectFirst(cssQuery, this);</b>
+<i>375</i>&nbsp;    }
+<i>376</i>&nbsp;
+<i>377</i>&nbsp;    /**
+<i>378</i>&nbsp;     * Check if this element matches the given {@link Selector} CSS query.
+<i>379</i>&nbsp;     * @param cssQuery a {@link Selector} CSS query
+<i>380</i>&nbsp;     * @return if this element matches the query
+<i>381</i>&nbsp;     */
+<i>382</i>&nbsp;    public boolean is(String cssQuery) {
+<b class="fc"><i>383</i>&nbsp;        return is(QueryParser.parse(cssQuery));</b>
+<i>384</i>&nbsp;    }
+<i>385</i>&nbsp;
+<i>386</i>&nbsp;    /**
+<i>387</i>&nbsp;     * Check if this element matches the given evaluator.
+<i>388</i>&nbsp;     * @param evaluator an element evaluator
+<i>389</i>&nbsp;     * @return if this element matches
+<i>390</i>&nbsp;     */
+<i>391</i>&nbsp;    public boolean is(Evaluator evaluator) {
+<b class="fc"><i>392</i>&nbsp;        return evaluator.matches((Element)this.root(), this);</b>
+<i>393</i>&nbsp;    }
+<i>394</i>&nbsp;    
+<i>395</i>&nbsp;    /**
+<i>396</i>&nbsp;     * Add a node child node to this element.
+<i>397</i>&nbsp;     * 
+<i>398</i>&nbsp;     * @param child node to add.
+<i>399</i>&nbsp;     * @return this element, so that you can add more child nodes or elements.
+<i>400</i>&nbsp;     */
+<i>401</i>&nbsp;    public Element appendChild(Node child) {
+<b class="fc"><i>402</i>&nbsp;        Validate.notNull(child);</b>
+<i>403</i>&nbsp;
+<i>404</i>&nbsp;        // was - Node#addChildren(child). short-circuits an array create and a loop.
+<b class="fc"><i>405</i>&nbsp;        reparentChild(child);</b>
+<b class="fc"><i>406</i>&nbsp;        ensureChildNodes();</b>
+<b class="fc"><i>407</i>&nbsp;        childNodes.add(child);</b>
+<b class="fc"><i>408</i>&nbsp;        child.setSiblingIndex(childNodes.size() - 1);</b>
+<b class="fc"><i>409</i>&nbsp;        return this;</b>
+<i>410</i>&nbsp;    }
+<i>411</i>&nbsp;
+<i>412</i>&nbsp;    /**
+<i>413</i>&nbsp;     * Add this element to the supplied parent element, as its next child.
+<i>414</i>&nbsp;     *
+<i>415</i>&nbsp;     * @param parent element to which this element will be appended
+<i>416</i>&nbsp;     * @return this element, so that you can continue modifying the element
+<i>417</i>&nbsp;     */
+<i>418</i>&nbsp;    public Element appendTo(Element parent) {
+<b class="fc"><i>419</i>&nbsp;        Validate.notNull(parent);</b>
+<b class="fc"><i>420</i>&nbsp;        parent.appendChild(this);</b>
+<b class="fc"><i>421</i>&nbsp;        return this;</b>
+<i>422</i>&nbsp;    }
+<i>423</i>&nbsp;
+<i>424</i>&nbsp;    /**
+<i>425</i>&nbsp;     * Add a node to the start of this element&#39;s children.
+<i>426</i>&nbsp;     * 
+<i>427</i>&nbsp;     * @param child node to add.
+<i>428</i>&nbsp;     * @return this element, so that you can add more child nodes or elements.
+<i>429</i>&nbsp;     */
+<i>430</i>&nbsp;    public Element prependChild(Node child) {
+<b class="fc"><i>431</i>&nbsp;        Validate.notNull(child);</b>
+<i>432</i>&nbsp;        
+<b class="fc"><i>433</i>&nbsp;        addChildren(0, child);</b>
+<b class="fc"><i>434</i>&nbsp;        return this;</b>
+<i>435</i>&nbsp;    }
+<i>436</i>&nbsp;
+<i>437</i>&nbsp;
+<i>438</i>&nbsp;    /**
+<i>439</i>&nbsp;     * Inserts the given child nodes into this element at the specified index. Current nodes will be shifted to the
+<i>440</i>&nbsp;     * right. The inserted nodes will be moved from their current parent. To prevent moving, copy the nodes first.
+<i>441</i>&nbsp;     *
+<i>442</i>&nbsp;     * @param index 0-based index to insert children at. Specify {@code 0} to insert at the start, {@code -1} at the
+<i>443</i>&nbsp;     * end
+<i>444</i>&nbsp;     * @param children child nodes to insert
+<i>445</i>&nbsp;     * @return this element, for chaining.
+<i>446</i>&nbsp;     */
+<i>447</i>&nbsp;    public Element insertChildren(int index, Collection&lt;? extends Node&gt; children) {
+<b class="fc"><i>448</i>&nbsp;        Validate.notNull(children, &quot;Children collection to be inserted must not be null.&quot;);</b>
+<b class="fc"><i>449</i>&nbsp;        int currentSize = childNodeSize();</b>
+<b class="fc"><i>450</i>&nbsp;        if (index &lt; 0) index += currentSize +1; // roll around</b>
+<b class="fc"><i>451</i>&nbsp;        Validate.isTrue(index &gt;= 0 &amp;&amp; index &lt;= currentSize, &quot;Insert position out of bounds.&quot;);</b>
+<i>452</i>&nbsp;
+<b class="fc"><i>453</i>&nbsp;        ArrayList&lt;Node&gt; nodes = new ArrayList&lt;&gt;(children);</b>
+<b class="fc"><i>454</i>&nbsp;        Node[] nodeArray = nodes.toArray(new Node[nodes.size()]);</b>
+<b class="fc"><i>455</i>&nbsp;        addChildren(index, nodeArray);</b>
+<b class="fc"><i>456</i>&nbsp;        return this;</b>
+<i>457</i>&nbsp;    }
+<i>458</i>&nbsp;
+<i>459</i>&nbsp;    /**
+<i>460</i>&nbsp;     * Inserts the given child nodes into this element at the specified index. Current nodes will be shifted to the
+<i>461</i>&nbsp;     * right. The inserted nodes will be moved from their current parent. To prevent moving, copy the nodes first.
+<i>462</i>&nbsp;     *
+<i>463</i>&nbsp;     * @param index 0-based index to insert children at. Specify {@code 0} to insert at the start, {@code -1} at the
+<i>464</i>&nbsp;     * end
+<i>465</i>&nbsp;     * @param children child nodes to insert
+<i>466</i>&nbsp;     * @return this element, for chaining.
+<i>467</i>&nbsp;     */
+<i>468</i>&nbsp;    public Element insertChildren(int index, Node... children) {
+<b class="fc"><i>469</i>&nbsp;        Validate.notNull(children, &quot;Children collection to be inserted must not be null.&quot;);</b>
+<b class="fc"><i>470</i>&nbsp;        int currentSize = childNodeSize();</b>
+<b class="fc"><i>471</i>&nbsp;        if (index &lt; 0) index += currentSize +1; // roll around</b>
+<b class="fc"><i>472</i>&nbsp;        Validate.isTrue(index &gt;= 0 &amp;&amp; index &lt;= currentSize, &quot;Insert position out of bounds.&quot;);</b>
+<i>473</i>&nbsp;
+<b class="fc"><i>474</i>&nbsp;        addChildren(index, children);</b>
+<b class="fc"><i>475</i>&nbsp;        return this;</b>
+<i>476</i>&nbsp;    }
+<i>477</i>&nbsp;    
+<i>478</i>&nbsp;    /**
+<i>479</i>&nbsp;     * Create a new element by tag name, and add it as the last child.
+<i>480</i>&nbsp;     * 
+<i>481</i>&nbsp;     * @param tagName the name of the tag (e.g. {@code div}).
+<i>482</i>&nbsp;     * @return the new element, to allow you to add content to it, e.g.:
+<i>483</i>&nbsp;     *  {@code parent.appendElement(&quot;h1&quot;).attr(&quot;id&quot;, &quot;header&quot;).text(&quot;Welcome&quot;);}
+<i>484</i>&nbsp;     */
+<i>485</i>&nbsp;    public Element appendElement(String tagName) {
+<b class="fc"><i>486</i>&nbsp;        Element child = new Element(Tag.valueOf(tagName), baseUri());</b>
+<b class="fc"><i>487</i>&nbsp;        appendChild(child);</b>
+<b class="fc"><i>488</i>&nbsp;        return child;</b>
+<i>489</i>&nbsp;    }
+<i>490</i>&nbsp;    
+<i>491</i>&nbsp;    /**
+<i>492</i>&nbsp;     * Create a new element by tag name, and add it as the first child.
+<i>493</i>&nbsp;     * 
+<i>494</i>&nbsp;     * @param tagName the name of the tag (e.g. {@code div}).
+<i>495</i>&nbsp;     * @return the new element, to allow you to add content to it, e.g.:
+<i>496</i>&nbsp;     *  {@code parent.prependElement(&quot;h1&quot;).attr(&quot;id&quot;, &quot;header&quot;).text(&quot;Welcome&quot;);}
+<i>497</i>&nbsp;     */
+<i>498</i>&nbsp;    public Element prependElement(String tagName) {
+<b class="fc"><i>499</i>&nbsp;        Element child = new Element(Tag.valueOf(tagName), baseUri());</b>
+<b class="fc"><i>500</i>&nbsp;        prependChild(child);</b>
+<b class="fc"><i>501</i>&nbsp;        return child;</b>
+<i>502</i>&nbsp;    }
+<i>503</i>&nbsp;    
+<i>504</i>&nbsp;    /**
+<i>505</i>&nbsp;     * Create and append a new TextNode to this element.
+<i>506</i>&nbsp;     * 
+<i>507</i>&nbsp;     * @param text the unencoded text to add
+<i>508</i>&nbsp;     * @return this element
+<i>509</i>&nbsp;     */
+<i>510</i>&nbsp;    public Element appendText(String text) {
+<b class="fc"><i>511</i>&nbsp;        Validate.notNull(text);</b>
+<b class="fc"><i>512</i>&nbsp;        TextNode node = new TextNode(text);</b>
+<b class="fc"><i>513</i>&nbsp;        appendChild(node);</b>
+<b class="fc"><i>514</i>&nbsp;        return this;</b>
+<i>515</i>&nbsp;    }
+<i>516</i>&nbsp;    
+<i>517</i>&nbsp;    /**
+<i>518</i>&nbsp;     * Create and prepend a new TextNode to this element.
+<i>519</i>&nbsp;     * 
+<i>520</i>&nbsp;     * @param text the unencoded text to add
+<i>521</i>&nbsp;     * @return this element
+<i>522</i>&nbsp;     */
+<i>523</i>&nbsp;    public Element prependText(String text) {
+<b class="fc"><i>524</i>&nbsp;        Validate.notNull(text);</b>
+<b class="fc"><i>525</i>&nbsp;        TextNode node = new TextNode(text);</b>
+<b class="fc"><i>526</i>&nbsp;        prependChild(node);</b>
+<b class="fc"><i>527</i>&nbsp;        return this;</b>
+<i>528</i>&nbsp;    }
+<i>529</i>&nbsp;    
+<i>530</i>&nbsp;    /**
+<i>531</i>&nbsp;     * Add inner HTML to this element. The supplied HTML will be parsed, and each node appended to the end of the children.
+<i>532</i>&nbsp;     * @param html HTML to add inside this element, after the existing HTML
+<i>533</i>&nbsp;     * @return this element
+<i>534</i>&nbsp;     * @see #html(String)
+<i>535</i>&nbsp;     */
+<i>536</i>&nbsp;    public Element append(String html) {
+<b class="fc"><i>537</i>&nbsp;        Validate.notNull(html);</b>
+<i>538</i>&nbsp;
+<b class="fc"><i>539</i>&nbsp;        List&lt;Node&gt; nodes = Parser.parseFragment(html, this, baseUri());</b>
+<b class="fc"><i>540</i>&nbsp;        addChildren(nodes.toArray(new Node[nodes.size()]));</b>
+<b class="fc"><i>541</i>&nbsp;        return this;</b>
+<i>542</i>&nbsp;    }
+<i>543</i>&nbsp;    
+<i>544</i>&nbsp;    /**
+<i>545</i>&nbsp;     * Add inner HTML into this element. The supplied HTML will be parsed, and each node prepended to the start of the element&#39;s children.
+<i>546</i>&nbsp;     * @param html HTML to add inside this element, before the existing HTML
+<i>547</i>&nbsp;     * @return this element
+<i>548</i>&nbsp;     * @see #html(String)
+<i>549</i>&nbsp;     */
+<i>550</i>&nbsp;    public Element prepend(String html) {
+<b class="fc"><i>551</i>&nbsp;        Validate.notNull(html);</b>
+<i>552</i>&nbsp;        
+<b class="fc"><i>553</i>&nbsp;        List&lt;Node&gt; nodes = Parser.parseFragment(html, this, baseUri());</b>
+<b class="fc"><i>554</i>&nbsp;        addChildren(0, nodes.toArray(new Node[nodes.size()]));</b>
+<b class="fc"><i>555</i>&nbsp;        return this;</b>
+<i>556</i>&nbsp;    }
+<i>557</i>&nbsp;
+<i>558</i>&nbsp;    /**
+<i>559</i>&nbsp;     * Insert the specified HTML into the DOM before this element (as a preceding sibling).
+<i>560</i>&nbsp;     *
+<i>561</i>&nbsp;     * @param html HTML to add before this element
+<i>562</i>&nbsp;     * @return this element, for chaining
+<i>563</i>&nbsp;     * @see #after(String)
+<i>564</i>&nbsp;     */
+<i>565</i>&nbsp;    @Override
+<i>566</i>&nbsp;    public Element before(String html) {
+<b class="fc"><i>567</i>&nbsp;        return (Element) super.before(html);</b>
+<i>568</i>&nbsp;    }
+<i>569</i>&nbsp;
+<i>570</i>&nbsp;    /**
+<i>571</i>&nbsp;     * Insert the specified node into the DOM before this node (as a preceding sibling).
+<i>572</i>&nbsp;     * @param node to add before this element
+<i>573</i>&nbsp;     * @return this Element, for chaining
+<i>574</i>&nbsp;     * @see #after(Node)
+<i>575</i>&nbsp;     */
+<i>576</i>&nbsp;    @Override
+<i>577</i>&nbsp;    public Element before(Node node) {
+<b class="fc"><i>578</i>&nbsp;        return (Element) super.before(node);</b>
+<i>579</i>&nbsp;    }
+<i>580</i>&nbsp;
+<i>581</i>&nbsp;    /**
+<i>582</i>&nbsp;     * Insert the specified HTML into the DOM after this element (as a following sibling).
+<i>583</i>&nbsp;     *
+<i>584</i>&nbsp;     * @param html HTML to add after this element
+<i>585</i>&nbsp;     * @return this element, for chaining
+<i>586</i>&nbsp;     * @see #before(String)
+<i>587</i>&nbsp;     */
+<i>588</i>&nbsp;    @Override
+<i>589</i>&nbsp;    public Element after(String html) {
+<b class="fc"><i>590</i>&nbsp;        return (Element) super.after(html);</b>
+<i>591</i>&nbsp;    }
+<i>592</i>&nbsp;
+<i>593</i>&nbsp;    /**
+<i>594</i>&nbsp;     * Insert the specified node into the DOM after this node (as a following sibling).
+<i>595</i>&nbsp;     * @param node to add after this element
+<i>596</i>&nbsp;     * @return this element, for chaining
+<i>597</i>&nbsp;     * @see #before(Node)
+<i>598</i>&nbsp;     */
+<i>599</i>&nbsp;    @Override
+<i>600</i>&nbsp;    public Element after(Node node) {
+<b class="fc"><i>601</i>&nbsp;        return (Element) super.after(node);</b>
+<i>602</i>&nbsp;    }
+<i>603</i>&nbsp;
+<i>604</i>&nbsp;    /**
+<i>605</i>&nbsp;     * Remove all of the element&#39;s child nodes. Any attributes are left as-is.
+<i>606</i>&nbsp;     * @return this element
+<i>607</i>&nbsp;     */
+<i>608</i>&nbsp;    public Element empty() {
+<b class="fc"><i>609</i>&nbsp;        childNodes.clear();</b>
+<b class="fc"><i>610</i>&nbsp;        return this;</b>
+<i>611</i>&nbsp;    }
+<i>612</i>&nbsp;
+<i>613</i>&nbsp;    /**
+<i>614</i>&nbsp;     * Wrap the supplied HTML around this element.
+<i>615</i>&nbsp;     *
+<i>616</i>&nbsp;     * @param html HTML to wrap around this element, e.g. {@code &lt;div class=&quot;head&quot;&gt;&lt;/div&gt;}. Can be arbitrarily deep.
+<i>617</i>&nbsp;     * @return this element, for chaining.
+<i>618</i>&nbsp;     */
+<i>619</i>&nbsp;    @Override
+<i>620</i>&nbsp;    public Element wrap(String html) {
+<b class="fc"><i>621</i>&nbsp;        return (Element) super.wrap(html);</b>
+<i>622</i>&nbsp;    }
+<i>623</i>&nbsp;
+<i>624</i>&nbsp;    /**
+<i>625</i>&nbsp;     * Get a CSS selector that will uniquely select this element.
+<i>626</i>&nbsp;     * &lt;p&gt;
+<i>627</i>&nbsp;     * If the element has an ID, returns #id;
+<i>628</i>&nbsp;     * otherwise returns the parent (if any) CSS selector, followed by {@literal &#39;&gt;&#39;},
+<i>629</i>&nbsp;     * followed by a unique selector for the element (tag.class.class:nth-child(n)).
+<i>630</i>&nbsp;     * &lt;/p&gt;
+<i>631</i>&nbsp;     *
+<i>632</i>&nbsp;     * @return the CSS Path that can be used to retrieve the element in a selector.
+<i>633</i>&nbsp;     */
+<i>634</i>&nbsp;    public String cssSelector() {
+<b class="fc"><i>635</i>&nbsp;        if (id().length() &gt; 0)</b>
+<b class="fc"><i>636</i>&nbsp;            return &quot;#&quot; + id();</b>
+<i>637</i>&nbsp;
+<i>638</i>&nbsp;        // Translate HTML namespace ns:tag to CSS namespace syntax ns|tag
+<b class="fc"><i>639</i>&nbsp;        String tagName = tagName().replace(&#39;:&#39;, &#39;|&#39;);</b>
+<b class="fc"><i>640</i>&nbsp;        StringBuilder selector = new StringBuilder(tagName);</b>
+<b class="fc"><i>641</i>&nbsp;        String classes = StringUtil.join(classNames(), &quot;.&quot;);</b>
+<b class="fc"><i>642</i>&nbsp;        if (classes.length() &gt; 0)</b>
+<b class="fc"><i>643</i>&nbsp;            selector.append(&#39;.&#39;).append(classes);</b>
+<i>644</i>&nbsp;
+<b class="fc"><i>645</i>&nbsp;        if (parent() == null || parent() instanceof Document) // don&#39;t add Document to selector, as will always have a html node</b>
+<b class="fc"><i>646</i>&nbsp;            return selector.toString();</b>
+<i>647</i>&nbsp;
+<b class="fc"><i>648</i>&nbsp;        selector.insert(0, &quot; &gt; &quot;);</b>
+<b class="fc"><i>649</i>&nbsp;        if (parent().select(selector.toString()).size() &gt; 1)</b>
+<b class="fc"><i>650</i>&nbsp;            selector.append(String.format(</b>
+<b class="fc"><i>651</i>&nbsp;                &quot;:nth-child(%d)&quot;, elementSiblingIndex() + 1));</b>
+<i>652</i>&nbsp;
+<b class="fc"><i>653</i>&nbsp;        return parent().cssSelector() + selector.toString();</b>
+<i>654</i>&nbsp;    }
+<i>655</i>&nbsp;
+<i>656</i>&nbsp;    /**
+<i>657</i>&nbsp;     * Get sibling elements. If the element has no sibling elements, returns an empty list. An element is not a sibling
+<i>658</i>&nbsp;     * of itself, so will not be included in the returned list.
+<i>659</i>&nbsp;     * @return sibling elements
+<i>660</i>&nbsp;     */
+<i>661</i>&nbsp;    public Elements siblingElements() {
+<b class="fc"><i>662</i>&nbsp;        if (parentNode == null)</b>
+<b class="fc"><i>663</i>&nbsp;            return new Elements(0);</b>
+<i>664</i>&nbsp;
+<b class="fc"><i>665</i>&nbsp;        List&lt;Element&gt; elements = parent().childElementsList();</b>
+<b class="fc"><i>666</i>&nbsp;        Elements siblings = new Elements(elements.size() - 1);</b>
+<b class="fc"><i>667</i>&nbsp;        for (Element el: elements)</b>
+<b class="fc"><i>668</i>&nbsp;            if (el != this)</b>
+<b class="fc"><i>669</i>&nbsp;                siblings.add(el);</b>
+<b class="fc"><i>670</i>&nbsp;        return siblings;</b>
+<i>671</i>&nbsp;    }
+<i>672</i>&nbsp;
+<i>673</i>&nbsp;    /**
+<i>674</i>&nbsp;     * Gets the next sibling element of this element. E.g., if a {@code div} contains two {@code p}s, 
+<i>675</i>&nbsp;     * the {@code nextElementSibling} of the first {@code p} is the second {@code p}.
+<i>676</i>&nbsp;     * &lt;p&gt;
+<i>677</i>&nbsp;     * This is similar to {@link #nextSibling()}, but specifically finds only Elements
+<i>678</i>&nbsp;     * &lt;/p&gt;
+<i>679</i>&nbsp;     * @return the next element, or null if there is no next element
+<i>680</i>&nbsp;     * @see #previousElementSibling()
+<i>681</i>&nbsp;     */
+<i>682</i>&nbsp;    public Element nextElementSibling() {
+<b class="fc"><i>683</i>&nbsp;        if (parentNode == null) return null;</b>
+<b class="fc"><i>684</i>&nbsp;        List&lt;Element&gt; siblings = parent().childElementsList();</b>
+<b class="fc"><i>685</i>&nbsp;        Integer index = indexInList(this, siblings);</b>
+<b class="fc"><i>686</i>&nbsp;        Validate.notNull(index);</b>
+<b class="fc"><i>687</i>&nbsp;        if (siblings.size() &gt; index+1)</b>
+<b class="fc"><i>688</i>&nbsp;            return siblings.get(index+1);</b>
+<i>689</i>&nbsp;        else
+<b class="fc"><i>690</i>&nbsp;            return null;</b>
+<i>691</i>&nbsp;    }
+<i>692</i>&nbsp;
+<i>693</i>&nbsp;    /**
+<i>694</i>&nbsp;     * Gets the previous element sibling of this element.
+<i>695</i>&nbsp;     * @return the previous element, or null if there is no previous element
+<i>696</i>&nbsp;     * @see #nextElementSibling()
+<i>697</i>&nbsp;     */
+<i>698</i>&nbsp;    public Element previousElementSibling() {
+<b class="fc"><i>699</i>&nbsp;        if (parentNode == null) return null;</b>
+<b class="fc"><i>700</i>&nbsp;        List&lt;Element&gt; siblings = parent().childElementsList();</b>
+<b class="fc"><i>701</i>&nbsp;        Integer index = indexInList(this, siblings);</b>
+<b class="fc"><i>702</i>&nbsp;        Validate.notNull(index);</b>
+<b class="fc"><i>703</i>&nbsp;        if (index &gt; 0)</b>
+<b class="fc"><i>704</i>&nbsp;            return siblings.get(index-1);</b>
+<i>705</i>&nbsp;        else
+<b class="fc"><i>706</i>&nbsp;            return null;</b>
+<i>707</i>&nbsp;    }
+<i>708</i>&nbsp;
+<i>709</i>&nbsp;    /**
+<i>710</i>&nbsp;     * Gets the first element sibling of this element.
+<i>711</i>&nbsp;     * @return the first sibling that is an element (aka the parent&#39;s first element child) 
+<i>712</i>&nbsp;     */
+<i>713</i>&nbsp;    public Element firstElementSibling() {
+<i>714</i>&nbsp;        // todo: should firstSibling() exclude this?
+<b class="fc"><i>715</i>&nbsp;        List&lt;Element&gt; siblings = parent().childElementsList();</b>
+<b class="fc"><i>716</i>&nbsp;        return siblings.size() &gt; 1 ? siblings.get(0) : null;</b>
+<i>717</i>&nbsp;    }
+<i>718</i>&nbsp;    
+<i>719</i>&nbsp;    /**
+<i>720</i>&nbsp;     * Get the list index of this element in its element sibling list. I.e. if this is the first element
+<i>721</i>&nbsp;     * sibling, returns 0.
+<i>722</i>&nbsp;     * @return position in element sibling list
+<i>723</i>&nbsp;     */
+<i>724</i>&nbsp;    public int elementSiblingIndex() {
+<b class="fc"><i>725</i>&nbsp;       if (parent() == null) return 0;</b>
+<b class="fc"><i>726</i>&nbsp;       return indexInList(this, parent().childElementsList());</b>
+<i>727</i>&nbsp;    }
+<i>728</i>&nbsp;
+<i>729</i>&nbsp;    /**
+<i>730</i>&nbsp;     * Gets the last element sibling of this element
+<i>731</i>&nbsp;     * @return the last sibling that is an element (aka the parent&#39;s last element child) 
+<i>732</i>&nbsp;     */
+<i>733</i>&nbsp;    public Element lastElementSibling() {
+<b class="fc"><i>734</i>&nbsp;        List&lt;Element&gt; siblings = parent().childElementsList();</b>
+<b class="fc"><i>735</i>&nbsp;        return siblings.size() &gt; 1 ? siblings.get(siblings.size() - 1) : null;</b>
+<i>736</i>&nbsp;    }
+<i>737</i>&nbsp;
+<i>738</i>&nbsp;    private static &lt;E extends Element&gt; int indexInList(Element search, List&lt;E&gt; elements) {
+<b class="fc"><i>739</i>&nbsp;        for (int i = 0; i &lt; elements.size(); i++) {</b>
+<b class="fc"><i>740</i>&nbsp;            if (elements.get(i) == search)</b>
+<b class="fc"><i>741</i>&nbsp;                return i;</b>
+<i>742</i>&nbsp;        }
+<b class="nc"><i>743</i>&nbsp;        return 0;</b>
+<i>744</i>&nbsp;    }
+<i>745</i>&nbsp;
+<i>746</i>&nbsp;    // DOM type methods
+<i>747</i>&nbsp;
+<i>748</i>&nbsp;    /**
+<i>749</i>&nbsp;     * Finds elements, including and recursively under this element, with the specified tag name.
+<i>750</i>&nbsp;     * @param tagName The tag name to search for (case insensitively).
+<i>751</i>&nbsp;     * @return a matching unmodifiable list of elements. Will be empty if this element and none of its children match.
+<i>752</i>&nbsp;     */
+<i>753</i>&nbsp;    public Elements getElementsByTag(String tagName) {
+<b class="fc"><i>754</i>&nbsp;        Validate.notEmpty(tagName);</b>
+<b class="fc"><i>755</i>&nbsp;        tagName = normalize(tagName);</b>
+<i>756</i>&nbsp;
+<b class="fc"><i>757</i>&nbsp;        return Collector.collect(new Evaluator.Tag(tagName), this);</b>
+<i>758</i>&nbsp;    }
+<i>759</i>&nbsp;
+<i>760</i>&nbsp;    /**
+<i>761</i>&nbsp;     * Find an element by ID, including or under this element.
+<i>762</i>&nbsp;     * &lt;p&gt;
+<i>763</i>&nbsp;     * Note that this finds the first matching ID, starting with this element. If you search down from a different
+<i>764</i>&nbsp;     * starting point, it is possible to find a different element by ID. For unique element by ID within a Document,
+<i>765</i>&nbsp;     * use {@link Document#getElementById(String)}
+<i>766</i>&nbsp;     * @param id The ID to search for.
+<i>767</i>&nbsp;     * @return The first matching element by ID, starting with this element, or null if none found.
+<i>768</i>&nbsp;     */
+<i>769</i>&nbsp;    public Element getElementById(String id) {
+<b class="fc"><i>770</i>&nbsp;        Validate.notEmpty(id);</b>
+<i>771</i>&nbsp;        
+<b class="fc"><i>772</i>&nbsp;        Elements elements = Collector.collect(new Evaluator.Id(id), this);</b>
+<b class="fc"><i>773</i>&nbsp;        if (elements.size() &gt; 0)</b>
+<b class="fc"><i>774</i>&nbsp;            return elements.get(0);</b>
+<i>775</i>&nbsp;        else
+<b class="fc"><i>776</i>&nbsp;            return null;</b>
+<i>777</i>&nbsp;    }
+<i>778</i>&nbsp;
+<i>779</i>&nbsp;    /**
+<i>780</i>&nbsp;     * Find elements that have this class, including or under this element. Case insensitive.
+<i>781</i>&nbsp;     * &lt;p&gt;
+<i>782</i>&nbsp;     * Elements can have multiple classes (e.g. {@code &lt;div class=&quot;header round first&quot;&gt;}. This method
+<i>783</i>&nbsp;     * checks each class, so you can find the above with {@code el.getElementsByClass(&quot;header&quot;);}.
+<i>784</i>&nbsp;     * 
+<i>785</i>&nbsp;     * @param className the name of the class to search for.
+<i>786</i>&nbsp;     * @return elements with the supplied class name, empty if none
+<i>787</i>&nbsp;     * @see #hasClass(String)
+<i>788</i>&nbsp;     * @see #classNames()
+<i>789</i>&nbsp;     */
+<i>790</i>&nbsp;    public Elements getElementsByClass(String className) {
+<b class="fc"><i>791</i>&nbsp;        Validate.notEmpty(className);</b>
+<i>792</i>&nbsp;
+<b class="fc"><i>793</i>&nbsp;        return Collector.collect(new Evaluator.Class(className), this);</b>
+<i>794</i>&nbsp;    }
+<i>795</i>&nbsp;
+<i>796</i>&nbsp;    /**
+<i>797</i>&nbsp;     * Find elements that have a named attribute set. Case insensitive.
+<i>798</i>&nbsp;     *
+<i>799</i>&nbsp;     * @param key name of the attribute, e.g. {@code href}
+<i>800</i>&nbsp;     * @return elements that have this attribute, empty if none
+<i>801</i>&nbsp;     */
+<i>802</i>&nbsp;    public Elements getElementsByAttribute(String key) {
+<b class="fc"><i>803</i>&nbsp;        Validate.notEmpty(key);</b>
+<b class="fc"><i>804</i>&nbsp;        key = key.trim();</b>
+<i>805</i>&nbsp;
+<b class="fc"><i>806</i>&nbsp;        return Collector.collect(new Evaluator.Attribute(key), this);</b>
+<i>807</i>&nbsp;    }
+<i>808</i>&nbsp;
+<i>809</i>&nbsp;    /**
+<i>810</i>&nbsp;     * Find elements that have an attribute name starting with the supplied prefix. Use {@code data-} to find elements
+<i>811</i>&nbsp;     * that have HTML5 datasets.
+<i>812</i>&nbsp;     * @param keyPrefix name prefix of the attribute e.g. {@code data-}
+<i>813</i>&nbsp;     * @return elements that have attribute names that start with with the prefix, empty if none.
+<i>814</i>&nbsp;     */
+<i>815</i>&nbsp;    public Elements getElementsByAttributeStarting(String keyPrefix) {
+<b class="nc"><i>816</i>&nbsp;        Validate.notEmpty(keyPrefix);</b>
+<b class="nc"><i>817</i>&nbsp;        keyPrefix = keyPrefix.trim();</b>
+<i>818</i>&nbsp;
+<b class="nc"><i>819</i>&nbsp;        return Collector.collect(new Evaluator.AttributeStarting(keyPrefix), this);</b>
+<i>820</i>&nbsp;    }
+<i>821</i>&nbsp;
+<i>822</i>&nbsp;    /**
+<i>823</i>&nbsp;     * Find elements that have an attribute with the specific value. Case insensitive.
+<i>824</i>&nbsp;     * 
+<i>825</i>&nbsp;     * @param key name of the attribute
+<i>826</i>&nbsp;     * @param value value of the attribute
+<i>827</i>&nbsp;     * @return elements that have this attribute with this value, empty if none
+<i>828</i>&nbsp;     */
+<i>829</i>&nbsp;    public Elements getElementsByAttributeValue(String key, String value) {
+<b class="fc"><i>830</i>&nbsp;        return Collector.collect(new Evaluator.AttributeWithValue(key, value), this);</b>
+<i>831</i>&nbsp;    }
+<i>832</i>&nbsp;
+<i>833</i>&nbsp;    /**
+<i>834</i>&nbsp;     * Find elements that either do not have this attribute, or have it with a different value. Case insensitive.
+<i>835</i>&nbsp;     * 
+<i>836</i>&nbsp;     * @param key name of the attribute
+<i>837</i>&nbsp;     * @param value value of the attribute
+<i>838</i>&nbsp;     * @return elements that do not have a matching attribute
+<i>839</i>&nbsp;     */
+<i>840</i>&nbsp;    public Elements getElementsByAttributeValueNot(String key, String value) {
+<b class="nc"><i>841</i>&nbsp;        return Collector.collect(new Evaluator.AttributeWithValueNot(key, value), this);</b>
+<i>842</i>&nbsp;    }
+<i>843</i>&nbsp;
+<i>844</i>&nbsp;    /**
+<i>845</i>&nbsp;     * Find elements that have attributes that start with the value prefix. Case insensitive.
+<i>846</i>&nbsp;     * 
+<i>847</i>&nbsp;     * @param key name of the attribute
+<i>848</i>&nbsp;     * @param valuePrefix start of attribute value
+<i>849</i>&nbsp;     * @return elements that have attributes that start with the value prefix
+<i>850</i>&nbsp;     */
+<i>851</i>&nbsp;    public Elements getElementsByAttributeValueStarting(String key, String valuePrefix) {
+<b class="nc"><i>852</i>&nbsp;        return Collector.collect(new Evaluator.AttributeWithValueStarting(key, valuePrefix), this);</b>
+<i>853</i>&nbsp;    }
+<i>854</i>&nbsp;
+<i>855</i>&nbsp;    /**
+<i>856</i>&nbsp;     * Find elements that have attributes that end with the value suffix. Case insensitive.
+<i>857</i>&nbsp;     * 
+<i>858</i>&nbsp;     * @param key name of the attribute
+<i>859</i>&nbsp;     * @param valueSuffix end of the attribute value
+<i>860</i>&nbsp;     * @return elements that have attributes that end with the value suffix
+<i>861</i>&nbsp;     */
+<i>862</i>&nbsp;    public Elements getElementsByAttributeValueEnding(String key, String valueSuffix) {
+<b class="nc"><i>863</i>&nbsp;        return Collector.collect(new Evaluator.AttributeWithValueEnding(key, valueSuffix), this);</b>
+<i>864</i>&nbsp;    }
+<i>865</i>&nbsp;
+<i>866</i>&nbsp;    /**
+<i>867</i>&nbsp;     * Find elements that have attributes whose value contains the match string. Case insensitive.
+<i>868</i>&nbsp;     * 
+<i>869</i>&nbsp;     * @param key name of the attribute
+<i>870</i>&nbsp;     * @param match substring of value to search for
+<i>871</i>&nbsp;     * @return elements that have attributes containing this text
+<i>872</i>&nbsp;     */
+<i>873</i>&nbsp;    public Elements getElementsByAttributeValueContaining(String key, String match) {
+<b class="nc"><i>874</i>&nbsp;        return Collector.collect(new Evaluator.AttributeWithValueContaining(key, match), this);</b>
+<i>875</i>&nbsp;    }
+<i>876</i>&nbsp;    
+<i>877</i>&nbsp;    /**
+<i>878</i>&nbsp;     * Find elements that have attributes whose values match the supplied regular expression.
+<i>879</i>&nbsp;     * @param key name of the attribute
+<i>880</i>&nbsp;     * @param pattern compiled regular expression to match against attribute values
+<i>881</i>&nbsp;     * @return elements that have attributes matching this regular expression
+<i>882</i>&nbsp;     */
+<i>883</i>&nbsp;    public Elements getElementsByAttributeValueMatching(String key, Pattern pattern) {
+<b class="nc"><i>884</i>&nbsp;        return Collector.collect(new Evaluator.AttributeWithValueMatching(key, pattern), this);</b>
+<i>885</i>&nbsp;        
+<i>886</i>&nbsp;    }
+<i>887</i>&nbsp;    
+<i>888</i>&nbsp;    /**
+<i>889</i>&nbsp;     * Find elements that have attributes whose values match the supplied regular expression.
+<i>890</i>&nbsp;     * @param key name of the attribute
+<i>891</i>&nbsp;     * @param regex regular expression to match against attribute values. You can use &lt;a href=&quot;http://java.sun.com/docs/books/tutorial/essential/regex/pattern.html#embedded&quot;&gt;embedded flags&lt;/a&gt; (such as (?i) and (?m) to control regex options.
+<i>892</i>&nbsp;     * @return elements that have attributes matching this regular expression
+<i>893</i>&nbsp;     */
+<i>894</i>&nbsp;    public Elements getElementsByAttributeValueMatching(String key, String regex) {
+<i>895</i>&nbsp;        Pattern pattern;
+<i>896</i>&nbsp;        try {
+<b class="nc"><i>897</i>&nbsp;            pattern = Pattern.compile(regex);</b>
+<b class="nc"><i>898</i>&nbsp;        } catch (PatternSyntaxException e) {</b>
+<b class="nc"><i>899</i>&nbsp;            throw new IllegalArgumentException(&quot;Pattern syntax error: &quot; + regex, e);</b>
+<b class="nc"><i>900</i>&nbsp;        }</b>
+<b class="nc"><i>901</i>&nbsp;        return getElementsByAttributeValueMatching(key, pattern);</b>
+<i>902</i>&nbsp;    }
+<i>903</i>&nbsp;    
+<i>904</i>&nbsp;    /**
+<i>905</i>&nbsp;     * Find elements whose sibling index is less than the supplied index.
+<i>906</i>&nbsp;     * @param index 0-based index
+<i>907</i>&nbsp;     * @return elements less than index
+<i>908</i>&nbsp;     */
+<i>909</i>&nbsp;    public Elements getElementsByIndexLessThan(int index) {
+<b class="fc"><i>910</i>&nbsp;        return Collector.collect(new Evaluator.IndexLessThan(index), this);</b>
+<i>911</i>&nbsp;    }
+<i>912</i>&nbsp;    
+<i>913</i>&nbsp;    /**
+<i>914</i>&nbsp;     * Find elements whose sibling index is greater than the supplied index.
+<i>915</i>&nbsp;     * @param index 0-based index
+<i>916</i>&nbsp;     * @return elements greater than index
+<i>917</i>&nbsp;     */
+<i>918</i>&nbsp;    public Elements getElementsByIndexGreaterThan(int index) {
+<b class="fc"><i>919</i>&nbsp;        return Collector.collect(new Evaluator.IndexGreaterThan(index), this);</b>
+<i>920</i>&nbsp;    }
+<i>921</i>&nbsp;    
+<i>922</i>&nbsp;    /**
+<i>923</i>&nbsp;     * Find elements whose sibling index is equal to the supplied index.
+<i>924</i>&nbsp;     * @param index 0-based index
+<i>925</i>&nbsp;     * @return elements equal to index
+<i>926</i>&nbsp;     */
+<i>927</i>&nbsp;    public Elements getElementsByIndexEquals(int index) {
+<b class="nc"><i>928</i>&nbsp;        return Collector.collect(new Evaluator.IndexEquals(index), this);</b>
+<i>929</i>&nbsp;    }
+<i>930</i>&nbsp;    
+<i>931</i>&nbsp;    /**
+<i>932</i>&nbsp;     * Find elements that contain the specified string. The search is case insensitive. The text may appear directly
+<i>933</i>&nbsp;     * in the element, or in any of its descendants.
+<i>934</i>&nbsp;     * @param searchText to look for in the element&#39;s text
+<i>935</i>&nbsp;     * @return elements that contain the string, case insensitive.
+<i>936</i>&nbsp;     * @see Element#text()
+<i>937</i>&nbsp;     */
+<i>938</i>&nbsp;    public Elements getElementsContainingText(String searchText) {
+<b class="nc"><i>939</i>&nbsp;        return Collector.collect(new Evaluator.ContainsText(searchText), this);</b>
+<i>940</i>&nbsp;    }
+<i>941</i>&nbsp;    
+<i>942</i>&nbsp;    /**
+<i>943</i>&nbsp;     * Find elements that directly contain the specified string. The search is case insensitive. The text must appear directly
+<i>944</i>&nbsp;     * in the element, not in any of its descendants.
+<i>945</i>&nbsp;     * @param searchText to look for in the element&#39;s own text
+<i>946</i>&nbsp;     * @return elements that contain the string, case insensitive.
+<i>947</i>&nbsp;     * @see Element#ownText()
+<i>948</i>&nbsp;     */
+<i>949</i>&nbsp;    public Elements getElementsContainingOwnText(String searchText) {
+<b class="nc"><i>950</i>&nbsp;        return Collector.collect(new Evaluator.ContainsOwnText(searchText), this);</b>
+<i>951</i>&nbsp;    }
+<i>952</i>&nbsp;    
+<i>953</i>&nbsp;    /**
+<i>954</i>&nbsp;     * Find elements whose text matches the supplied regular expression.
+<i>955</i>&nbsp;     * @param pattern regular expression to match text against
+<i>956</i>&nbsp;     * @return elements matching the supplied regular expression.
+<i>957</i>&nbsp;     * @see Element#text()
+<i>958</i>&nbsp;     */
+<i>959</i>&nbsp;    public Elements getElementsMatchingText(Pattern pattern) {
+<b class="nc"><i>960</i>&nbsp;        return Collector.collect(new Evaluator.Matches(pattern), this);</b>
+<i>961</i>&nbsp;    }
+<i>962</i>&nbsp;    
+<i>963</i>&nbsp;    /**
+<i>964</i>&nbsp;     * Find elements whose text matches the supplied regular expression.
+<i>965</i>&nbsp;     * @param regex regular expression to match text against. You can use &lt;a href=&quot;http://java.sun.com/docs/books/tutorial/essential/regex/pattern.html#embedded&quot;&gt;embedded flags&lt;/a&gt; (such as (?i) and (?m) to control regex options.
+<i>966</i>&nbsp;     * @return elements matching the supplied regular expression.
+<i>967</i>&nbsp;     * @see Element#text()
+<i>968</i>&nbsp;     */
+<i>969</i>&nbsp;    public Elements getElementsMatchingText(String regex) {
+<i>970</i>&nbsp;        Pattern pattern;
+<i>971</i>&nbsp;        try {
+<b class="nc"><i>972</i>&nbsp;            pattern = Pattern.compile(regex);</b>
+<b class="nc"><i>973</i>&nbsp;        } catch (PatternSyntaxException e) {</b>
+<b class="nc"><i>974</i>&nbsp;            throw new IllegalArgumentException(&quot;Pattern syntax error: &quot; + regex, e);</b>
+<b class="nc"><i>975</i>&nbsp;        }</b>
+<b class="nc"><i>976</i>&nbsp;        return getElementsMatchingText(pattern);</b>
+<i>977</i>&nbsp;    }
+<i>978</i>&nbsp;    
+<i>979</i>&nbsp;    /**
+<i>980</i>&nbsp;     * Find elements whose own text matches the supplied regular expression.
+<i>981</i>&nbsp;     * @param pattern regular expression to match text against
+<i>982</i>&nbsp;     * @return elements matching the supplied regular expression.
+<i>983</i>&nbsp;     * @see Element#ownText()
+<i>984</i>&nbsp;     */
+<i>985</i>&nbsp;    public Elements getElementsMatchingOwnText(Pattern pattern) {
+<b class="nc"><i>986</i>&nbsp;        return Collector.collect(new Evaluator.MatchesOwn(pattern), this);</b>
+<i>987</i>&nbsp;    }
+<i>988</i>&nbsp;    
+<i>989</i>&nbsp;    /**
+<i>990</i>&nbsp;     * Find elements whose text matches the supplied regular expression.
+<i>991</i>&nbsp;     * @param regex regular expression to match text against. You can use &lt;a href=&quot;http://java.sun.com/docs/books/tutorial/essential/regex/pattern.html#embedded&quot;&gt;embedded flags&lt;/a&gt; (such as (?i) and (?m) to control regex options.
+<i>992</i>&nbsp;     * @return elements matching the supplied regular expression.
+<i>993</i>&nbsp;     * @see Element#ownText()
+<i>994</i>&nbsp;     */
+<i>995</i>&nbsp;    public Elements getElementsMatchingOwnText(String regex) {
+<i>996</i>&nbsp;        Pattern pattern;
+<i>997</i>&nbsp;        try {
+<b class="nc"><i>998</i>&nbsp;            pattern = Pattern.compile(regex);</b>
+<b class="nc"><i>999</i>&nbsp;        } catch (PatternSyntaxException e) {</b>
+<b class="nc"><i>1000</i>&nbsp;            throw new IllegalArgumentException(&quot;Pattern syntax error: &quot; + regex, e);</b>
+<b class="nc"><i>1001</i>&nbsp;        }</b>
+<b class="nc"><i>1002</i>&nbsp;        return getElementsMatchingOwnText(pattern);</b>
+<i>1003</i>&nbsp;    }
+<i>1004</i>&nbsp;    
+<i>1005</i>&nbsp;    /**
+<i>1006</i>&nbsp;     * Find all elements under this element (including self, and children of children).
+<i>1007</i>&nbsp;     * 
+<i>1008</i>&nbsp;     * @return all elements
+<i>1009</i>&nbsp;     */
+<i>1010</i>&nbsp;    public Elements getAllElements() {
+<b class="fc"><i>1011</i>&nbsp;        return Collector.collect(new Evaluator.AllElements(), this);</b>
+<i>1012</i>&nbsp;    }
+<i>1013</i>&nbsp;
+<i>1014</i>&nbsp;    /**
+<i>1015</i>&nbsp;     * Gets the combined text of this element and all its children. Whitespace is normalized and trimmed.
+<i>1016</i>&nbsp;     * &lt;p&gt;
+<i>1017</i>&nbsp;     * For example, given HTML {@code &lt;p&gt;Hello  &lt;b&gt;there&lt;/b&gt; now! &lt;/p&gt;}, {@code p.text()} returns {@code &quot;Hello there now!&quot;}
+<i>1018</i>&nbsp;     *
+<i>1019</i>&nbsp;     * @return unencoded, normalized text, or empty string if none.
+<i>1020</i>&nbsp;     * @see #wholeText() if you don&#39;t want the text to be normalized.
+<i>1021</i>&nbsp;     * @see #ownText()
+<i>1022</i>&nbsp;     * @see #textNodes()
+<i>1023</i>&nbsp;     */
+<i>1024</i>&nbsp;    public String text() {
+<b class="fc"><i>1025</i>&nbsp;        final StringBuilder accum = new StringBuilder();</b>
+<b class="fc"><i>1026</i>&nbsp;        NodeTraversor.traverse(new NodeVisitor() {</b>
+<i>1027</i>&nbsp;            public void head(Node node, int depth) {
+<b class="fc"><i>1028</i>&nbsp;                if (node instanceof TextNode) {</b>
+<b class="fc"><i>1029</i>&nbsp;                    TextNode textNode = (TextNode) node;</b>
+<b class="fc"><i>1030</i>&nbsp;                    appendNormalisedText(accum, textNode);</b>
+<b class="fc"><i>1031</i>&nbsp;                } else if (node instanceof Element) {</b>
+<b class="fc"><i>1032</i>&nbsp;                    Element element = (Element) node;</b>
+<b class="fc"><i>1033</i>&nbsp;                    if (accum.length() &gt; 0 &amp;&amp;</b>
+<b class="fc"><i>1034</i>&nbsp;                        (element.isBlock() || element.tag.getName().equals(&quot;br&quot;)) &amp;&amp;</b>
+<b class="fc"><i>1035</i>&nbsp;                        !TextNode.lastCharIsWhitespace(accum))</b>
+<b class="fc"><i>1036</i>&nbsp;                        accum.append(&#39; &#39;);</b>
+<i>1037</i>&nbsp;                }
+<b class="fc"><i>1038</i>&nbsp;            }</b>
+<i>1039</i>&nbsp;
+<i>1040</i>&nbsp;            public void tail(Node node, int depth) {
+<i>1041</i>&nbsp;                // make sure there is a space between block tags and immediately following text nodes &lt;div&gt;One&lt;/div&gt;Two should be &quot;One Two&quot;.
+<b class="fc"><i>1042</i>&nbsp;                if (node instanceof Element) {</b>
+<b class="fc"><i>1043</i>&nbsp;                    Element element = (Element) node;</b>
+<b class="fc"><i>1044</i>&nbsp;                    if (element.isBlock() &amp;&amp; (node.nextSibling() instanceof TextNode) &amp;&amp; !TextNode.lastCharIsWhitespace(accum))</b>
+<b class="fc"><i>1045</i>&nbsp;                        accum.append(&#39; &#39;);</b>
+<i>1046</i>&nbsp;                }
+<i>1047</i>&nbsp;
+<b class="fc"><i>1048</i>&nbsp;            }</b>
+<i>1049</i>&nbsp;        }, this);
+<b class="fc"><i>1050</i>&nbsp;        return accum.toString().trim();</b>
+<i>1051</i>&nbsp;    }
+<i>1052</i>&nbsp;
+<i>1053</i>&nbsp;    /**
+<i>1054</i>&nbsp;     * Get the (unencoded) text of all children of this element, including any newlines and spaces present in the
+<i>1055</i>&nbsp;     * original.
+<i>1056</i>&nbsp;     *
+<i>1057</i>&nbsp;     * @return unencoded, un-normalized text
+<i>1058</i>&nbsp;     * @see #text()
+<i>1059</i>&nbsp;     */
+<i>1060</i>&nbsp;    public String wholeText() {
+<b class="fc"><i>1061</i>&nbsp;        final StringBuilder accum = new StringBuilder();</b>
+<b class="fc"><i>1062</i>&nbsp;        NodeTraversor.traverse(new NodeVisitor() {</b>
+<i>1063</i>&nbsp;            public void head(Node node, int depth) {
+<b class="fc"><i>1064</i>&nbsp;                if (node instanceof TextNode) {</b>
+<b class="fc"><i>1065</i>&nbsp;                    TextNode textNode = (TextNode) node;</b>
+<b class="fc"><i>1066</i>&nbsp;                    accum.append(textNode.getWholeText());</b>
+<i>1067</i>&nbsp;                }
+<b class="fc"><i>1068</i>&nbsp;            }</b>
+<i>1069</i>&nbsp;
+<i>1070</i>&nbsp;            public void tail(Node node, int depth) {
+<b class="fc"><i>1071</i>&nbsp;            }</b>
+<i>1072</i>&nbsp;        }, this);
+<b class="fc"><i>1073</i>&nbsp;        return accum.toString();</b>
+<i>1074</i>&nbsp;    }
+<i>1075</i>&nbsp;
+<i>1076</i>&nbsp;    /**
+<i>1077</i>&nbsp;     * Gets the text owned by this element only; does not get the combined text of all children.
+<i>1078</i>&nbsp;     * &lt;p&gt;
+<i>1079</i>&nbsp;     * For example, given HTML {@code &lt;p&gt;Hello &lt;b&gt;there&lt;/b&gt; now!&lt;/p&gt;}, {@code p.ownText()} returns {@code &quot;Hello now!&quot;},
+<i>1080</i>&nbsp;     * whereas {@code p.text()} returns {@code &quot;Hello there now!&quot;}.
+<i>1081</i>&nbsp;     * Note that the text within the {@code b} element is not returned, as it is not a direct child of the {@code p} element.
+<i>1082</i>&nbsp;     *
+<i>1083</i>&nbsp;     * @return unencoded text, or empty string if none.
+<i>1084</i>&nbsp;     * @see #text()
+<i>1085</i>&nbsp;     * @see #textNodes()
+<i>1086</i>&nbsp;     */
+<i>1087</i>&nbsp;    public String ownText() {
+<b class="fc"><i>1088</i>&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="fc"><i>1089</i>&nbsp;        ownText(sb);</b>
+<b class="fc"><i>1090</i>&nbsp;        return sb.toString().trim();</b>
+<i>1091</i>&nbsp;    }
+<i>1092</i>&nbsp;
+<i>1093</i>&nbsp;    private void ownText(StringBuilder accum) {
+<b class="fc"><i>1094</i>&nbsp;        for (Node child : childNodes) {</b>
+<b class="fc"><i>1095</i>&nbsp;            if (child instanceof TextNode) {</b>
+<b class="fc"><i>1096</i>&nbsp;                TextNode textNode = (TextNode) child;</b>
+<b class="fc"><i>1097</i>&nbsp;                appendNormalisedText(accum, textNode);</b>
+<b class="fc"><i>1098</i>&nbsp;            } else if (child instanceof Element) {</b>
+<b class="fc"><i>1099</i>&nbsp;                appendWhitespaceIfBr((Element) child, accum);</b>
+<i>1100</i>&nbsp;            }
+<b class="fc"><i>1101</i>&nbsp;        }</b>
+<b class="fc"><i>1102</i>&nbsp;    }</b>
+<i>1103</i>&nbsp;
+<i>1104</i>&nbsp;    private static void appendNormalisedText(StringBuilder accum, TextNode textNode) {
+<b class="fc"><i>1105</i>&nbsp;        String text = textNode.getWholeText();</b>
+<i>1106</i>&nbsp;
+<b class="fc"><i>1107</i>&nbsp;        if (preserveWhitespace(textNode.parentNode) || textNode instanceof CDataNode)</b>
+<b class="fc"><i>1108</i>&nbsp;            accum.append(text);</b>
+<i>1109</i>&nbsp;        else
+<b class="fc"><i>1110</i>&nbsp;            StringUtil.appendNormalisedWhitespace(accum, text, TextNode.lastCharIsWhitespace(accum));</b>
+<b class="fc"><i>1111</i>&nbsp;    }</b>
+<i>1112</i>&nbsp;
+<i>1113</i>&nbsp;    private static void appendWhitespaceIfBr(Element element, StringBuilder accum) {
+<b class="fc"><i>1114</i>&nbsp;        if (element.tag.getName().equals(&quot;br&quot;) &amp;&amp; !TextNode.lastCharIsWhitespace(accum))</b>
+<b class="fc"><i>1115</i>&nbsp;            accum.append(&quot; &quot;);</b>
+<b class="fc"><i>1116</i>&nbsp;    }</b>
+<i>1117</i>&nbsp;
+<i>1118</i>&nbsp;    static boolean preserveWhitespace(Node node) {
+<i>1119</i>&nbsp;        // looks only at this element and five levels up, to prevent recursion &amp; needless stack searches
+<b class="fc"><i>1120</i>&nbsp;        if (node != null &amp;&amp; node instanceof Element) {</b>
+<b class="fc"><i>1121</i>&nbsp;            Element el = (Element) node;</b>
+<b class="fc"><i>1122</i>&nbsp;            int i = 0;</b>
+<i>1123</i>&nbsp;            do {
+<b class="fc"><i>1124</i>&nbsp;                if (el.tag.preserveWhitespace())</b>
+<b class="fc"><i>1125</i>&nbsp;                    return true;</b>
+<b class="fc"><i>1126</i>&nbsp;                el = el.parent();</b>
+<b class="fc"><i>1127</i>&nbsp;                i++;</b>
+<b class="fc"><i>1128</i>&nbsp;            } while (i &lt; 6 &amp;&amp; el != null);</b>
+<i>1129</i>&nbsp;        }
+<b class="fc"><i>1130</i>&nbsp;        return false;</b>
+<i>1131</i>&nbsp;    }
+<i>1132</i>&nbsp;
+<i>1133</i>&nbsp;    /**
+<i>1134</i>&nbsp;     * Set the text of this element. Any existing contents (text or elements) will be cleared
+<i>1135</i>&nbsp;     * @param text unencoded text
+<i>1136</i>&nbsp;     * @return this element
+<i>1137</i>&nbsp;     */
+<i>1138</i>&nbsp;    public Element text(String text) {
+<b class="fc"><i>1139</i>&nbsp;        Validate.notNull(text);</b>
+<i>1140</i>&nbsp;
+<b class="fc"><i>1141</i>&nbsp;        empty();</b>
+<b class="fc"><i>1142</i>&nbsp;        TextNode textNode = new TextNode(text);</b>
+<b class="fc"><i>1143</i>&nbsp;        appendChild(textNode);</b>
+<i>1144</i>&nbsp;
+<b class="fc"><i>1145</i>&nbsp;        return this;</b>
+<i>1146</i>&nbsp;    }
+<i>1147</i>&nbsp;
+<i>1148</i>&nbsp;    /**
+<i>1149</i>&nbsp;     Test if this element has any text content (that is not just whitespace).
+<i>1150</i>&nbsp;     @return true if element has non-blank text content.
+<i>1151</i>&nbsp;     */
+<i>1152</i>&nbsp;    public boolean hasText() {
+<b class="fc"><i>1153</i>&nbsp;        for (Node child: childNodes) {</b>
+<b class="fc"><i>1154</i>&nbsp;            if (child instanceof TextNode) {</b>
+<b class="fc"><i>1155</i>&nbsp;                TextNode textNode = (TextNode) child;</b>
+<b class="fc"><i>1156</i>&nbsp;                if (!textNode.isBlank())</b>
+<b class="fc"><i>1157</i>&nbsp;                    return true;</b>
+<b class="nc"><i>1158</i>&nbsp;            } else if (child instanceof Element) {</b>
+<b class="fc"><i>1159</i>&nbsp;                Element el = (Element) child;</b>
+<b class="fc"><i>1160</i>&nbsp;                if (el.hasText())</b>
+<b class="fc"><i>1161</i>&nbsp;                    return true;</b>
+<i>1162</i>&nbsp;            }
+<b class="fc"><i>1163</i>&nbsp;        }</b>
+<b class="fc"><i>1164</i>&nbsp;        return false;</b>
+<i>1165</i>&nbsp;    }
+<i>1166</i>&nbsp;
+<i>1167</i>&nbsp;    /**
+<i>1168</i>&nbsp;     * Get the combined data of this element. Data is e.g. the inside of a {@code script} tag. Note that data is NOT the
+<i>1169</i>&nbsp;     * text of the element. Use {@link #text()} to get the text that would be visible to a user, and {@link #data()}
+<i>1170</i>&nbsp;     * for the contents of scripts, comments, CSS styles, etc.
+<i>1171</i>&nbsp;     *
+<i>1172</i>&nbsp;     * @return the data, or empty string if none
+<i>1173</i>&nbsp;     *
+<i>1174</i>&nbsp;     * @see #dataNodes()
+<i>1175</i>&nbsp;     */
+<i>1176</i>&nbsp;    public String data() {
+<b class="fc"><i>1177</i>&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<i>1178</i>&nbsp;
+<b class="fc"><i>1179</i>&nbsp;        for (Node childNode : childNodes) {</b>
+<b class="fc"><i>1180</i>&nbsp;            if (childNode instanceof DataNode) {</b>
+<b class="fc"><i>1181</i>&nbsp;                DataNode data = (DataNode) childNode;</b>
+<b class="fc"><i>1182</i>&nbsp;                sb.append(data.getWholeData());</b>
+<b class="fc"><i>1183</i>&nbsp;            } else if (childNode instanceof Comment) {</b>
+<b class="fc"><i>1184</i>&nbsp;                Comment comment = (Comment) childNode;</b>
+<b class="fc"><i>1185</i>&nbsp;                sb.append(comment.getData());</b>
+<b class="fc"><i>1186</i>&nbsp;            } else if (childNode instanceof Element) {</b>
+<b class="fc"><i>1187</i>&nbsp;                Element element = (Element) childNode;</b>
+<b class="fc"><i>1188</i>&nbsp;                String elementData = element.data();</b>
+<b class="fc"><i>1189</i>&nbsp;                sb.append(elementData);</b>
+<b class="fc"><i>1190</i>&nbsp;            } else if (childNode instanceof CDataNode) {</b>
+<i>1191</i>&nbsp;                // this shouldn&#39;t really happen because the html parser won&#39;t see the cdata as anything special when parsing script.
+<i>1192</i>&nbsp;                // but incase another type gets through.
+<b class="nc"><i>1193</i>&nbsp;                CDataNode cDataNode = (CDataNode) childNode;</b>
+<b class="nc"><i>1194</i>&nbsp;                sb.append(cDataNode.getWholeText());</b>
+<i>1195</i>&nbsp;            }
+<b class="fc"><i>1196</i>&nbsp;        }</b>
+<b class="fc"><i>1197</i>&nbsp;        return sb.toString();</b>
+<i>1198</i>&nbsp;    }   
+<i>1199</i>&nbsp;
+<i>1200</i>&nbsp;    /**
+<i>1201</i>&nbsp;     * Gets the literal value of this element&#39;s &quot;class&quot; attribute, which may include multiple class names, space
+<i>1202</i>&nbsp;     * separated. (E.g. on &lt;code&gt;&amp;lt;div class=&quot;header gray&quot;&amp;gt;&lt;/code&gt; returns, &quot;&lt;code&gt;header gray&lt;/code&gt;&quot;)
+<i>1203</i>&nbsp;     * @return The literal class attribute, or &lt;b&gt;empty string&lt;/b&gt; if no class attribute set.
+<i>1204</i>&nbsp;     */
+<i>1205</i>&nbsp;    public String className() {
+<b class="fc"><i>1206</i>&nbsp;        return attr(&quot;class&quot;).trim();</b>
+<i>1207</i>&nbsp;    }
+<i>1208</i>&nbsp;
+<i>1209</i>&nbsp;    /**
+<i>1210</i>&nbsp;     * Get all of the element&#39;s class names. E.g. on element {@code &lt;div class=&quot;header gray&quot;&gt;},
+<i>1211</i>&nbsp;     * returns a set of two elements {@code &quot;header&quot;, &quot;gray&quot;}. Note that modifications to this set are not pushed to
+<i>1212</i>&nbsp;     * the backing {@code class} attribute; use the {@link #classNames(java.util.Set)} method to persist them.
+<i>1213</i>&nbsp;     * @return set of classnames, empty if no class attribute
+<i>1214</i>&nbsp;     */
+<i>1215</i>&nbsp;    public Set&lt;String&gt; classNames() {
+<b class="fc"><i>1216</i>&nbsp;    	String[] names = classSplit.split(className());</b>
+<b class="fc"><i>1217</i>&nbsp;    	Set&lt;String&gt; classNames = new LinkedHashSet&lt;&gt;(Arrays.asList(names));</b>
+<b class="fc"><i>1218</i>&nbsp;    	classNames.remove(&quot;&quot;); // if classNames() was empty, would include an empty class</b>
+<i>1219</i>&nbsp;
+<b class="fc"><i>1220</i>&nbsp;        return classNames;</b>
+<i>1221</i>&nbsp;    }
+<i>1222</i>&nbsp;
+<i>1223</i>&nbsp;    /**
+<i>1224</i>&nbsp;     Set the element&#39;s {@code class} attribute to the supplied class names.
+<i>1225</i>&nbsp;     @param classNames set of classes
+<i>1226</i>&nbsp;     @return this element, for chaining
+<i>1227</i>&nbsp;     */
+<i>1228</i>&nbsp;    public Element classNames(Set&lt;String&gt; classNames) {
+<b class="fc"><i>1229</i>&nbsp;        Validate.notNull(classNames);</b>
+<b class="fc"><i>1230</i>&nbsp;        if (classNames.isEmpty()) {</b>
+<b class="fc"><i>1231</i>&nbsp;            attributes().remove(&quot;class&quot;);</b>
+<i>1232</i>&nbsp;        } else {
+<b class="fc"><i>1233</i>&nbsp;            attributes().put(&quot;class&quot;, StringUtil.join(classNames, &quot; &quot;));</b>
+<i>1234</i>&nbsp;        }
+<b class="fc"><i>1235</i>&nbsp;        return this;</b>
+<i>1236</i>&nbsp;    }
+<i>1237</i>&nbsp;
+<i>1238</i>&nbsp;    /**
+<i>1239</i>&nbsp;     * Tests if this element has a class. Case insensitive.
+<i>1240</i>&nbsp;     * @param className name of class to check for
+<i>1241</i>&nbsp;     * @return true if it does, false if not
+<i>1242</i>&nbsp;     */
+<i>1243</i>&nbsp;    // performance sensitive
+<i>1244</i>&nbsp;    public boolean hasClass(String className) {
+<b class="fc"><i>1245</i>&nbsp;        final String classAttr = attributes().getIgnoreCase(&quot;class&quot;);</b>
+<b class="fc"><i>1246</i>&nbsp;        final int len = classAttr.length();</b>
+<b class="fc"><i>1247</i>&nbsp;        final int wantLen = className.length();</b>
+<i>1248</i>&nbsp;
+<b class="fc"><i>1249</i>&nbsp;        if (len == 0 || len &lt; wantLen) {</b>
+<b class="fc"><i>1250</i>&nbsp;            return false;</b>
+<i>1251</i>&nbsp;        }
+<i>1252</i>&nbsp;
+<i>1253</i>&nbsp;        // if both lengths are equal, only need compare the className with the attribute
+<b class="fc"><i>1254</i>&nbsp;        if (len == wantLen) {</b>
+<b class="fc"><i>1255</i>&nbsp;            return className.equalsIgnoreCase(classAttr);</b>
+<i>1256</i>&nbsp;        }
+<i>1257</i>&nbsp;
+<i>1258</i>&nbsp;        // otherwise, scan for whitespace and compare regions (with no string or arraylist allocations)
+<b class="fc"><i>1259</i>&nbsp;        boolean inClass = false;</b>
+<b class="fc"><i>1260</i>&nbsp;        int start = 0;</b>
+<b class="fc"><i>1261</i>&nbsp;        for (int i = 0; i &lt; len; i++) {</b>
+<b class="fc"><i>1262</i>&nbsp;            if (Character.isWhitespace(classAttr.charAt(i))) {</b>
+<b class="fc"><i>1263</i>&nbsp;                if (inClass) {</b>
+<i>1264</i>&nbsp;                    // white space ends a class name, compare it with the requested one, ignore case
+<b class="fc"><i>1265</i>&nbsp;                    if (i - start == wantLen &amp;&amp; classAttr.regionMatches(true, start, className, 0, wantLen)) {</b>
+<b class="fc"><i>1266</i>&nbsp;                        return true;</b>
+<i>1267</i>&nbsp;                    }
+<b class="fc"><i>1268</i>&nbsp;                    inClass = false;</b>
+<i>1269</i>&nbsp;                }
+<i>1270</i>&nbsp;            } else {
+<b class="fc"><i>1271</i>&nbsp;                if (!inClass) {</b>
+<i>1272</i>&nbsp;                    // we&#39;re in a class name : keep the start of the substring
+<b class="fc"><i>1273</i>&nbsp;                    inClass = true;</b>
+<b class="fc"><i>1274</i>&nbsp;                    start = i;</b>
+<i>1275</i>&nbsp;                }
+<i>1276</i>&nbsp;            }
+<i>1277</i>&nbsp;        }
+<i>1278</i>&nbsp;
+<i>1279</i>&nbsp;        // check the last entry
+<b class="fc"><i>1280</i>&nbsp;        if (inClass &amp;&amp; len - start == wantLen) {</b>
+<b class="fc"><i>1281</i>&nbsp;            return classAttr.regionMatches(true, start, className, 0, wantLen);</b>
+<i>1282</i>&nbsp;        }
+<i>1283</i>&nbsp;
+<b class="fc"><i>1284</i>&nbsp;        return false;</b>
+<i>1285</i>&nbsp;    }
+<i>1286</i>&nbsp;
+<i>1287</i>&nbsp;    /**
+<i>1288</i>&nbsp;     Add a class name to this element&#39;s {@code class} attribute.
+<i>1289</i>&nbsp;     @param className class name to add
+<i>1290</i>&nbsp;     @return this element
+<i>1291</i>&nbsp;     */
+<i>1292</i>&nbsp;    public Element addClass(String className) {
+<b class="fc"><i>1293</i>&nbsp;        Validate.notNull(className);</b>
+<i>1294</i>&nbsp;
+<b class="fc"><i>1295</i>&nbsp;        Set&lt;String&gt; classes = classNames();</b>
+<b class="fc"><i>1296</i>&nbsp;        classes.add(className);</b>
+<b class="fc"><i>1297</i>&nbsp;        classNames(classes);</b>
+<i>1298</i>&nbsp;
+<b class="fc"><i>1299</i>&nbsp;        return this;</b>
+<i>1300</i>&nbsp;    }
+<i>1301</i>&nbsp;
+<i>1302</i>&nbsp;    /**
+<i>1303</i>&nbsp;     Remove a class name from this element&#39;s {@code class} attribute.
+<i>1304</i>&nbsp;     @param className class name to remove
+<i>1305</i>&nbsp;     @return this element
+<i>1306</i>&nbsp;     */
+<i>1307</i>&nbsp;    public Element removeClass(String className) {
+<b class="fc"><i>1308</i>&nbsp;        Validate.notNull(className);</b>
+<i>1309</i>&nbsp;
+<b class="fc"><i>1310</i>&nbsp;        Set&lt;String&gt; classes = classNames();</b>
+<b class="fc"><i>1311</i>&nbsp;        classes.remove(className);</b>
+<b class="fc"><i>1312</i>&nbsp;        classNames(classes);</b>
+<i>1313</i>&nbsp;
+<b class="fc"><i>1314</i>&nbsp;        return this;</b>
+<i>1315</i>&nbsp;    }
+<i>1316</i>&nbsp;
+<i>1317</i>&nbsp;    /**
+<i>1318</i>&nbsp;     Toggle a class name on this element&#39;s {@code class} attribute: if present, remove it; otherwise add it.
+<i>1319</i>&nbsp;     @param className class name to toggle
+<i>1320</i>&nbsp;     @return this element
+<i>1321</i>&nbsp;     */
+<i>1322</i>&nbsp;    public Element toggleClass(String className) {
+<b class="fc"><i>1323</i>&nbsp;        Validate.notNull(className);</b>
+<i>1324</i>&nbsp;
+<b class="fc"><i>1325</i>&nbsp;        Set&lt;String&gt; classes = classNames();</b>
+<b class="fc"><i>1326</i>&nbsp;        if (classes.contains(className))</b>
+<b class="fc"><i>1327</i>&nbsp;            classes.remove(className);</b>
+<i>1328</i>&nbsp;        else
+<b class="fc"><i>1329</i>&nbsp;            classes.add(className);</b>
+<b class="fc"><i>1330</i>&nbsp;        classNames(classes);</b>
+<i>1331</i>&nbsp;
+<b class="fc"><i>1332</i>&nbsp;        return this;</b>
+<i>1333</i>&nbsp;    }
+<i>1334</i>&nbsp;    
+<i>1335</i>&nbsp;    /**
+<i>1336</i>&nbsp;     * Get the value of a form element (input, textarea, etc).
+<i>1337</i>&nbsp;     * @return the value of the form element, or empty string if not set.
+<i>1338</i>&nbsp;     */
+<i>1339</i>&nbsp;    public String val() {
+<b class="fc"><i>1340</i>&nbsp;        if (tagName().equals(&quot;textarea&quot;))</b>
+<b class="fc"><i>1341</i>&nbsp;            return text();</b>
+<i>1342</i>&nbsp;        else
+<b class="fc"><i>1343</i>&nbsp;            return attr(&quot;value&quot;);</b>
+<i>1344</i>&nbsp;    }
+<i>1345</i>&nbsp;    
+<i>1346</i>&nbsp;    /**
+<i>1347</i>&nbsp;     * Set the value of a form element (input, textarea, etc).
+<i>1348</i>&nbsp;     * @param value value to set
+<i>1349</i>&nbsp;     * @return this element (for chaining)
+<i>1350</i>&nbsp;     */
+<i>1351</i>&nbsp;    public Element val(String value) {
+<b class="fc"><i>1352</i>&nbsp;        if (tagName().equals(&quot;textarea&quot;))</b>
+<b class="fc"><i>1353</i>&nbsp;            text(value);</b>
+<i>1354</i>&nbsp;        else
+<b class="fc"><i>1355</i>&nbsp;            attr(&quot;value&quot;, value);</b>
+<b class="fc"><i>1356</i>&nbsp;        return this;</b>
+<i>1357</i>&nbsp;    }
+<i>1358</i>&nbsp;
+<i>1359</i>&nbsp;    void outerHtmlHead(final Appendable accum, int depth, final Document.OutputSettings out) throws IOException {
+<b class="fc"><i>1360</i>&nbsp;        if (out.prettyPrint() &amp;&amp; (tag.formatAsBlock() || (parent() != null &amp;&amp; parent().tag().formatAsBlock()) || out.outline())) {</b>
+<b class="fc"><i>1361</i>&nbsp;            if (accum instanceof StringBuilder) {</b>
+<b class="fc"><i>1362</i>&nbsp;                if (((StringBuilder) accum).length() &gt; 0)</b>
+<b class="fc"><i>1363</i>&nbsp;                    indent(accum, depth, out);</b>
+<i>1364</i>&nbsp;            } else {
+<b class="nc"><i>1365</i>&nbsp;                indent(accum, depth, out);</b>
+<i>1366</i>&nbsp;            }
+<i>1367</i>&nbsp;        }
+<b class="fc"><i>1368</i>&nbsp;        accum.append(&#39;&lt;&#39;).append(tagName());</b>
+<b class="fc"><i>1369</i>&nbsp;        if (attributes != null) attributes.html(accum, out);</b>
+<i>1370</i>&nbsp;
+<i>1371</i>&nbsp;        // selfclosing includes unknown tags, isEmpty defines tags that are always empty
+<b class="fc"><i>1372</i>&nbsp;        if (childNodes.isEmpty() &amp;&amp; tag.isSelfClosing()) {</b>
+<b class="fc"><i>1373</i>&nbsp;            if (out.syntax() == Document.OutputSettings.Syntax.html &amp;&amp; tag.isEmpty())</b>
+<b class="fc"><i>1374</i>&nbsp;                accum.append(&#39;&gt;&#39;);</b>
+<i>1375</i>&nbsp;            else
+<b class="fc"><i>1376</i>&nbsp;                accum.append(&quot; /&gt;&quot;); // &lt;img&gt; in html, &lt;img /&gt; in xml</b>
+<i>1377</i>&nbsp;        }
+<i>1378</i>&nbsp;        else
+<b class="fc"><i>1379</i>&nbsp;            accum.append(&#39;&gt;&#39;);</b>
+<b class="fc"><i>1380</i>&nbsp;    }</b>
+<i>1381</i>&nbsp;
+<i>1382</i>&nbsp;	void outerHtmlTail(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+<b class="fc"><i>1383</i>&nbsp;        if (!(childNodes.isEmpty() &amp;&amp; tag.isSelfClosing())) {</b>
+<b class="fc"><i>1384</i>&nbsp;            if (out.prettyPrint() &amp;&amp; (!childNodes.isEmpty() &amp;&amp; (</b>
+<b class="fc"><i>1385</i>&nbsp;                    tag.formatAsBlock() || (out.outline() &amp;&amp; (childNodes.size()&gt;1 || (childNodes.size()==1 &amp;&amp; !(childNodes.get(0) instanceof TextNode))))</b>
+<i>1386</i>&nbsp;            )))
+<b class="fc"><i>1387</i>&nbsp;                indent(accum, depth, out);</b>
+<b class="fc"><i>1388</i>&nbsp;            accum.append(&quot;&lt;/&quot;).append(tagName()).append(&#39;&gt;&#39;);</b>
+<i>1389</i>&nbsp;        }
+<b class="fc"><i>1390</i>&nbsp;    }</b>
+<i>1391</i>&nbsp;
+<i>1392</i>&nbsp;    /**
+<i>1393</i>&nbsp;     * Retrieves the element&#39;s inner HTML. E.g. on a {@code &lt;div&gt;} with one empty {@code &lt;p&gt;}, would return
+<i>1394</i>&nbsp;     * {@code &lt;p&gt;&lt;/p&gt;}. (Whereas {@link #outerHtml()} would return {@code &lt;div&gt;&lt;p&gt;&lt;/p&gt;&lt;/div&gt;}.)
+<i>1395</i>&nbsp;     * 
+<i>1396</i>&nbsp;     * @return String of HTML.
+<i>1397</i>&nbsp;     * @see #outerHtml()
+<i>1398</i>&nbsp;     */
+<i>1399</i>&nbsp;    public String html() {
+<b class="fc"><i>1400</i>&nbsp;        StringBuilder accum = StringUtil.stringBuilder();</b>
+<b class="fc"><i>1401</i>&nbsp;        html(accum);</b>
+<b class="fc"><i>1402</i>&nbsp;        return getOutputSettings().prettyPrint() ? accum.toString().trim() : accum.toString();</b>
+<i>1403</i>&nbsp;    }
+<i>1404</i>&nbsp;
+<i>1405</i>&nbsp;    private void html(StringBuilder accum) {
+<b class="fc"><i>1406</i>&nbsp;        for (Node node : childNodes)</b>
+<b class="fc"><i>1407</i>&nbsp;            node.outerHtml(accum);</b>
+<b class="fc"><i>1408</i>&nbsp;    }</b>
+<i>1409</i>&nbsp;
+<i>1410</i>&nbsp;    /**
+<i>1411</i>&nbsp;     * {@inheritDoc}
+<i>1412</i>&nbsp;     */
+<i>1413</i>&nbsp;    @Override
+<i>1414</i>&nbsp;    public &lt;T extends Appendable&gt; T html(T appendable) {
+<b class="fc"><i>1415</i>&nbsp;        for (Node node : childNodes)</b>
+<b class="fc"><i>1416</i>&nbsp;            node.outerHtml(appendable);</b>
+<i>1417</i>&nbsp;
+<b class="fc"><i>1418</i>&nbsp;        return appendable;</b>
+<i>1419</i>&nbsp;    }
+<i>1420</i>&nbsp;    
+<i>1421</i>&nbsp;    /**
+<i>1422</i>&nbsp;     * Set this element&#39;s inner HTML. Clears the existing HTML first.
+<i>1423</i>&nbsp;     * @param html HTML to parse and set into this element
+<i>1424</i>&nbsp;     * @return this element
+<i>1425</i>&nbsp;     * @see #append(String)
+<i>1426</i>&nbsp;     */
+<i>1427</i>&nbsp;    public Element html(String html) {
+<b class="fc"><i>1428</i>&nbsp;        empty();</b>
+<b class="fc"><i>1429</i>&nbsp;        append(html);</b>
+<b class="fc"><i>1430</i>&nbsp;        return this;</b>
+<i>1431</i>&nbsp;    }
+<i>1432</i>&nbsp;
+<i>1433</i>&nbsp;	public String toString() {
+<b class="fc"><i>1434</i>&nbsp;        return outerHtml();</b>
+<i>1435</i>&nbsp;    }
+<i>1436</i>&nbsp;
+<i>1437</i>&nbsp;    @Override
+<i>1438</i>&nbsp;    public Element clone() {
+<b class="fc"><i>1439</i>&nbsp;        return (Element) super.clone();</b>
+<i>1440</i>&nbsp;    }
+<i>1441</i>&nbsp;
+<i>1442</i>&nbsp;    @Override
+<i>1443</i>&nbsp;    public Element shallowClone() {
+<i>1444</i>&nbsp;        // simpler than implementing a clone version with no child copy
+<b class="fc"><i>1445</i>&nbsp;        return new Element(tag, baseUri, attributes);</b>
+<i>1446</i>&nbsp;    }
+<i>1447</i>&nbsp;
+<i>1448</i>&nbsp;    @Override
+<i>1449</i>&nbsp;    protected Element doClone(Node parent) {
+<b class="fc"><i>1450</i>&nbsp;        Element clone = (Element) super.doClone(parent);</b>
+<b class="fc"><i>1451</i>&nbsp;        clone.attributes = attributes != null ? attributes.clone() : null;</b>
+<b class="fc"><i>1452</i>&nbsp;        clone.baseUri = baseUri;</b>
+<b class="fc"><i>1453</i>&nbsp;        clone.childNodes = new NodeList(clone, childNodes.size());</b>
+<b class="fc"><i>1454</i>&nbsp;        clone.childNodes.addAll(childNodes); // the children then get iterated and cloned in Node.clone</b>
+<i>1455</i>&nbsp;
+<b class="fc"><i>1456</i>&nbsp;        return clone;</b>
+<i>1457</i>&nbsp;    }
+<i>1458</i>&nbsp;
+<i>1459</i>&nbsp;    private static final class NodeList extends ChangeNotifyingArrayList&lt;Node&gt; {
+<i>1460</i>&nbsp;        private final Element owner;
+<i>1461</i>&nbsp;
+<i>1462</i>&nbsp;        NodeList(Element owner, int initialCapacity) {
+<b class="fc"><i>1463</i>&nbsp;            super(initialCapacity);</b>
+<b class="fc"><i>1464</i>&nbsp;            this.owner = owner;</b>
+<b class="fc"><i>1465</i>&nbsp;        }</b>
+<i>1466</i>&nbsp;
+<i>1467</i>&nbsp;        public void onContentsChanged() {
+<b class="fc"><i>1468</i>&nbsp;            owner.nodelistChanged();</b>
+<b class="fc"><i>1469</i>&nbsp;        }</b>
+<i>1470</i>&nbsp;    }
+<i>1471</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-19 13:25</div>
+</div>
+</body>
+</html>

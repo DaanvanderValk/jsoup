@@ -1,0 +1,106 @@
+* Starting client
+* Connecting to master process on port 11501
+* Analyzing classpath: 
+  - C:/Users/Daan/IdeaProjects/jsoup/target/classes
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\charsets.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\deploy.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\access-bridge-64.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\cldrdata.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\dnsns.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jaccess.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\localedata.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\nashorn.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunec.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunjce_provider.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunmscapi.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunpkcs11.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\zipfs.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\javaws.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jce.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jfr.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jfxswt.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jsse.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\management-agent.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\plugin.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\resources.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\rt.jar
+  - C:\Users\Daan\IdeaProjects\jsoup\target\test-classes
+  - C:\Users\Daan\IdeaProjects\jsoup\target\classes
+  - C:\Users\Daan\.m2\repository\junit\junit\4.12\junit-4.12.jar
+  - C:\Users\Daan\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar
+  - C:\Users\Daan\.m2\repository\com\google\code\gson\gson\2.7\gson-2.7.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-server\9.2.22.v20170606\jetty-server-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\javax\servlet\javax.servlet-api\3.1.0\javax.servlet-api-3.1.0.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-http\9.2.22.v20170606\jetty-http-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-util\9.2.22.v20170606\jetty-util-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-io\9.2.22.v20170606\jetty-io-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-servlet\9.2.22.v20170606\jetty-servlet-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-security\9.2.22.v20170606\jetty-security-9.2.22.v20170606.jar
+* Finished analyzing classpath
+* Generating tests for class org.jsoup.helper.Validate
+* Test criteria:
+  - Line Coverage
+  - Branch Coverage
+  - Exception
+  - Mutation testing (weak)
+  - Method-Output Coverage
+  - Top-Level Method Coverage
+  - No-Exception Top-Level Method Coverage
+  - Context Branch Coverage
+* Setting up search algorithm for whole suite generation
+[MASTER] 12:37:32.183 [pool-2-thread-1] WARN  TestSuiteSerialization - Cannot load tests because file does not exist: C:\Users\Daan\IdeaProjects\jsoup\.evosuite\evosuite-seeds\org.jsoup.helper.Validate.seed
+* Loaded 0 tests from C:\Users\Daan\IdeaProjects\jsoup\.evosuite\evosuite-seeds\org.jsoup.helper.Validate.seed
+* Total number of test goals: 
+  - Line 32
+  - Branch 26
+  - Exception 0
+  - MutationFactory 39
+  - Output 0
+  - Method 11
+  - MethodNoException 11
+  - CBranchFitnessFactory 26
+* Using seed 1524134241915
+* Starting evolution
+* Search finished after 69s and 291 generations, 46051 statements, best individual has fitness: 3.071428571428571
+* Writing sequences to pool
+* Minimizing test suite
+* Going to analyze the coverage criteria
+* Coverage analysis for criterion LINE
+* Coverage of criterion LINE: 97%
+* Total number of goals: 32
+* Number of covered goals: 31
+* Coverage analysis for criterion BRANCH
+* Coverage of criterion BRANCH: 100%
+* Total number of goals: 26
+* Number of covered goals: 26
+* Coverage analysis for criterion EXCEPTION
+* Coverage of criterion EXCEPTION: 100%
+* Total number of goals: 13
+* Number of covered goals: 13
+* Coverage analysis for criterion WEAKMUTATION
+* Coverage of criterion WEAKMUTATION: 92%
+* Total number of goals: 39
+* Number of covered goals: 36
+* Coverage analysis for criterion OUTPUT
+* Coverage of criterion OUTPUT: 100% (no goals)
+* Coverage analysis for criterion METHOD
+* Coverage of criterion METHOD: 100%
+* Total number of goals: 11
+* Number of covered goals: 11
+* Coverage analysis for criterion METHODNOEXCEPTION
+* Coverage of criterion METHODNOEXCEPTION: 91%
+* Total number of goals: 11
+* Number of covered goals: 10
+* Coverage analysis for criterion CBRANCH
+* Coverage of criterion CBRANCH: 100%
+* Total number of goals: 26
+* Number of covered goals: 26
+* Generated 25 tests with total length 37
+* Resulting test suite's coverage: 98% (average coverage for all fitness functions)
+* Generating assertions
+* Resulting test suite's mutation score: 49%
+* Compiling and checking tests
+* Writing JUnit test case 'Validate_ESTest' to C:\Users\Daan\IdeaProjects\jsoup\.evosuite\tmp_2018_04_19_12_13_31\tests
+* Done!
+

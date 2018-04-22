@@ -1,0 +1,109 @@
+* Starting client
+* Connecting to master process on port 14904
+* Analyzing classpath: 
+  - C:/Users/Daan/IdeaProjects/jsoup/target/classes
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\charsets.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\deploy.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\access-bridge-64.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\cldrdata.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\dnsns.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jaccess.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\localedata.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\nashorn.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunec.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunjce_provider.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunmscapi.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\sunpkcs11.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\zipfs.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\javaws.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jce.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jfr.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jfxswt.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\jsse.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\management-agent.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\plugin.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\resources.jar
+  - C:\Program Files\Java\jdk1.8.0_171\jre\lib\rt.jar
+  - C:\Users\Daan\IdeaProjects\jsoup\target\test-classes
+  - C:\Users\Daan\IdeaProjects\jsoup\target\classes
+  - C:\Users\Daan\.m2\repository\junit\junit\4.12\junit-4.12.jar
+  - C:\Users\Daan\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar
+  - C:\Users\Daan\.m2\repository\com\google\code\gson\gson\2.7\gson-2.7.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-server\9.2.22.v20170606\jetty-server-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\javax\servlet\javax.servlet-api\3.1.0\javax.servlet-api-3.1.0.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-http\9.2.22.v20170606\jetty-http-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-util\9.2.22.v20170606\jetty-util-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-io\9.2.22.v20170606\jetty-io-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-servlet\9.2.22.v20170606\jetty-servlet-9.2.22.v20170606.jar
+  - C:\Users\Daan\.m2\repository\org\eclipse\jetty\jetty-security\9.2.22.v20170606\jetty-security-9.2.22.v20170606.jar
+* Finished analyzing classpath
+* Generating tests for class org.jsoup.parser.ParseSettings
+* Test criteria:
+  - Line Coverage
+  - Branch Coverage
+  - Exception
+  - Mutation testing (weak)
+  - Method-Output Coverage
+  - Top-Level Method Coverage
+  - No-Exception Top-Level Method Coverage
+  - Context Branch Coverage
+* Setting up search algorithm for whole suite generation
+[MASTER] 12:41:35.477 [pool-2-thread-1] WARN  TestSuiteSerialization - Cannot load tests because file does not exist: C:\Users\Daan\IdeaProjects\jsoup\.evosuite\evosuite-seeds\org.jsoup.parser.ParseSettings.seed
+* Loaded 0 tests from C:\Users\Daan\IdeaProjects\jsoup\.evosuite\evosuite-seeds\org.jsoup.parser.ParseSettings.seed
+* Total number of test goals: 
+  - Line 15
+  - Branch 7
+  - Exception 0
+  - MutationFactory 6
+  - Output 10
+  - Method 4
+  - MethodNoException 4
+  - CBranchFitnessFactory 7
+* Using seed 1524134480160
+* Starting evolution
+[MASTER] 12:41:35.924 [pool-2-thread-1] WARN  TimeController - Phase INITIALIZATION lasted too long, 9 seconds more than allowed.
+* Search finished after 44s and 128 generations, 68232 statements, best individual has fitness: 5.25
+* Writing sequences to pool
+* Minimizing test suite
+* Going to analyze the coverage criteria
+* Coverage analysis for criterion LINE
+* Coverage of criterion LINE: 93%
+* Total number of goals: 15
+* Number of covered goals: 14
+* Coverage analysis for criterion BRANCH
+* Coverage of criterion BRANCH: 86%
+* Total number of goals: 7
+* Number of covered goals: 6
+* Coverage analysis for criterion EXCEPTION
+* Coverage of criterion EXCEPTION: 100%
+* Total number of goals: 3
+* Number of covered goals: 3
+* Coverage analysis for criterion WEAKMUTATION
+* Coverage of criterion WEAKMUTATION: 100%
+* Total number of goals: 6
+* Number of covered goals: 6
+* Coverage analysis for criterion OUTPUT
+* Coverage of criterion OUTPUT: 50%
+* Total number of goals: 10
+* Number of covered goals: 5
+* Coverage analysis for criterion METHOD
+* Coverage of criterion METHOD: 100%
+* Total number of goals: 4
+* Number of covered goals: 4
+* Coverage analysis for criterion METHODNOEXCEPTION
+* Coverage of criterion METHODNOEXCEPTION: 100%
+* Total number of goals: 4
+* Number of covered goals: 4
+* Coverage analysis for criterion CBRANCH
+* Coverage of criterion CBRANCH: 86%
+* Total number of goals: 7
+* Number of covered goals: 6
+* Generated 9 tests with total length 18
+* Resulting test suite's coverage: 94% (average coverage for all fitness functions)
+* Generating assertions
+* Resulting test suite's mutation score: 14%
+* Compiling and checking tests
+* Writing JUnit test case 'ParseSettings_ESTest' to C:\Users\Daan\IdeaProjects\jsoup\.evosuite\tmp_2018_04_19_12_13_31\tests
+* Done!
+

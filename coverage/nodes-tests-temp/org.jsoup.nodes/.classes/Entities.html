@@ -1,0 +1,502 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Entities</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.nodes</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Entities (org.jsoup.nodes)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Entities</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (14/ 16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.5%
+  </span>
+  <span class="absValue">
+    (97/ 122)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Entities$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Entities$CoreCharset</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Entities$EscapeMode</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (13/ 14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    88.5%
+  </span>
+  <span class="absValue">
+    (23/ 26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.9%
+  </span>
+  <span class="absValue">
+    (118/ 144)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.nodes;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.SerializationException;
+<i>4</i>&nbsp;import org.jsoup.helper.StringUtil;
+<i>5</i>&nbsp;import org.jsoup.helper.Validate;
+<i>6</i>&nbsp;import org.jsoup.parser.CharacterReader;
+<i>7</i>&nbsp;import org.jsoup.parser.Parser;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import java.io.IOException;
+<i>10</i>&nbsp;import java.nio.charset.CharsetEncoder;
+<i>11</i>&nbsp;import java.util.Arrays;
+<i>12</i>&nbsp;import java.util.HashMap;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;import static org.jsoup.nodes.Entities.EscapeMode.base;
+<i>15</i>&nbsp;import static org.jsoup.nodes.Entities.EscapeMode.extended;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;/**
+<i>18</i>&nbsp; * HTML entities, and escape routines. Source: &lt;a href=&quot;http://www.w3.org/TR/html5/named-character-references.html#named-character-references&quot;&gt;W3C
+<i>19</i>&nbsp; * HTML named character references&lt;/a&gt;.
+<i>20</i>&nbsp; */
+<b class="fc"><i>21</i>&nbsp;public class Entities {</b>
+<i>22</i>&nbsp;    private static final int empty = -1;
+<i>23</i>&nbsp;    private static final String emptyName = &quot;&quot;;
+<i>24</i>&nbsp;    static final int codepointRadix = 36;
+<b class="fc"><i>25</i>&nbsp;    private static final char[] codeDelims = {&#39;,&#39;, &#39;;&#39;};</b>
+<b class="fc"><i>26</i>&nbsp;    private static final HashMap&lt;String, String&gt; multipoints = new HashMap&lt;&gt;(); // name -&gt; multiple character references</b>
+<b class="fc"><i>27</i>&nbsp;    private static final Document.OutputSettings DefaultOutput = new Document.OutputSettings();</b>
+<i>28</i>&nbsp;
+<b class="fc"><i>29</i>&nbsp;    public enum EscapeMode {</b>
+<i>30</i>&nbsp;        /**
+<i>31</i>&nbsp;         * Restricted entities suitable for XHTML output: lt, gt, amp, and quot only.
+<i>32</i>&nbsp;         */
+<b class="fc"><i>33</i>&nbsp;        xhtml(EntitiesData.xmlPoints, 4),</b>
+<i>34</i>&nbsp;        /**
+<i>35</i>&nbsp;         * Default HTML output entities.
+<i>36</i>&nbsp;         */
+<b class="fc"><i>37</i>&nbsp;        base(EntitiesData.basePoints, 106),</b>
+<i>38</i>&nbsp;        /**
+<i>39</i>&nbsp;         * Complete HTML entities.
+<i>40</i>&nbsp;         */
+<b class="fc"><i>41</i>&nbsp;        extended(EntitiesData.fullPoints, 2125);</b>
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;        // table of named references to their codepoints. sorted so we can binary search. built by BuildEntities.
+<i>44</i>&nbsp;        private String[] nameKeys;
+<i>45</i>&nbsp;        private int[] codeVals; // limitation is the few references with multiple characters; those go into multipoints.
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;        // table of codepoints to named entities.
+<i>48</i>&nbsp;        private int[] codeKeys; // we don&#39; support multicodepoints to single named value currently
+<i>49</i>&nbsp;        private String[] nameVals;
+<i>50</i>&nbsp;
+<b class="fc"><i>51</i>&nbsp;        EscapeMode(String file, int size) {</b>
+<b class="fc"><i>52</i>&nbsp;            load(this, file, size);</b>
+<b class="fc"><i>53</i>&nbsp;        }</b>
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;        int codepointForName(final String name) {
+<b class="fc"><i>56</i>&nbsp;            int index = Arrays.binarySearch(nameKeys, name);</b>
+<b class="fc"><i>57</i>&nbsp;            return index &gt;= 0 ? codeVals[index] : empty;</b>
+<i>58</i>&nbsp;        }
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;        String nameForCodepoint(final int codepoint) {
+<b class="fc"><i>61</i>&nbsp;            final int index = Arrays.binarySearch(codeKeys, codepoint);</b>
+<b class="fc"><i>62</i>&nbsp;            if (index &gt;= 0) {</b>
+<i>63</i>&nbsp;                // the results are ordered so lower case versions of same codepoint come after uppercase, and we prefer to emit lower
+<i>64</i>&nbsp;                // (and binary search for same item with multi results is undefined
+<b class="fc"><i>65</i>&nbsp;                return (index &lt; nameVals.length - 1 &amp;&amp; codeKeys[index + 1] == codepoint) ?</b>
+<i>66</i>&nbsp;                    nameVals[index + 1] : nameVals[index];
+<i>67</i>&nbsp;            }
+<b class="fc"><i>68</i>&nbsp;            return emptyName;</b>
+<i>69</i>&nbsp;        }
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;        private int size() {
+<b class="nc"><i>72</i>&nbsp;            return nameKeys.length;</b>
+<i>73</i>&nbsp;        }
+<i>74</i>&nbsp;    }
+<i>75</i>&nbsp;
+<b class="nc"><i>76</i>&nbsp;    private Entities() {</b>
+<b class="nc"><i>77</i>&nbsp;    }</b>
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;    /**
+<i>80</i>&nbsp;     * Check if the input is a known named entity
+<i>81</i>&nbsp;     *
+<i>82</i>&nbsp;     * @param name the possible entity name (e.g. &quot;lt&quot; or &quot;amp&quot;)
+<i>83</i>&nbsp;     * @return true if a known named entity
+<i>84</i>&nbsp;     */
+<i>85</i>&nbsp;    public static boolean isNamedEntity(final String name) {
+<b class="fc"><i>86</i>&nbsp;        return extended.codepointForName(name) != empty;</b>
+<i>87</i>&nbsp;    }
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;    /**
+<i>90</i>&nbsp;     * Check if the input is a known named entity in the base entity set.
+<i>91</i>&nbsp;     *
+<i>92</i>&nbsp;     * @param name the possible entity name (e.g. &quot;lt&quot; or &quot;amp&quot;)
+<i>93</i>&nbsp;     * @return true if a known named entity in the base set
+<i>94</i>&nbsp;     * @see #isNamedEntity(String)
+<i>95</i>&nbsp;     */
+<i>96</i>&nbsp;    public static boolean isBaseNamedEntity(final String name) {
+<b class="fc"><i>97</i>&nbsp;        return base.codepointForName(name) != empty;</b>
+<i>98</i>&nbsp;    }
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;    /**
+<i>101</i>&nbsp;     * Get the Character value of the named entity
+<i>102</i>&nbsp;     *
+<i>103</i>&nbsp;     * @param name named entity (e.g. &quot;lt&quot; or &quot;amp&quot;)
+<i>104</i>&nbsp;     * @return the Character value of the named entity (e.g. &#39;{@literal &lt;}&#39; or &#39;{@literal &amp;}&#39;)
+<i>105</i>&nbsp;     * @deprecated does not support characters outside the BMP or multiple character names
+<i>106</i>&nbsp;     */
+<i>107</i>&nbsp;    public static Character getCharacterByName(String name) {
+<b class="fc"><i>108</i>&nbsp;        return (char) extended.codepointForName(name);</b>
+<i>109</i>&nbsp;    }
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;    /**
+<i>112</i>&nbsp;     * Get the character(s) represented by the named entity
+<i>113</i>&nbsp;     *
+<i>114</i>&nbsp;     * @param name entity (e.g. &quot;lt&quot; or &quot;amp&quot;)
+<i>115</i>&nbsp;     * @return the string value of the character(s) represented by this entity, or &quot;&quot; if not defined
+<i>116</i>&nbsp;     */
+<i>117</i>&nbsp;    public static String getByName(String name) {
+<b class="fc"><i>118</i>&nbsp;        String val = multipoints.get(name);</b>
+<b class="fc"><i>119</i>&nbsp;        if (val != null)</b>
+<b class="nc"><i>120</i>&nbsp;            return val;</b>
+<b class="fc"><i>121</i>&nbsp;        int codepoint = extended.codepointForName(name);</b>
+<b class="fc"><i>122</i>&nbsp;        if (codepoint != empty)</b>
+<b class="nc"><i>123</i>&nbsp;            return new String(new int[]{codepoint}, 0, 1);</b>
+<b class="fc"><i>124</i>&nbsp;        return emptyName;</b>
+<i>125</i>&nbsp;    }
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;    public static int codepointsForName(final String name, final int[] codepoints) {
+<b class="fc"><i>128</i>&nbsp;        String val = multipoints.get(name);</b>
+<b class="fc"><i>129</i>&nbsp;        if (val != null) {</b>
+<b class="nc"><i>130</i>&nbsp;            codepoints[0] = val.codePointAt(0);</b>
+<b class="nc"><i>131</i>&nbsp;            codepoints[1] = val.codePointAt(1);</b>
+<b class="nc"><i>132</i>&nbsp;            return 2;</b>
+<i>133</i>&nbsp;        }
+<b class="fc"><i>134</i>&nbsp;        int codepoint = extended.codepointForName(name);</b>
+<b class="fc"><i>135</i>&nbsp;        if (codepoint != empty) {</b>
+<b class="fc"><i>136</i>&nbsp;            codepoints[0] = codepoint;</b>
+<b class="fc"><i>137</i>&nbsp;            return 1;</b>
+<i>138</i>&nbsp;        }
+<b class="fc"><i>139</i>&nbsp;        return 0;</b>
+<i>140</i>&nbsp;    }
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;    /**
+<i>143</i>&nbsp;     * HTML escape an input string. That is, {@code &lt;} is returned as {@code &amp;lt;}
+<i>144</i>&nbsp;     *
+<i>145</i>&nbsp;     * @param string the un-escaped string to escape
+<i>146</i>&nbsp;     * @param out the output settings to use
+<i>147</i>&nbsp;     * @return the escaped string
+<i>148</i>&nbsp;     */
+<i>149</i>&nbsp;    public static String escape(String string, Document.OutputSettings out) {
+<b class="fc"><i>150</i>&nbsp;        if (string == null)</b>
+<b class="fc"><i>151</i>&nbsp;            return &quot;&quot;;</b>
+<b class="fc"><i>152</i>&nbsp;        StringBuilder accum = new StringBuilder(string.length() * 2);</b>
+<i>153</i>&nbsp;        try {
+<b class="fc"><i>154</i>&nbsp;            escape(accum, string, out, false, false, false);</b>
+<b class="nc"><i>155</i>&nbsp;        } catch (IOException e) {</b>
+<b class="nc"><i>156</i>&nbsp;            throw new SerializationException(e); // doesn&#39;t happen</b>
+<b class="fc"><i>157</i>&nbsp;        }</b>
+<b class="fc"><i>158</i>&nbsp;        return accum.toString();</b>
+<i>159</i>&nbsp;    }
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;    /**
+<i>162</i>&nbsp;     * HTML escape an input string, using the default settings (UTF-8, base entities). That is, {@code &lt;} is returned as
+<i>163</i>&nbsp;     * {@code &amp;lt;}
+<i>164</i>&nbsp;     *
+<i>165</i>&nbsp;     * @param string the un-escaped string to escape
+<i>166</i>&nbsp;     * @return the escaped string
+<i>167</i>&nbsp;     */
+<i>168</i>&nbsp;    public static String escape(String string) {
+<b class="fc"><i>169</i>&nbsp;        return escape(string, DefaultOutput);</b>
+<i>170</i>&nbsp;    }
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;    // this method is ugly, and does a lot. but other breakups cause rescanning and stringbuilder generations
+<i>173</i>&nbsp;    static void escape(Appendable accum, String string, Document.OutputSettings out,
+<i>174</i>&nbsp;                       boolean inAttribute, boolean normaliseWhite, boolean stripLeadingWhite) throws IOException {
+<i>175</i>&nbsp;
+<b class="fc"><i>176</i>&nbsp;        boolean lastWasWhite = false;</b>
+<b class="fc"><i>177</i>&nbsp;        boolean reachedNonWhite = false;</b>
+<b class="fc"><i>178</i>&nbsp;        final EscapeMode escapeMode = out.escapeMode();</b>
+<b class="fc"><i>179</i>&nbsp;        final CharsetEncoder encoder = out.encoder();</b>
+<b class="fc"><i>180</i>&nbsp;        final CoreCharset coreCharset = out.coreCharset; // init in out.prepareEncoder()</b>
+<b class="fc"><i>181</i>&nbsp;        final int length = string.length();</b>
+<i>182</i>&nbsp;
+<i>183</i>&nbsp;        int codePoint;
+<b class="fc"><i>184</i>&nbsp;        for (int offset = 0; offset &lt; length; offset += Character.charCount(codePoint)) {</b>
+<b class="fc"><i>185</i>&nbsp;            codePoint = string.codePointAt(offset);</b>
+<i>186</i>&nbsp;
+<b class="fc"><i>187</i>&nbsp;            if (normaliseWhite) {</b>
+<b class="fc"><i>188</i>&nbsp;                if (StringUtil.isWhitespace(codePoint)) {</b>
+<b class="fc"><i>189</i>&nbsp;                    if ((stripLeadingWhite &amp;&amp; !reachedNonWhite) || lastWasWhite)</b>
+<b class="fc"><i>190</i>&nbsp;                        continue;</b>
+<b class="fc"><i>191</i>&nbsp;                    accum.append(&#39; &#39;);</b>
+<b class="fc"><i>192</i>&nbsp;                    lastWasWhite = true;</b>
+<b class="fc"><i>193</i>&nbsp;                    continue;</b>
+<i>194</i>&nbsp;                } else {
+<b class="fc"><i>195</i>&nbsp;                    lastWasWhite = false;</b>
+<b class="fc"><i>196</i>&nbsp;                    reachedNonWhite = true;</b>
+<i>197</i>&nbsp;                }
+<i>198</i>&nbsp;            }
+<i>199</i>&nbsp;            // surrogate pairs, split implementation for efficiency on single char common case (saves creating strings, char[]):
+<b class="fc"><i>200</i>&nbsp;            if (codePoint &lt; Character.MIN_SUPPLEMENTARY_CODE_POINT) {</b>
+<b class="fc"><i>201</i>&nbsp;                final char c = (char) codePoint;</b>
+<i>202</i>&nbsp;                // html specific and required escapes:
+<b class="fc"><i>203</i>&nbsp;                switch (c) {</b>
+<i>204</i>&nbsp;                    case &#39;&amp;&#39;:
+<b class="fc"><i>205</i>&nbsp;                        accum.append(&quot;&amp;amp;&quot;);</b>
+<b class="fc"><i>206</i>&nbsp;                        break;</b>
+<i>207</i>&nbsp;                    case 0xA0:
+<b class="nc"><i>208</i>&nbsp;                        if (escapeMode != EscapeMode.xhtml)</b>
+<b class="nc"><i>209</i>&nbsp;                            accum.append(&quot;&amp;nbsp;&quot;);</b>
+<i>210</i>&nbsp;                        else
+<b class="nc"><i>211</i>&nbsp;                            accum.append(&quot;&amp;#xa0;&quot;);</b>
+<b class="nc"><i>212</i>&nbsp;                        break;</b>
+<i>213</i>&nbsp;                    case &#39;&lt;&#39;:
+<i>214</i>&nbsp;                        // escape when in character data or when in a xml attribue val; not needed in html attr val
+<b class="fc"><i>215</i>&nbsp;                        if (!inAttribute || escapeMode == EscapeMode.xhtml)</b>
+<b class="fc"><i>216</i>&nbsp;                            accum.append(&quot;&amp;lt;&quot;);</b>
+<i>217</i>&nbsp;                        else
+<b class="nc"><i>218</i>&nbsp;                            accum.append(c);</b>
+<b class="nc"><i>219</i>&nbsp;                        break;</b>
+<i>220</i>&nbsp;                    case &#39;&gt;&#39;:
+<b class="fc"><i>221</i>&nbsp;                        if (!inAttribute)</b>
+<b class="fc"><i>222</i>&nbsp;                            accum.append(&quot;&amp;gt;&quot;);</b>
+<i>223</i>&nbsp;                        else
+<b class="fc"><i>224</i>&nbsp;                            accum.append(c);</b>
+<b class="fc"><i>225</i>&nbsp;                        break;</b>
+<i>226</i>&nbsp;                    case &#39;&quot;&#39;:
+<b class="fc"><i>227</i>&nbsp;                        if (inAttribute)</b>
+<b class="fc"><i>228</i>&nbsp;                            accum.append(&quot;&amp;quot;&quot;);</b>
+<i>229</i>&nbsp;                        else
+<b class="fc"><i>230</i>&nbsp;                            accum.append(c);</b>
+<b class="fc"><i>231</i>&nbsp;                        break;</b>
+<i>232</i>&nbsp;                    default:
+<b class="fc"><i>233</i>&nbsp;                        if (canEncode(coreCharset, c, encoder))</b>
+<b class="fc"><i>234</i>&nbsp;                            accum.append(c);</b>
+<i>235</i>&nbsp;                        else
+<b class="nc"><i>236</i>&nbsp;                            appendEncoded(accum, escapeMode, codePoint);</b>
+<i>237</i>&nbsp;                }
+<b class="fc"><i>238</i>&nbsp;            } else {</b>
+<b class="nc"><i>239</i>&nbsp;                final String c = new String(Character.toChars(codePoint));</b>
+<b class="nc"><i>240</i>&nbsp;                if (encoder.canEncode(c)) // uses fallback encoder for simplicity</b>
+<b class="nc"><i>241</i>&nbsp;                    accum.append(c);</b>
+<i>242</i>&nbsp;                else
+<b class="nc"><i>243</i>&nbsp;                    appendEncoded(accum, escapeMode, codePoint);</b>
+<i>244</i>&nbsp;            }
+<i>245</i>&nbsp;        }
+<b class="fc"><i>246</i>&nbsp;    }</b>
+<i>247</i>&nbsp;
+<i>248</i>&nbsp;    private static void appendEncoded(Appendable accum, EscapeMode escapeMode, int codePoint) throws IOException {
+<b class="nc"><i>249</i>&nbsp;        final String name = escapeMode.nameForCodepoint(codePoint);</b>
+<b class="nc"><i>250</i>&nbsp;        if (name != emptyName) // ok for identity check</b>
+<b class="nc"><i>251</i>&nbsp;            accum.append(&#39;&amp;&#39;).append(name).append(&#39;;&#39;);</b>
+<i>252</i>&nbsp;        else
+<b class="nc"><i>253</i>&nbsp;            accum.append(&quot;&amp;#x&quot;).append(Integer.toHexString(codePoint)).append(&#39;;&#39;);</b>
+<b class="nc"><i>254</i>&nbsp;    }</b>
+<i>255</i>&nbsp;
+<i>256</i>&nbsp;    /**
+<i>257</i>&nbsp;     * Un-escape an HTML escaped string. That is, {@code &amp;lt;} is returned as {@code &lt;}.
+<i>258</i>&nbsp;     *
+<i>259</i>&nbsp;     * @param string the HTML string to un-escape
+<i>260</i>&nbsp;     * @return the unescaped string
+<i>261</i>&nbsp;     */
+<i>262</i>&nbsp;    public static String unescape(String string) {
+<b class="fc"><i>263</i>&nbsp;        return unescape(string, false);</b>
+<i>264</i>&nbsp;    }
+<i>265</i>&nbsp;
+<i>266</i>&nbsp;    /**
+<i>267</i>&nbsp;     * Unescape the input string.
+<i>268</i>&nbsp;     *
+<i>269</i>&nbsp;     * @param string to un-HTML-escape
+<i>270</i>&nbsp;     * @param strict if &quot;strict&quot; (that is, requires trailing &#39;;&#39; char, otherwise that&#39;s optional)
+<i>271</i>&nbsp;     * @return unescaped string
+<i>272</i>&nbsp;     */
+<i>273</i>&nbsp;    static String unescape(String string, boolean strict) {
+<b class="fc"><i>274</i>&nbsp;        return Parser.unescapeEntities(string, strict);</b>
+<i>275</i>&nbsp;    }
+<i>276</i>&nbsp;
+<i>277</i>&nbsp;    /*
+<i>278</i>&nbsp;     * Provides a fast-path for Encoder.canEncode, which drastically improves performance on Android post JellyBean.
+<i>279</i>&nbsp;     * After KitKat, the implementation of canEncode degrades to the point of being useless. For non ASCII or UTF,
+<i>280</i>&nbsp;     * performance may be bad. We can add more encoders for common character sets that are impacted by performance
+<i>281</i>&nbsp;     * issues on Android if required.
+<i>282</i>&nbsp;     *
+<i>283</i>&nbsp;     * Benchmarks:     *
+<i>284</i>&nbsp;     * OLD toHtml() impl v New (fastpath) in millis
+<i>285</i>&nbsp;     * Wiki: 1895, 16
+<i>286</i>&nbsp;     * CNN: 6378, 55
+<i>287</i>&nbsp;     * Alterslash: 3013, 28
+<i>288</i>&nbsp;     * Jsoup: 167, 2
+<i>289</i>&nbsp;     */
+<i>290</i>&nbsp;    private static boolean canEncode(final CoreCharset charset, final char c, final CharsetEncoder fallback) {
+<i>291</i>&nbsp;        // todo add more charset tests if impacted by Android&#39;s bad perf in canEncode
+<b class="fc"><i>292</i>&nbsp;        switch (charset) {</b>
+<i>293</i>&nbsp;            case ascii:
+<b class="fc"><i>294</i>&nbsp;                return c &lt; 0x80;</b>
+<i>295</i>&nbsp;            case utf:
+<b class="fc"><i>296</i>&nbsp;                return true; // real is:!(Character.isLowSurrogate(c) || Character.isHighSurrogate(c)); - but already check above</b>
+<i>297</i>&nbsp;            default:
+<b class="fc"><i>298</i>&nbsp;                return fallback.canEncode(c);</b>
+<i>299</i>&nbsp;        }
+<i>300</i>&nbsp;    }
+<i>301</i>&nbsp;
+<b class="fc"><i>302</i>&nbsp;    enum CoreCharset {</b>
+<b class="fc"><i>303</i>&nbsp;        ascii, utf, fallback;</b>
+<i>304</i>&nbsp;
+<i>305</i>&nbsp;        static CoreCharset byName(final String name) {
+<b class="fc"><i>306</i>&nbsp;            if (name.equals(&quot;US-ASCII&quot;))</b>
+<b class="fc"><i>307</i>&nbsp;                return ascii;</b>
+<b class="fc"><i>308</i>&nbsp;            if (name.startsWith(&quot;UTF-&quot;)) // covers UTF-8, UTF-16, et al</b>
+<b class="fc"><i>309</i>&nbsp;                return utf;</b>
+<b class="fc"><i>310</i>&nbsp;            return fallback;</b>
+<i>311</i>&nbsp;        }
+<i>312</i>&nbsp;    }
+<i>313</i>&nbsp;
+<i>314</i>&nbsp;    private static void load(EscapeMode e, String pointsData, int size) {
+<b class="fc"><i>315</i>&nbsp;        e.nameKeys = new String[size];</b>
+<b class="fc"><i>316</i>&nbsp;        e.codeVals = new int[size];</b>
+<b class="fc"><i>317</i>&nbsp;        e.codeKeys = new int[size];</b>
+<b class="fc"><i>318</i>&nbsp;        e.nameVals = new String[size];</b>
+<i>319</i>&nbsp;
+<b class="fc"><i>320</i>&nbsp;        int i = 0;</b>
+<b class="fc"><i>321</i>&nbsp;        CharacterReader reader = new CharacterReader(pointsData);</b>
+<i>322</i>&nbsp;
+<b class="fc"><i>323</i>&nbsp;        while (!reader.isEmpty()) {</b>
+<i>324</i>&nbsp;            // NotNestedLessLess=10913,824;1887&amp;
+<i>325</i>&nbsp;
+<b class="fc"><i>326</i>&nbsp;            final String name = reader.consumeTo(&#39;=&#39;);</b>
+<b class="fc"><i>327</i>&nbsp;            reader.advance();</b>
+<b class="fc"><i>328</i>&nbsp;            final int cp1 = Integer.parseInt(reader.consumeToAny(codeDelims), codepointRadix);</b>
+<b class="fc"><i>329</i>&nbsp;            final char codeDelim = reader.current();</b>
+<b class="fc"><i>330</i>&nbsp;            reader.advance();</b>
+<i>331</i>&nbsp;            final int cp2;
+<b class="fc"><i>332</i>&nbsp;            if (codeDelim == &#39;,&#39;) {</b>
+<b class="fc"><i>333</i>&nbsp;                cp2 = Integer.parseInt(reader.consumeTo(&#39;;&#39;), codepointRadix);</b>
+<b class="fc"><i>334</i>&nbsp;                reader.advance();</b>
+<i>335</i>&nbsp;            } else {
+<b class="fc"><i>336</i>&nbsp;                cp2 = empty;</b>
+<i>337</i>&nbsp;            }
+<b class="fc"><i>338</i>&nbsp;            final String indexS = reader.consumeTo(&#39;&amp;&#39;);</b>
+<b class="fc"><i>339</i>&nbsp;            final int index = Integer.parseInt(indexS, codepointRadix);</b>
+<b class="fc"><i>340</i>&nbsp;            reader.advance();</b>
+<i>341</i>&nbsp;
+<b class="fc"><i>342</i>&nbsp;            e.nameKeys[i] = name;</b>
+<b class="fc"><i>343</i>&nbsp;            e.codeVals[i] = cp1;</b>
+<b class="fc"><i>344</i>&nbsp;            e.codeKeys[index] = cp1;</b>
+<b class="fc"><i>345</i>&nbsp;            e.nameVals[index] = name;</b>
+<i>346</i>&nbsp;
+<b class="fc"><i>347</i>&nbsp;            if (cp2 != empty) {</b>
+<b class="fc"><i>348</i>&nbsp;                multipoints.put(name, new String(new int[]{cp1, cp2}, 0, 2));</b>
+<i>349</i>&nbsp;            }
+<b class="fc"><i>350</i>&nbsp;            i++;</b>
+<b class="fc"><i>351</i>&nbsp;        }</b>
+<i>352</i>&nbsp;
+<b class="fc"><i>353</i>&nbsp;        Validate.isTrue(i == size, &quot;Unexpected count of entities loaded&quot;);</b>
+<b class="fc"><i>354</i>&nbsp;    }</b>
+<i>355</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-19 14:53</div>
+</div>
+</body>
+</html>

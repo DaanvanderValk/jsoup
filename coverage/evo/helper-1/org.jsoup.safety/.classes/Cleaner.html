@@ -1,0 +1,303 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Cleaner</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.safety</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Cleaner (org.jsoup.safety)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Cleaner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 37)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Cleaner$CleaningVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 27)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Cleaner$ElementMeta</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 67)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.safety;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.jsoup.helper.Validate;
+<i>4</i>&nbsp;import org.jsoup.nodes.Attribute;
+<i>5</i>&nbsp;import org.jsoup.nodes.Attributes;
+<i>6</i>&nbsp;import org.jsoup.nodes.DataNode;
+<i>7</i>&nbsp;import org.jsoup.nodes.Document;
+<i>8</i>&nbsp;import org.jsoup.nodes.Element;
+<i>9</i>&nbsp;import org.jsoup.nodes.Node;
+<i>10</i>&nbsp;import org.jsoup.nodes.TextNode;
+<i>11</i>&nbsp;import org.jsoup.parser.ParseErrorList;
+<i>12</i>&nbsp;import org.jsoup.parser.Parser;
+<i>13</i>&nbsp;import org.jsoup.parser.Tag;
+<i>14</i>&nbsp;import org.jsoup.select.NodeTraversor;
+<i>15</i>&nbsp;import org.jsoup.select.NodeVisitor;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;import java.util.List;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;/**
+<i>21</i>&nbsp; The whitelist based HTML cleaner. Use to ensure that end-user provided HTML contains only the elements and attributes
+<i>22</i>&nbsp; that you are expecting; no junk, and no cross-site scripting attacks!
+<i>23</i>&nbsp; &lt;p&gt;
+<i>24</i>&nbsp; The HTML cleaner parses the input as HTML and then runs it through a white-list, so the output HTML can only contain
+<i>25</i>&nbsp; HTML that is allowed by the whitelist.
+<i>26</i>&nbsp; &lt;/p&gt;
+<i>27</i>&nbsp; &lt;p&gt;
+<i>28</i>&nbsp; It is assumed that the input HTML is a body fragment; the clean methods only pull from the source&#39;s body, and the
+<i>29</i>&nbsp; canned white-lists only allow body contained tags.
+<i>30</i>&nbsp; &lt;/p&gt;
+<i>31</i>&nbsp; &lt;p&gt;
+<i>32</i>&nbsp; Rather than interacting directly with a Cleaner object, generally see the {@code clean} methods in {@link org.jsoup.Jsoup}.
+<i>33</i>&nbsp; &lt;/p&gt;
+<i>34</i>&nbsp; */
+<b class="nc"><i>35</i>&nbsp;public class Cleaner {</b>
+<i>36</i>&nbsp;    private Whitelist whitelist;
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    /**
+<i>39</i>&nbsp;     Create a new cleaner, that sanitizes documents using the supplied whitelist.
+<i>40</i>&nbsp;     @param whitelist white-list to clean with
+<i>41</i>&nbsp;     */
+<b class="nc"><i>42</i>&nbsp;    public Cleaner(Whitelist whitelist) {</b>
+<b class="nc"><i>43</i>&nbsp;        Validate.notNull(whitelist);</b>
+<b class="nc"><i>44</i>&nbsp;        this.whitelist = whitelist;</b>
+<i>45</i>&nbsp;    }
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;    /**
+<i>48</i>&nbsp;     Creates a new, clean document, from the original dirty document, containing only elements allowed by the whitelist.
+<i>49</i>&nbsp;     The original document is not modified. Only elements from the dirt document&#39;s &lt;code&gt;body&lt;/code&gt; are used.
+<i>50</i>&nbsp;     @param dirtyDocument Untrusted base document to clean.
+<i>51</i>&nbsp;     @return cleaned document.
+<i>52</i>&nbsp;     */
+<i>53</i>&nbsp;    public Document clean(Document dirtyDocument) {
+<b class="nc"><i>54</i>&nbsp;        Validate.notNull(dirtyDocument);</b>
+<i>55</i>&nbsp;
+<b class="nc"><i>56</i>&nbsp;        Document clean = Document.createShell(dirtyDocument.baseUri());</b>
+<b class="nc"><i>57</i>&nbsp;        if (dirtyDocument.body() != null) // frameset documents won&#39;t have a body. the clean doc will have empty body.</b>
+<b class="nc"><i>58</i>&nbsp;            copySafeNodes(dirtyDocument.body(), clean.body());</b>
+<i>59</i>&nbsp;
+<b class="nc"><i>60</i>&nbsp;        return clean;</b>
+<i>61</i>&nbsp;    }
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;    /**
+<i>64</i>&nbsp;     Determines if the input document &lt;b&gt;body&lt;/b&gt;is valid, against the whitelist. It is considered valid if all the tags and attributes
+<i>65</i>&nbsp;     in the input HTML are allowed by the whitelist, and that there is no content in the &lt;code&gt;head&lt;/code&gt;.
+<i>66</i>&nbsp;     &lt;p&gt;
+<i>67</i>&nbsp;     This method can be used as a validator for user input. An invalid document will still be cleaned successfully
+<i>68</i>&nbsp;     using the {@link #clean(Document)} document. If using as a validator, it is recommended to still clean the document
+<i>69</i>&nbsp;     to ensure enforced attributes are set correctly, and that the output is tidied.
+<i>70</i>&nbsp;     &lt;/p&gt;
+<i>71</i>&nbsp;     @param dirtyDocument document to test
+<i>72</i>&nbsp;     @return true if no tags or attributes need to be removed; false if they do
+<i>73</i>&nbsp;     */
+<i>74</i>&nbsp;    public boolean isValid(Document dirtyDocument) {
+<b class="nc"><i>75</i>&nbsp;        Validate.notNull(dirtyDocument);</b>
+<i>76</i>&nbsp;
+<b class="nc"><i>77</i>&nbsp;        Document clean = Document.createShell(dirtyDocument.baseUri());</b>
+<b class="nc"><i>78</i>&nbsp;        int numDiscarded = copySafeNodes(dirtyDocument.body(), clean.body());</b>
+<b class="nc"><i>79</i>&nbsp;        return numDiscarded == 0</b>
+<b class="nc"><i>80</i>&nbsp;            &amp;&amp; dirtyDocument.head().childNodes().size() == 0; // because we only look at the body, but we start from a shell, make sure there&#39;s nothing in the head</b>
+<i>81</i>&nbsp;    }
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;    public boolean isValidBodyHtml(String bodyHtml) {
+<b class="nc"><i>84</i>&nbsp;        Document clean = Document.createShell(&quot;&quot;);</b>
+<b class="nc"><i>85</i>&nbsp;        Document dirty = Document.createShell(&quot;&quot;);</b>
+<b class="nc"><i>86</i>&nbsp;        ParseErrorList errorList = ParseErrorList.tracking(1);</b>
+<b class="nc"><i>87</i>&nbsp;        List&lt;Node&gt; nodes = Parser.parseFragment(bodyHtml, dirty.body(), &quot;&quot;, errorList);</b>
+<b class="nc"><i>88</i>&nbsp;        dirty.body().insertChildren(0, nodes);</b>
+<b class="nc"><i>89</i>&nbsp;        int numDiscarded = copySafeNodes(dirty.body(), clean.body());</b>
+<b class="nc"><i>90</i>&nbsp;        return numDiscarded == 0 &amp;&amp; errorList.size() == 0;</b>
+<i>91</i>&nbsp;    }
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;    /**
+<i>94</i>&nbsp;     Iterates the input and copies trusted nodes (tags, attributes, text) into the destination.
+<i>95</i>&nbsp;     */
+<b class="nc"><i>96</i>&nbsp;    private final class CleaningVisitor implements NodeVisitor {</b>
+<b class="nc"><i>97</i>&nbsp;        private int numDiscarded = 0;</b>
+<i>98</i>&nbsp;        private final Element root;
+<i>99</i>&nbsp;        private Element destination; // current element to append nodes to
+<i>100</i>&nbsp;
+<b class="nc"><i>101</i>&nbsp;        private CleaningVisitor(Element root, Element destination) {</b>
+<b class="nc"><i>102</i>&nbsp;            this.root = root;</b>
+<b class="nc"><i>103</i>&nbsp;            this.destination = destination;</b>
+<i>104</i>&nbsp;        }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;        public void head(Node source, int depth) {
+<b class="nc"><i>107</i>&nbsp;            if (source instanceof Element) {</b>
+<b class="nc"><i>108</i>&nbsp;                Element sourceEl = (Element) source;</b>
+<i>109</i>&nbsp;
+<b class="nc"><i>110</i>&nbsp;                if (whitelist.isSafeTag(sourceEl.tagName())) { // safe, clone and copy safe attrs</b>
+<b class="nc"><i>111</i>&nbsp;                    ElementMeta meta = createSafeElement(sourceEl);</b>
+<b class="nc"><i>112</i>&nbsp;                    Element destChild = meta.el;</b>
+<b class="nc"><i>113</i>&nbsp;                    destination.appendChild(destChild);</b>
+<i>114</i>&nbsp;
+<b class="nc"><i>115</i>&nbsp;                    numDiscarded += meta.numAttribsDiscarded;</b>
+<b class="nc"><i>116</i>&nbsp;                    destination = destChild;</b>
+<b class="nc"><i>117</i>&nbsp;                } else if (source != root) { // not a safe tag, so don&#39;t add. don&#39;t count root against discarded.</b>
+<b class="nc"><i>118</i>&nbsp;                    numDiscarded++;</b>
+<i>119</i>&nbsp;                }
+<b class="nc"><i>120</i>&nbsp;            } else if (source instanceof TextNode) {</b>
+<b class="nc"><i>121</i>&nbsp;                TextNode sourceText = (TextNode) source;</b>
+<b class="nc"><i>122</i>&nbsp;                TextNode destText = new TextNode(sourceText.getWholeText());</b>
+<b class="nc"><i>123</i>&nbsp;                destination.appendChild(destText);</b>
+<b class="nc"><i>124</i>&nbsp;            } else if (source instanceof DataNode &amp;&amp; whitelist.isSafeTag(source.parent().nodeName())) {</b>
+<b class="nc"><i>125</i>&nbsp;              DataNode sourceData = (DataNode) source;</b>
+<b class="nc"><i>126</i>&nbsp;              DataNode destData = new DataNode(sourceData.getWholeData());</b>
+<b class="nc"><i>127</i>&nbsp;              destination.appendChild(destData);</b>
+<b class="nc"><i>128</i>&nbsp;            } else { // else, we don&#39;t care about comments, xml proc instructions, etc</b>
+<b class="nc"><i>129</i>&nbsp;                numDiscarded++;</b>
+<i>130</i>&nbsp;            }
+<i>131</i>&nbsp;        }
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;        public void tail(Node source, int depth) {
+<b class="nc"><i>134</i>&nbsp;            if (source instanceof Element &amp;&amp; whitelist.isSafeTag(source.nodeName())) {</b>
+<b class="nc"><i>135</i>&nbsp;                destination = destination.parent(); // would have descended, so pop destination stack</b>
+<i>136</i>&nbsp;            }
+<i>137</i>&nbsp;        }
+<i>138</i>&nbsp;    }
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;    private int copySafeNodes(Element source, Element dest) {
+<b class="nc"><i>141</i>&nbsp;        CleaningVisitor cleaningVisitor = new CleaningVisitor(source, dest);</b>
+<b class="nc"><i>142</i>&nbsp;        NodeTraversor.traverse(cleaningVisitor, source);</b>
+<b class="nc"><i>143</i>&nbsp;        return cleaningVisitor.numDiscarded;</b>
+<i>144</i>&nbsp;    }
+<i>145</i>&nbsp;
+<i>146</i>&nbsp;    private ElementMeta createSafeElement(Element sourceEl) {
+<b class="nc"><i>147</i>&nbsp;        String sourceTag = sourceEl.tagName();</b>
+<b class="nc"><i>148</i>&nbsp;        Attributes destAttrs = new Attributes();</b>
+<b class="nc"><i>149</i>&nbsp;        Element dest = new Element(Tag.valueOf(sourceTag), sourceEl.baseUri(), destAttrs);</b>
+<b class="nc"><i>150</i>&nbsp;        int numDiscarded = 0;</b>
+<i>151</i>&nbsp;
+<b class="nc"><i>152</i>&nbsp;        Attributes sourceAttrs = sourceEl.attributes();</b>
+<b class="nc"><i>153</i>&nbsp;        for (Attribute sourceAttr : sourceAttrs) {</b>
+<b class="nc"><i>154</i>&nbsp;            if (whitelist.isSafeAttribute(sourceTag, sourceEl, sourceAttr))</b>
+<b class="nc"><i>155</i>&nbsp;                destAttrs.put(sourceAttr);</b>
+<i>156</i>&nbsp;            else
+<b class="nc"><i>157</i>&nbsp;                numDiscarded++;</b>
+<b class="nc"><i>158</i>&nbsp;        }</b>
+<b class="nc"><i>159</i>&nbsp;        Attributes enforcedAttrs = whitelist.getEnforcedAttributes(sourceTag);</b>
+<b class="nc"><i>160</i>&nbsp;        destAttrs.addAll(enforcedAttrs);</b>
+<i>161</i>&nbsp;
+<b class="nc"><i>162</i>&nbsp;        return new ElementMeta(dest, numDiscarded);</b>
+<i>163</i>&nbsp;    }
+<i>164</i>&nbsp;
+<i>165</i>&nbsp;    private static class ElementMeta {
+<i>166</i>&nbsp;        Element el;
+<i>167</i>&nbsp;        int numAttribsDiscarded;
+<i>168</i>&nbsp;
+<b class="nc"><i>169</i>&nbsp;        ElementMeta(Element el, int numAttribsDiscarded) {</b>
+<b class="nc"><i>170</i>&nbsp;            this.el = el;</b>
+<b class="nc"><i>171</i>&nbsp;            this.numAttribsDiscarded = numAttribsDiscarded;</b>
+<i>172</i>&nbsp;        }
+<i>173</i>&nbsp;    }
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-22 12:34</div>
+</div>
+</body>
+</html>

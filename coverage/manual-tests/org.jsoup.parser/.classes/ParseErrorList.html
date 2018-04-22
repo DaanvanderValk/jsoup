@@ -1,0 +1,117 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ParseErrorList</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.jsoup.parser</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ParseErrorList (org.jsoup.parser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ParseErrorList</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/ 7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package org.jsoup.parser;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.ArrayList;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp; * A container for ParseErrors.
+<i>7</i>&nbsp; * 
+<i>8</i>&nbsp; * @author Jonathan Hedley
+<i>9</i>&nbsp; */
+<i>10</i>&nbsp;public class ParseErrorList extends ArrayList&lt;ParseError&gt;{
+<i>11</i>&nbsp;    private static final int INITIAL_CAPACITY = 16;
+<i>12</i>&nbsp;    private final int maxSize;
+<i>13</i>&nbsp;    
+<i>14</i>&nbsp;    ParseErrorList(int initialCapacity, int maxSize) {
+<b class="fc"><i>15</i>&nbsp;        super(initialCapacity);</b>
+<b class="fc"><i>16</i>&nbsp;        this.maxSize = maxSize;</b>
+<b class="fc"><i>17</i>&nbsp;    }</b>
+<i>18</i>&nbsp;    
+<i>19</i>&nbsp;    boolean canAddError() {
+<b class="fc"><i>20</i>&nbsp;        return size() &lt; maxSize;</b>
+<i>21</i>&nbsp;    }
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    int getMaxSize() {
+<b class="nc"><i>24</i>&nbsp;        return maxSize;</b>
+<i>25</i>&nbsp;    }
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    public static ParseErrorList noTracking() {
+<b class="fc"><i>28</i>&nbsp;        return new ParseErrorList(0, 0);</b>
+<i>29</i>&nbsp;    }
+<i>30</i>&nbsp;    
+<i>31</i>&nbsp;    public static ParseErrorList tracking(int maxSize) {
+<b class="fc"><i>32</i>&nbsp;        return new ParseErrorList(INITIAL_CAPACITY, maxSize);</b>
+<i>33</i>&nbsp;    }
+<i>34</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-04-19 13:25</div>
+</div>
+</body>
+</html>
