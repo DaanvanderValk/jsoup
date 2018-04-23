@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true, useJEE = true) 
 public class ChangeNotifyingArrayList_ESTest extends ChangeNotifyingArrayList_ESTest_scaffolding {
-  @Ignore
+  //@Ignore
   @Test
   public void notGeneratedAnyTest() {
     // EvoSuite did not generate any tests
