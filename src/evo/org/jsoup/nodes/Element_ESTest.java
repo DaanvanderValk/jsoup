@@ -5,6 +5,7 @@
 
 package org.jsoup.nodes;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.shaded.org.mockito.Mockito.*;
@@ -17566,6 +17567,7 @@ public class Element_ESTest extends Element_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test053()  throws Throwable  {
       Document document0 = new Document("org.jsoup.nodes.Element$1");
@@ -31566,6 +31568,7 @@ public class Element_ESTest extends Element_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test085()  throws Throwable  {
       Document document0 = Document.createShell("");
@@ -40340,6 +40343,7 @@ public class Element_ESTest extends Element_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test105()  throws Throwable  {
       Document document0 = Document.createShell("");
@@ -47445,6 +47449,7 @@ public class Element_ESTest extends Element_ESTest_scaffolding {
       assertNotNull(elements0);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test119()  throws Throwable  {
       Document document0 = Document.createShell("dnPrAdICB}>k");
@@ -49315,6 +49320,7 @@ public class Element_ESTest extends Element_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test126()  throws Throwable  {
       Document document0 = Document.createShell("dnPrAdICB}>k");
@@ -68687,6 +68693,7 @@ public class Element_ESTest extends Element_ESTest_scaffolding {
       }
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test212()  throws Throwable  {
       Document document0 = Document.createShell("5>X@^");
@@ -70841,6 +70848,7 @@ public class Element_ESTest extends Element_ESTest_scaffolding {
       assertNotNull(string0);
   }
 
+  @Ignore
   @Test(timeout = 4000)
   public void test229()  throws Throwable  {
       String string0 = "";
