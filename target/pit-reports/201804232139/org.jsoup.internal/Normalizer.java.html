@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>Normalizer.java</h1>
+
+<table class="src">
+
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_1'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package org.jsoup.internal;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_2'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_3'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.Locale;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_4'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_5'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''>/**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_6'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Util methods for normalizing strings. Jsoup internal use only, please don&#39;t depend on this API.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_7'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''> */</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_8'></a>
+<span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>public final class Normalizer {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_9'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_10'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public static String lowerCase(final String input) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_11'/>
+11
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_11'>2</a>
+<span>
+
+1. lowerCase : mutated return of Object value for org/jsoup/internal/Normalizer::lowerCase to ( if (x != null) null else throw new RuntimeException ) &rarr; SURVIVED<br/>
+
+2. lowerCase : negated conditional &rarr; KILLED<br/>
+
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        return input != null ? input.toLowerCase(Locale.ENGLISH) : &#34;&#34;;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_12'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_13'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_14'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public static String normalize(final String input) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_15'/>
+15
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_15'>1</a>
+<span>
+
+1. normalize : mutated return of Object value for org/jsoup/internal/Normalizer::normalize to ( if (x != null) null else throw new RuntimeException ) &rarr; SURVIVED<br/>
+
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        return lowerCase(input).trim();</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_16'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@412195aa_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_17'></a>
+<span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@412195aa_11'>11</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_11'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>lowerCase<br/><b>Killed by : </b>org.jsoup.nodes.Element_ESTest.org.jsoup.nodes.Element_ESTest</span></span> negated conditional &rarr; KILLED</p> <p class='SURVIVED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>lowerCase<br/><b>Killed by : </b>none</span></span> mutated return of Object value for org/jsoup/internal/Normalizer::lowerCase to ( if (x != null) null else throw new RuntimeException ) &rarr; SURVIVED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@412195aa_15'>15</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@412195aa_15'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>normalize<br/><b>Killed by : </b>none</span></span> mutated return of Object value for org/jsoup/internal/Normalizer::normalize to ( if (x != null) null else throw new RuntimeException ) &rarr; SURVIVED</p> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+
+<li class='mutator'>INCREMENTS_MUTATOR</li>
+
+<li class='mutator'>VOID_METHOD_CALL_MUTATOR</li>
+
+<li class='mutator'>RETURN_VALS_MUTATOR</li>
+
+<li class='mutator'>MATH_MUTATOR</li>
+
+<li class='mutator'>NEGATE_CONDITIONALS_MUTATOR</li>
+
+<li class='mutator'>INVERT_NEGS_MUTATOR</li>
+
+<li class='mutator'>CONDITIONALS_BOUNDARY_MUTATOR</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>org.jsoup.internal.Normalizer_ESTest.org.jsoup.internal.Normalizer_ESTest (14 ms)</li><li>org.jsoup.select.QueryParser_ESTest.org.jsoup.select.QueryParser_ESTest (453 ms)</li><li>org.jsoup.parser.Tag_ESTest.org.jsoup.parser.Tag_ESTest (492 ms)</li><li>org.jsoup.nodes.Element_ESTest.org.jsoup.nodes.Element_ESTest (1274 ms)</li><li>org.jsoup.nodes.XmlDeclaration_ESTest.org.jsoup.nodes.XmlDeclaration_ESTest (452 ms)</li><li>org.jsoup.nodes.DocumentType_ESTest.org.jsoup.nodes.DocumentType_ESTest (535 ms)</li><li>org.jsoup.parser.HtmlTreeBuilder_ESTest.org.jsoup.parser.HtmlTreeBuilder_ESTest (1303 ms)</li><li>org.jsoup.parser.Token_ESTest.org.jsoup.parser.Token_ESTest (444 ms)</li><li>org.jsoup.nodes.LeafNode_ESTest.org.jsoup.nodes.LeafNode_ESTest (624 ms)</li><li>org.jsoup.nodes.Attribute_ESTest.org.jsoup.nodes.Attribute_ESTest (654 ms)</li><li>org.jsoup.examples.Wikipedia_ESTest.org.jsoup.examples.Wikipedia_ESTest (570 ms)</li><li>org.jsoup.parser.ParseSettings_ESTest.org.jsoup.parser.ParseSettings_ESTest (39 ms)</li><li>org.jsoup.nodes.Document_ESTest.org.jsoup.nodes.Document_ESTest (628 ms)</li><li>org.jsoup.safety.Cleaner_ESTest.org.jsoup.safety.Cleaner_ESTest (815 ms)</li><li>org.jsoup.nodes.DataNode_ESTest.org.jsoup.nodes.DataNode_ESTest (683 ms)</li><li>org.jsoup.select.Selector_ESTest.org.jsoup.select.Selector_ESTest (779 ms)</li><li>org.jsoup.select.NodeTraversor_ESTest.org.jsoup.select.NodeTraversor_ESTest (698 ms)</li><li>org.jsoup.select.Evaluator_ESTest.org.jsoup.select.Evaluator_ESTest (562 ms)</li><li>org.jsoup.safety.Whitelist_ESTest.org.jsoup.safety.Whitelist_ESTest (768 ms)</li><li>org.jsoup.nodes.Comment_ESTest.org.jsoup.nodes.Comment_ESTest (490 ms)</li><li>org.jsoup.helper.HttpConnection_ESTest.org.jsoup.helper.HttpConnection_ESTest (956 ms)</li><li>org.jsoup.Jsoup_ESTest.org.jsoup.Jsoup_ESTest (2836 ms)</li><li>org.jsoup.helper.DataUtil_ESTest.org.jsoup.helper.DataUtil_ESTest (994 ms)</li><li>org.jsoup.parser.Tokeniser_ESTest.org.jsoup.parser.Tokeniser_ESTest (715 ms)</li><li>org.jsoup.nodes.TextNode_ESTest.org.jsoup.nodes.TextNode_ESTest (852 ms)</li><li>org.jsoup.parser.XmlTreeBuilder_ESTest.org.jsoup.parser.XmlTreeBuilder_ESTest (584 ms)</li><li>org.jsoup.nodes.FormElement_ESTest.org.jsoup.nodes.FormElement_ESTest (611 ms)</li><li>org.jsoup.parser.Parser_ESTest.org.jsoup.parser.Parser_ESTest (652 ms)</li><li>org.jsoup.parser.TreeBuilder_ESTest.org.jsoup.parser.TreeBuilder_ESTest (535 ms)</li><li>org.jsoup.nodes.Attributes_ESTest.org.jsoup.nodes.Attributes_ESTest (736 ms)</li><li>org.jsoup.select.Elements_ESTest.org.jsoup.select.Elements_ESTest (1665 ms)</li><li>org.jsoup.nodes.CDataNode_ESTest.org.jsoup.nodes.CDataNode_ESTest (537 ms)</li><li>org.jsoup.nodes.Node_ESTest.org.jsoup.nodes.Node_ESTest (770 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='http://pitest.org'>PIT</a> 1.3.2
+
+</body>
+</html>
