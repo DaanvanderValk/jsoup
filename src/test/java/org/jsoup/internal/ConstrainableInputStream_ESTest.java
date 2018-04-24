@@ -67,7 +67,8 @@ public class ConstrainableInputStream_ESTest extends ConstrainableInputStream_ES
   @Ignore
   @Test(timeout = 4000)
   public void test04()  throws Throwable  {
-      Enumeration<ConstrainableInputStream> enumeration0 = (Enumeration<ConstrainableInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());
+      Enumeration<ConstrainableInputStream> enumeration0 = (Enumeration<ConstrainableInputStream>)
+              mock(Enumeration.class, new ViolatedAssumptionAnswer());
       doReturn(false).when(enumeration0).hasMoreElements();
       SequenceInputStream sequenceInputStream0 = new SequenceInputStream(enumeration0);
       // Undeclared exception!
